@@ -1,3 +1,22 @@
+# SANSKAAR: Indian Wedding & Ethnic Wear website
+
+Static website for **SANSKAAR**, a men's and women's wedding and ethnic wear brand with a royal Rajasthani theme. It lives in [`sanskaar/`](sanskaar/).
+
+**Run it:** open `sanskaar/index.html` in a browser, or serve the folder (`cd sanskaar && python3 -m http.server`). No build step is needed. It can be hosted on GitHub Pages, Netlify or any static host.
+
+| Page | What it does |
+|------|--------------|
+| `index.html` | Home: hero, shop by category, groom & bride edits, occasions, bestsellers, collections, story, appointment booking |
+| `catalog.html` | Full catalogue with filters (men/women, category, occasion, collection, colour, price), search, sort and wishlist |
+| `product.html?id=SKU` | Product page: front/back/side/close-up gallery with zoom, sizes, bag, WhatsApp enquiry, complete-the-look |
+
+- **Edit products:** `sanskaar/js/catalog-data.js` (50 products across 10 categories).
+- **Business details** (WhatsApp number, phone, address): top of `sanskaar/js/app.js`.
+- **Add real photos:** see `sanskaar/images/README.md`.
+- Checkout and appointment requests go to WhatsApp, so no payment backend is needed yet.
+
+---
+
 **Sample Project: PMI Conference Registration Website**
 
 As the Project Manager for the PMI Conference Registration Website, I successfully led the end-to-end development of a comprehensive online platform aimed at streamlining the registration process and enhancing the overall attendee experience. This project involved a range of key project management activities, including the preparation of the Business Case, Project Charter, creation of Work Breakdown Structures (WBS), budgeting, and sprint planning. 

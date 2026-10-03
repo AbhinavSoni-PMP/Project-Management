@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Catalogue · SANSKAAR</title>
+<meta name="description" content="Browse the complete Sanskaar catalogue of Indian wedding and ethnic wear for men and women.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#6b0f1a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%236b0f1a'/%3E%3Ctext x='32' y='44' font-family='Georgia' font-size='36' text-anchor='middle' fill='%23e8d39a'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="catalog">
+<div id="site-header"></div>
+<main>
+  <section class="page-hero">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Catalogue</div>
+    <h1 id="cat-title">The Complete Catalogue</h1>
+    <p id="cat-sub"></p>
+  </section>
+  <div class="container catalog-layout">
+    <aside class="filters" id="filters" aria-label="Filters">
+      <h3>Filters <button class="clear" id="clear-filters">Clear all</button></h3>
+      <div id="filters-body"></div>
+      <button class="btn btn-primary btn-block filter-toggle" data-close style="margin-top:16px">Show results</button>
+    </aside>
+    <section>
+      <div class="toolbar">
+        <button class="btn btn-outline filter-toggle" id="filter-toggle" style="padding:10px 18px">Filters</button>
+        <span class="count" id="result-count"></span>
+        <label>
+          <span class="sr-only">Sort by</span>
+          <select id="sort">
+            <option value="featured">Sort: Featured</option>
+            <option value="new">Newest first</option>
+            <option value="price-asc">Price: Low to high</option>
+            <option value="price-desc">Price: High to low</option>
+            <option value="discount">Best offers</option>
+          </select>
+        </label>
+      </div>
+      <div class="active-filters" id="active-filters"></div>
+      <div class="product-grid" id="catalog-grid"></div>
+    </section>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="js/catalog-data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
