@@ -343,7 +343,12 @@ SANSKAAR.config = {
     return `<img src="${src}" alt="${esc(alt)}" ${eager ? "" : 'loading="lazy"'} onerror="this.remove()">`;
   }
   function media(p, view = "front", eager) {
-    const src = (p.photos && p.photos[view]) || `images/products/${p.id}/${view}.jpg`;
+    // products with a `photos` list use only those shots; others probe the folder
+    if (p.photos) {
+      const shot = p.photos.includes(view) ? view : p.photos[0];
+      return `<div class="ph">${photoLayer(`images/products/${p.id}/${shot}.jpg`, `${p.name} — ${view} view`, eager)}</div>`;
+    }
+    const src = `images/products/${p.id}/${view}.jpg`;
     return `<div class="ph">${Art.garment(p, view)}${photoLayer(src, `${p.name} — ${view} view`, eager)}</div>`;
   }
   // site imagery (hero, banners, collections) with an illustrated fallback
@@ -360,7 +365,7 @@ SANSKAAR.config = {
       <a href="product.html?id=${p.id}" class="media" aria-label="${esc(p.name)}">
         ${tag}
         <div class="v main">${media(p, "front")}</div>
-        <div class="v alt">${media(p, "back")}</div>
+        <div class="v alt">${media(p, p.photos ? (p.photos[1] || p.photos[0]) : "back")}</div>
         <span class="quick" data-quick="${p.id}">Quick add · Size ${p.sizes[2]}</span>
       </a>
       <button class="wish ${wish.has(p.id) ? "on" : ""}" data-wish="${p.id}" aria-label="Add to wishlist">${I.heart}</button>
@@ -623,7 +628,7 @@ SANSKAAR.config = {
       if (s === "price-desc") return list.sort((a, b) => b.price - a.price);
       if (s === "new") return list.sort((a, b) => (b.tag === "new") - (a.tag === "new"));
       if (s === "discount") return list.sort((a, b) => ((b.mrp ? 1 - b.price / b.mrp : 0) - (a.mrp ? 1 - a.price / a.mrp : 0)));
-      return list.sort((a, b) => (b.tag === "bestseller") - (a.tag === "bestseller"));
+      return list.sort((a, b) => (!!b.photos - !!a.photos) || ((b.tag === "bestseller") - (a.tag === "bestseller")));
     }
 
     function drawGrid() {
@@ -673,8 +678,8 @@ SANSKAAR.config = {
     document.title = `${p.name} · SANSKAAR`;
     const c = collOf(p.collection);
     const off = p.mrp ? Math.round((1 - p.price / p.mrp) * 100) : 0;
-    const views = ["front", "back", "side", "detail"];
-    const viewNames = { front: "Front", back: "Back", side: "Side", detail: "Close-up" };
+    const views = p.photos || ["front", "back", "side", "detail"];
+    const viewNames = { front: "Front", back: "Back", side: "Side", detail: "Close-up", flatlay: "Flat lay" };
     const siblings = S.products.filter(x => x.category === p.category && x.id !== p.id);
     const includes = {
       sherwani: "Sherwani, churidar, stole", bandhgala: "Bandhgala jacket, trousers", indowestern: "Indo-western jacket, dhoti trousers",

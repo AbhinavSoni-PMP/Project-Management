@@ -15,6 +15,11 @@ Create a folder named after the product's SKU (shown on every product page, and 
 | `side.jpg`   | Three-quarter or side angle                      |
 | `detail.jpg` | Close-up of embroidery / fabric / buttons        |
 
+If a product has only some shots (e.g. no back view), list the ones you have in
+`js/catalog-data.js` (see the `photos` list at the bottom of that file, e.g.
+`["front", "detail"]`) and the site shows exactly those. A flat-lay shot can be
+named `flatlay.jpg`.
+
 ## Site photos (home page)
 
 | File                                  | Where it appears                          |

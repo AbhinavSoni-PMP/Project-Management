@@ -92,6 +92,17 @@ SANSKAAR.colors = {
   const S = "#e8e2d6"; // silver zari
 
   SANSKAAR.products = [
+    /* ---------------- MEN · STUDIO-PHOTOGRAPHED (real product photos) ---------------- */
+    p("SK-M-IWS-101", "Neel Kamal Velvet Indo-Western", "men", "indowestern", "marwar", ["reception", "sangeet", "wedding"], "black", "#8fb3e0", "#1c1a1a", 24999, 28999, "Velvet with sequin jaal", "Blue & silver floral thread embroidery", "new",
+      "Midnight-black velvet worked with an all-over sequin jaal and cascading blue and silver florals along the hem and sleeves. Open-front cut over a black satin bandhgala kurta with antique-gold buttons, paired with tailored satin trousers."),
+    p("SK-M-IWS-102", "Gulnaar Velvet Indo-Western", "men", "indowestern", "rajwada", ["reception", "sangeet", "festive"], "black", "#e46a8f", "#1c1a1a", 24999, 28999, "Velvet with sequin jaal", "Multicolour floral thread embroidery", "new",
+      "Black sequinned velvet blooming with rose, coral and sage florals across the hem, cuffs and shoulders, finished with an embroidered border. Worn open over a black satin inner kurta with gold buttons."),
+    p("SK-M-IWS-103", "Phoolbagh Sequin Velvet Jacket", "men", "indowestern", "gulabi", ["sangeet", "reception", "festive"], "black", "#e7a3c4", "#1c1a1a", 23999, 27999, "Velvet with sequin jaal", "Pastel daisy thread embroidery", "new",
+      "A garden of pink, lilac and ivory daisies scattered over black sequinned velvet, growing into a dense floral border at the hem. Open-front jacket over a black satin inner kurta."),
+    p("SK-M-IWS-104", "Chandni Ivory Indo-Western", "men", "indowestern", "thar", ["wedding", "reception", "festive"], "ivory", "#c9b28a", "#efe4cc", 26999, 30999, "Silk blend", "Champagne threadwork & scalloped sequin border", "new",
+      "Ivory silk-blend with delicate champagne butis, a floral vine at the hem and a scalloped sequin border. Layered over a matching ivory bandhgala kurta with pearl-tone buttons and a pocket square."),
+    p("SK-M-IWS-105", "Gulabi Chandni Ivory Indo-Western", "men", "indowestern", "udaipur", ["wedding", "reception", "festive"], "ivory", "#a8737f", "#efe4cc", 26999, 30999, "Silk blend", "Rosewood threadwork & scalloped sequin border", "new",
+      "Ivory silk-blend embroidered in soft rosewood tones: scattered butis, a blossoming vine and a scalloped sequin border at the hem and cuffs. Over a matching ivory bandhgala kurta with a pocket square."),
     /* ---------------- MEN · SHERWANI ---------------- */
     p("SK-M-SHW-001", "Maharaja Zardozi Sherwani", "men", "sherwani", "rajwada", ["wedding"], "ivory", G, "#efe4cc", 64999, 79999, "Raw silk", "Hand zardozi, dabka & sequin", "bestseller",
       "An heirloom ivory sherwani hand-embroidered with zardozi peacocks along the hem and cuffs. Paired with a matching churidar and a silk stole."),
@@ -218,3 +229,8 @@ SANSKAAR.colors = {
   ];
 
 })();
+
+// Real studio photos (images/products/<SKU>/<shot>.jpg) for these products
+[["SK-M-IWS-101", ["front", "detail"]], ["SK-M-IWS-102", ["front", "detail"]], ["SK-M-IWS-103", ["flatlay", "detail"]],
+ ["SK-M-IWS-104", ["front", "detail"]], ["SK-M-IWS-105", ["front", "detail"]]]
+  .forEach(([id, shots]) => { SANSKAAR.products.find(p => p.id === id).photos = shots; });

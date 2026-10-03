@@ -163,6 +163,7 @@ p { margin: 0 0 1em; }
 .hero { position: relative; min-height: calc(100vh - var(--header-h) - 33px); min-height: calc(100svh - var(--header-h) - 33px); display: flex; align-items: center; overflow: hidden; margin-top: calc(-1 * var(--header-h)); padding-top: var(--header-h); }
 .hero-bg { position: absolute; inset: 0; }
 .hero-bg .ph { background: #0b0908; }
+.hero-bg .ph > img { object-position: 78% 100%; }
 .hero-bg img, .hero-bg svg { animation: slowzoom 18s ease-out both; }
 @keyframes slowzoom { from { transform: scale(1.08); } to { transform: scale(1); } }
 .hero::after {
