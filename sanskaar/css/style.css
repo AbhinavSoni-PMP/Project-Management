@@ -32,7 +32,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; color-scheme: dark; }
+html, :root { scroll-behavior: smooth; color-scheme: dark; }
 body {
   margin: 0;
   font-family: var(--sans);
@@ -101,7 +101,7 @@ p { margin: 0 0 1em; }
 }
 .announce a { color: var(--gold-2); }
 .site-header {
-  position: sticky; top: 0; z-index: 50;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
   background: rgba(14, 12, 11, .55); backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border-bottom: 1px solid var(--line-soft);
@@ -497,8 +497,9 @@ p { margin: 0 0 1em; }
 .mobile-nav > a { display: block; padding: 16px 0; border-bottom: 1px solid var(--line-soft); font-family: var(--serif); font-size: 22px; }
 .mobile-nav .search-pill { border-bottom: 1px solid var(--line); margin: 8px 0 6px; }
 
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
-.reveal.in { opacity: 1; transform: none; }
+.reveal { transition: opacity 1s var(--ease), transform 1s var(--ease); }
+.reveal.pre { opacity: 0; transform: translateY(30px); }
+.reveal.pre.in { opacity: 1; transform: none; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) {
@@ -572,5 +573,5 @@ p { margin: 0 0 1em; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .reveal { opacity: 1; transform: none; }
+  .reveal.pre { opacity: 1; transform: none; }
 }

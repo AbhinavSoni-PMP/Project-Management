@@ -8,7 +8,7 @@ Static website for **SANSKAAR**, an Indian wedding couture brand for the bride a
 |------|--------------|
 | `index.html` | Home: full-screen hero, bride & groom edits, couture catalog with tabs and search, 3-step Style Advisor quiz, collections, The Atelier, consultation booking |
 | `catalog.html` | Full catalogue with filters (men/women, category, occasion, collection, colour, price), search, sort and wishlist |
-| `product.html?id=SKU` | Product page: front/back/side/close-up gallery with zoom, sizes, bag, WhatsApp enquiry, complete-the-look |
+| `product.html#id.SKU` | Product page: front/back/side/close-up gallery with zoom, sizes, bag, WhatsApp enquiry, complete-the-look |
 
 - **Edit products:** `sanskaar/js/catalog-data.js` (52 products across 10 categories).
 - **Business details** (WhatsApp number, phone, address): top of `sanskaar/js/app.js`.
