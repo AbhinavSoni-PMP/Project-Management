@@ -10,7 +10,7 @@ Static website for **SANSKAAR**, a men's and women's wedding and ethnic wear bra
 | `catalog.html` | Full catalogue with filters (men/women, category, occasion, collection, colour, price), search, sort and wishlist |
 | `product.html?id=SKU` | Product page: front/back/side/close-up gallery with zoom, sizes, bag, WhatsApp enquiry, complete-the-look |
 
-- **Edit products:** `sanskaar/js/catalog-data.js` (50 products across 10 categories).
+- **Edit products:** `sanskaar/js/catalog-data.js` (52 products across 10 categories).
 - **Business details** (WhatsApp number, phone, address): top of `sanskaar/js/app.js`.
 - **Add real photos:** see `sanskaar/images/README.md`.
 - Checkout and appointment requests go to WhatsApp, so no payment backend is needed yet.
