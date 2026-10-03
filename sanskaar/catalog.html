@@ -1,34 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Catalogue · SANSKAAR</title>
-<meta name="description" content="Browse the complete Sanskaar catalogue of Indian wedding and ethnic wear for men and women.">
+<title>Couture Catalog · SANSKAAR</title>
+<meta name="description" content="Browse the SANSKAAR couture catalog of Indian wedding and festive wear for the bride, groom and family.">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#6b0f1a">
+<meta name="theme-color" content="#0e0c0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%236b0f1a'/%3E%3Ctext x='32' y='44' font-family='Georgia' font-size='36' text-anchor='middle' fill='%23e8d39a'%3ES%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%230e0c0b%27/%3E%3Ctext x=%2732%27 y=%2745%27 font-family=%27Georgia%27 font-size=%2738%27 text-anchor=%27middle%27 fill=%27%23e3c886%27%3ES%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body data-page="catalog">
+<body data-page="catalog" data-nav="catalog">
 <div id="site-header"></div>
 <main>
   <section class="page-hero">
-    <div class="breadcrumb"><a href="index.html">Home</a> / Catalogue</div>
-    <h1 id="cat-title">The Complete Catalogue</h1>
-    <p id="cat-sub"></p>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Couture Catalog</div>
+      <h1 id="cat-title">The Couture Catalog</h1>
+      <p id="cat-sub"></p>
+    </div>
   </section>
   <div class="container catalog-layout">
     <aside class="filters" id="filters" aria-label="Filters">
-      <h3>Filters <button class="clear" id="clear-filters">Clear all</button></h3>
+      <h3>Refine <button class="clear" id="clear-filters">Clear all</button></h3>
       <div id="filters-body"></div>
-      <button class="btn btn-primary btn-block filter-toggle" data-close style="margin-top:16px">Show results</button>
+      <button class="btn btn-gold btn-block filter-toggle" data-close style="margin-top:18px">Show results</button>
     </aside>
     <section>
       <div class="toolbar">
-        <button class="btn btn-outline filter-toggle" id="filter-toggle" style="padding:10px 18px">Filters</button>
+        <button class="btn btn-outline filter-toggle" id="filter-toggle" style="padding:11px 20px">Filters</button>
+        <label class="search-pill" style="flex:1;max-width:360px;border-bottom:1px solid var(--line)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Search the catalog…" aria-label="Search the catalog"></label>
         <span class="count" id="result-count"></span>
         <label>
           <span class="sr-only">Sort by</span>

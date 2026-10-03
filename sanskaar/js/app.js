@@ -59,7 +59,7 @@ SANSKAAR.config = {
     festive: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 32h28c-2 6-7 8-14 8s-12-2-14-8z"/><path d="M24 30c-4-3-4-8 0-14 4 6 4 11 0 14z"/><path d="M24 8v3"/></svg>'
   };
 
-  const ornament = `<div class="ornament">${I.lotus}</div>`;
+  const ornament = `<div class="divider" style="margin:0 auto 22px"></div>`;
 
   /* ---------- Header / nav ---------- */
   function megaMenu(gender) {
@@ -76,12 +76,10 @@ SANSKAAR.config = {
       </ul></div>
       <div><h4>Collections</h4><ul>
         ${S.collections.map(c => `<li><a href="catalog.html?gender=${gender}&collection=${c.key}">${c.name}</a></li>`).join("")}
-        <li><a href="catalog.html?gender=${gender}&tag=new">New arrivals</a></li>
       </ul></div>
       <a class="mega-feature" href="catalog.html?gender=${gender}&occasion=wedding">
-        <div class="art">${Art.scene({ colors: gender === "men" ? ["#6b0f1a", "#c9a24a"] : ["#9b1b30", "#e8a9b4"], w: 500, h: 260, seed: gender === "men" ? 3 : 9,
-          figure: feature ? Art.figureGroup(feature, 300, 6, .62) : "" })}</div>
-        <div class="txt"><span>The ${g} Edit</span><h3>Wedding ${g === "Groom" ? "Sherwanis" : "Lehengas"}</h3></div>
+        <div class="art">${feature ? media(feature, "front") : ""}</div>
+        <div class="txt"><span class="eyebrow">The ${g} Edit</span><h3>Wedding ${g === "Groom" ? "Sherwanis" : "Lehengas"}</h3></div>
       </a>
     </div></div>`;
   }
@@ -90,57 +88,53 @@ SANSKAAR.config = {
     const el = $("#site-header");
     if (!el) return;
     el.outerHTML = `
-    <div class="announce">Free shipping across India on orders above ${inr(S.config.freeShippingAbove)} &nbsp;·&nbsp; <a href="#" data-open="appointment">Book a styling appointment</a></div>
+    <div class="announce">Complimentary shipping across India above ${inr(S.config.freeShippingAbove)} &nbsp;·&nbsp; <a href="#" data-open="appointment">Book a private bridal consultation</a></div>
     <header class="site-header" id="header">
       <div class="container header-row">
-        <div class="header-left">
-          <button class="icon-btn menu-toggle" data-open="mobile-nav" aria-label="Open menu">${I.menu}</button>
-          <form class="search-inline" action="catalog.html" role="search">
-            ${I.search}<input type="search" name="q" placeholder="Search sherwani, lehenga…" aria-label="Search the catalogue">
-          </form>
-        </div>
+        <button class="icon-btn menu-toggle" data-open="mobile-nav" aria-label="Open menu">${I.menu}</button>
         <a href="index.html" class="logo" aria-label="Sanskaar home">
-          <span class="logo-mark">SANSKAAR</span><span class="logo-sub">संस्कार · since tradition</span>
+          <span class="logo-mark">SANSKAAR</span><span class="logo-sub">Indian Wedding Couture</span>
         </a>
+        <nav class="main-nav" aria-label="Main">
+          <ul>
+            <li><a href="index.html" class="${active === "home" ? "active" : ""}">Home</a></li>
+            <li><a href="catalog.html?gender=women" class="${active === "women" ? "active" : ""}">Bride</a>${megaMenu("women")}</li>
+            <li><a href="catalog.html?gender=men" class="${active === "men" ? "active" : ""}">Groom</a>${megaMenu("men")}</li>
+            <li><a href="index.html#advisor">Style Advisor</a></li>
+            <li><a href="catalog.html" class="${active === "catalog" ? "active" : ""}">Couture Catalog</a></li>
+            <li><a href="index.html#atelier">The Atelier</a></li>
+          </ul>
+        </nav>
         <div class="header-right">
-          <button class="icon-btn hide-sm" data-open="appointment" aria-label="Book appointment" title="Book appointment">${I.calendar}</button>
+          <a class="icon-btn hide-sm" href="catalog.html#search" aria-label="Search">${I.search}</a>
           <a class="icon-btn" href="catalog.html?wishlist=1" aria-label="Wishlist">${I.heart}<span class="badge" id="wish-count"></span></a>
           <button class="icon-btn" data-open="cart" aria-label="Shopping bag">${I.bag}<span class="badge" id="cart-count"></span></button>
+          <a href="#" data-open="appointment" class="btn btn-ghost-gold header-cta">Book Consultation</a>
         </div>
       </div>
-      <nav class="main-nav" aria-label="Main">
-        <ul>
-          <li><a href="catalog.html?tag=new" class="${active === "new" ? "active" : ""}">New In</a></li>
-          <li><a href="catalog.html?gender=men" class="${active === "men" ? "active" : ""}">Men</a>${megaMenu("men")}</li>
-          <li><a href="catalog.html?gender=women" class="${active === "women" ? "active" : ""}">Women</a>${megaMenu("women")}</li>
-          <li><a href="catalog.html?occasion=wedding" class="highlight ${active === "wedding" ? "active" : ""}">Wedding Store</a></li>
-          <li><a href="index.html#collections">Collections</a></li>
-          <li><a href="catalog.html?tag=bestseller">Bestsellers</a></li>
-          <li><a href="index.html#story">Our Story</a></li>
-        </ul>
-      </nav>
-    </header>
-    <div class="border-band thin"></div>`;
+    </header>`;
 
-    // mobile nav
     document.body.insertAdjacentHTML("beforeend", `
     <aside class="mobile-nav" id="mobile-nav" aria-label="Menu">
-      <div class="drawer-head" style="padding:0 0 16px"><span class="logo-mark" style="font-size:22px">SANSKAAR</span><button class="close" data-close>&times;</button></div>
-      <form action="catalog.html" class="search-inline" style="display:flex;margin:6px 0 10px">${I.search}<input type="search" name="q" placeholder="Search…"></form>
-      <a href="catalog.html?tag=new">New In</a>
-      ${["men", "women"].map(g => `<details><summary>${g === "men" ? "Men" : "Women"}</summary><ul>
+      <div class="drawer-head" style="padding:0 0 18px;border:0"><span class="logo-mark" style="font-size:24px">SANSKAAR</span><button class="close" data-close aria-label="Close menu">&times;</button></div>
+      <form action="catalog.html" class="search-pill">${I.search}<input type="search" name="q" placeholder="Search lehenga, sherwani…" aria-label="Search"></form>
+      <a href="index.html">Home</a>
+      ${["women", "men"].map(g => `<details><summary>${g === "men" ? "Groom" : "Bride"}</summary><ul>
         <li><a href="catalog.html?gender=${g}">View all</a></li>
         ${S.categories[g].map(c => `<li><a href="catalog.html?gender=${g}&category=${c.key}">${c.name}</a></li>`).join("")}
       </ul></details>`).join("")}
       <details><summary>Occasions</summary><ul>${S.occasions.map(o => `<li><a href="catalog.html?occasion=${o.key}">${o.name}</a></li>`).join("")}</ul></details>
       <details><summary>Collections</summary><ul>${S.collections.map(c => `<li><a href="catalog.html?collection=${c.key}">${c.name}</a></li>`).join("")}</ul></details>
-      <a href="catalog.html?tag=bestseller">Bestsellers</a>
+      <a href="index.html#advisor">Style Advisor</a>
+      <a href="catalog.html">Couture Catalog</a>
       <a href="catalog.html?wishlist=1">Wishlist</a>
-      <a href="#" data-open="appointment">Book Appointment</a>
-    </aside>`);
+      <a href="#" data-open="appointment" class="btn btn-gold btn-block" style="font-family:var(--sans);font-size:11px;margin-top:24px;border:0">Book Consultation</a>
+    </aside>
+    <a class="wa-float" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent("Namaste SANSKAAR, I'd like some help choosing an outfit.")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">${I.whatsapp}</a>`);
 
     const h = $("#header");
-    window.addEventListener("scroll", () => h.classList.toggle("scrolled", window.scrollY > 10), { passive: true });
+    const onScroll = () => h.classList.toggle("scrolled", window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
   }
 
   /* ---------- Footer ---------- */
@@ -149,46 +143,41 @@ SANSKAAR.config = {
     if (!el) return;
     const cf = S.config;
     el.outerHTML = `
-    <section class="trust container" aria-label="Why shop with us">
-      <div>${I.truck}<p><b>Free shipping</b><span>Across India above ${inr(cf.freeShippingAbove)}</span></p></div>
-      <div>${I.scissors}<p><b>Made to measure</b><span>Free alterations on every outfit</span></p></div>
-      <div>${I.hand}<p><b>Handcrafted</b><span>By Rajasthani karigars</span></p></div>
-      <div>${I.return}<p><b>Easy exchange</b><span>7-day size exchange</span></p></div>
+    <section class="container trust" aria-label="Why shop with us">
+      <div>${I.truck}<p><b>Insured shipping</b><span>Pan-India & worldwide</span></p></div>
+      <div>${I.scissors}<p><b>Bespoke fittings</b><span>Free alterations, made to measure</span></p></div>
+      <div>${I.hand}<p><b>Handcrafted</b><span>By master karigars of Rajasthan</span></p></div>
+      <div>${I.shield}<p><b>Authenticity</b><span>Pure handloom & silk-mark fabrics</span></p></div>
     </section>
-    <section class="newsletter section" style="padding:64px 0">
-      <div class="container">
-        ${ornament}
-        <h2 style="color:var(--maroon);font-size:clamp(28px,3vw,40px)">Join the Sanskaar parivaar</h2>
-        <p style="color:var(--muted)">New collections, wedding styling notes and private previews — straight to your inbox.</p>
-        <form id="newsletter"><input type="email" required placeholder="Your email address" aria-label="Email"><button class="btn btn-primary">Subscribe</button></form>
-      </div>
-    </section>
-    <div class="border-band"></div>
     <footer class="site-footer">
       <div class="container footer-grid">
         <div>
-          <div class="logo"><span class="logo-mark">SANSKAAR</span><span class="logo-sub">संस्कार</span></div>
-          <p style="margin-top:18px;max-width:320px">Wedding and festive couture for men and women, rooted in the craft of Rajasthan and cut for today.</p>
-          <p>${cf.address}<br>${cf.phone} · ${cf.email}</p>
+          <div class="logo"><span class="logo-mark">SANSKAAR</span><span class="logo-sub">Indian Wedding Couture</span></div>
+          <p style="margin-top:22px;max-width:340px">Heirloom wedding couture for the bride, the groom and the family, rooted in the ateliers of Jaipur.</p>
+          <form class="newsletter-inline" id="newsletter"><input type="email" required placeholder="Your email for private previews" aria-label="Email"><button>Join</button></form>
           <div class="socials">
             <a href="${cf.instagram}" aria-label="Instagram">${I.instagram}</a><a href="${cf.facebook}" aria-label="Facebook">${I.facebook}</a>
             <a href="${cf.youtube}" aria-label="YouTube">${I.youtube}</a><a href="${cf.pinterest}" aria-label="Pinterest">${I.pinterest}</a>
           </div>
         </div>
-        <div><h4>Men</h4><ul>${S.categories.men.map(c => `<li><a href="catalog.html?gender=men&category=${c.key}">${c.name}</a></li>`).join("")}</ul></div>
-        <div><h4>Women</h4><ul>${S.categories.women.map(c => `<li><a href="catalog.html?gender=women&category=${c.key}">${c.name}</a></li>`).join("")}</ul></div>
-        <div><h4>Occasions</h4><ul>${S.occasions.map(o => `<li><a href="catalog.html?occasion=${o.key}">${o.name}</a></li>`).join("")}</ul></div>
-        <div><h4>Help</h4><ul>
-          <li><a href="#" data-open="appointment">Book appointment</a></li>
+        <div><h4>Bride</h4><ul>${S.categories.women.map(c => `<li><a href="catalog.html?gender=women&category=${c.key}">${c.name}</a></li>`).join("")}</ul></div>
+        <div><h4>Groom</h4><ul>${S.categories.men.map(c => `<li><a href="catalog.html?gender=men&category=${c.key}">${c.name}</a></li>`).join("")}</ul></div>
+        <div><h4>Client care</h4><ul>
+          <li><a href="#" data-open="appointment">Book consultation</a></li>
           <li><a href="#" data-open="sizeguide">Size guide</a></li>
+          <li><a href="index.html#advisor">Style advisor</a></li>
+          <li><a href="#">Shipping & exchange</a></li>
+        </ul></div>
+        <div><h4>Visit the atelier</h4><ul>
+          <li>${cf.address}</li>
+          <li><a href="tel:${cf.phone.replace(/\s/g, "")}">${cf.phone}</a></li>
+          <li><a href="mailto:${cf.email}">${cf.email}</a></li>
           <li><a href="https://wa.me/${cf.whatsapp}" target="_blank" rel="noopener">WhatsApp us</a></li>
-          <li><a href="#">Shipping & returns</a></li>
-          <li><a href="#">Store locator</a></li>
         </ul></div>
       </div>
       <div class="container footer-bottom">
-        <span>© ${new Date().getFullYear()} Sanskaar. All rights reserved.</span>
-        <span>Crafted with love in Jaipur, Rajasthan</span>
+        <span>© ${new Date().getFullYear()} SANSKAAR. All rights reserved.</span>
+        <span>Crafted in Jaipur, Rajasthan</span>
       </div>
     </footer>`;
   }
@@ -206,8 +195,9 @@ SANSKAAR.config = {
       <div class="modal-card">
         <button class="close" data-close aria-label="Close">&times;</button>
         ${ornament}
-        <h3 id="appt-title">Book a Styling Appointment</h3>
-        <p style="text-align:center;color:var(--muted)">Meet our stylists in store or over video call. We'll confirm on WhatsApp.</p>
+        <span class="eyebrow">Private consultation</span>
+        <h3 id="appt-title">Book your <em>bespoke</em> session</h3>
+        <p class="intro">Meet our couturiers at the Jaipur atelier or over a video call. We'll confirm on WhatsApp.</p>
         <form id="appt-form" class="form-grid">
           <div class="field"><label>Name</label><input name="name" required></div>
           <div class="field"><label>Phone</label><input name="phone" type="tel" required></div>
@@ -216,7 +206,7 @@ SANSKAAR.config = {
           <div class="field"><label>Preferred date</label><input name="date" type="date"></div>
           <div class="field"><label>Wedding date</label><input name="wedding" type="date"></div>
           <div class="field full"><label>Anything we should know?</label><textarea name="notes" rows="3"></textarea></div>
-          <div class="full"><button class="btn btn-primary btn-block">Request appointment</button></div>
+          <div class="full"><button class="btn btn-gold btn-block">Request consultation</button></div>
         </form>
       </div>
     </div>
@@ -224,16 +214,16 @@ SANSKAAR.config = {
       <div class="modal-card" style="width:min(680px,100%)">
         <button class="close" data-close aria-label="Close">&times;</button>
         <h3 id="sg-title">Size Guide</h3>
-        <p style="text-align:center;color:var(--muted)">All measurements in inches. Every outfit can also be made to your measurements.</p>
-        <h4 style="color:var(--maroon)">Men</h4>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px">
-          <tr style="background:var(--sand)"><th>Size</th><th>Chest</th><th>Waist</th><th>Shoulder</th></tr>
-          ${[["36", 36, 30, 16.5], ["38", 38, 32, 17], ["40", 40, 34, 17.5], ["42", 42, 36, 18], ["44", 44, 38, 18.5], ["46", 46, 40, 19]].map(r => `<tr style="text-align:center;border-bottom:1px solid var(--line)">${r.map(v => `<td style="padding:7px">${v}</td>`).join("")}</tr>`).join("")}
+        <p class="intro">All measurements in inches. Every outfit can also be made to your measurements.</p>
+        <h4>Groom</h4>
+        <table>
+          <tr><th>Size</th><th>Chest</th><th>Waist</th><th>Shoulder</th></tr>
+          ${[["36", 36, 30, 16.5], ["38", 38, 32, 17], ["40", 40, 34, 17.5], ["42", 42, 36, 18], ["44", 44, 38, 18.5], ["46", 46, 40, 19]].map(r => `<tr>${r.map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}
         </table>
-        <h4 style="color:var(--maroon)">Women</h4>
-        <table style="width:100%;border-collapse:collapse;font-size:14px">
-          <tr style="background:var(--sand)"><th>Size</th><th>Bust</th><th>Waist</th><th>Hip</th></tr>
-          ${[["XS", 32, 26, 35], ["S", 34, 28, 37], ["M", 36, 30, 39], ["L", 38, 32, 41], ["XL", 40, 34, 43], ["XXL", 42, 36, 45]].map(r => `<tr style="text-align:center;border-bottom:1px solid var(--line)">${r.map(v => `<td style="padding:7px">${v}</td>`).join("")}</tr>`).join("")}
+        <h4>Bride</h4>
+        <table>
+          <tr><th>Size</th><th>Bust</th><th>Waist</th><th>Hip</th></tr>
+          ${[["XS", 32, 26, 35], ["S", 34, 28, 37], ["M", 36, 30, 39], ["L", 38, 32, 41], ["XL", 40, 34, 43], ["XXL", 42, 36, 45]].map(r => `<tr>${r.map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}
         </table>
       </div>
     </div>
@@ -255,7 +245,7 @@ SANSKAAR.config = {
       e.target.reset();
     });
     document.addEventListener("submit", e => {
-      if (e.target.id === "newsletter") { e.preventDefault(); toast("Thank you! You're on the list."); e.target.reset(); }
+      if (e.target.id === "newsletter") { e.preventDefault(); toast("Thank you — you're on the list for private previews."); e.target.reset(); }
     });
   }
   function open(id) {
@@ -317,7 +307,7 @@ SANSKAAR.config = {
     const body = $("#cart-body"), foot = $("#cart-foot");
     const items = cart.items();
     if (!items.length) {
-      body.innerHTML = `<div class="empty" style="padding:60px 0">${ornament}<h3>Your bag is empty</h3><p>Let's find something beautiful.</p><a class="btn btn-primary" href="catalog.html">Shop the catalogue</a></div>`;
+      body.innerHTML = `<div class="empty" style="padding:60px 0">${ornament}<h3>Your bag is empty</h3><p>Let's find something beautiful.</p><a class="btn btn-ghost-gold" href="catalog.html">Explore the catalog</a></div>`;
       foot.innerHTML = ""; return;
     }
     body.innerHTML = items.map((it, idx) => {
@@ -332,10 +322,10 @@ SANSKAAR.config = {
     const total = cart.total();
     const left = S.config.freeShippingAbove - total;
     foot.innerHTML = `
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">${left > 0 ? `Add ${inr(left)} more for free shipping` : "✦ You've unlocked free shipping"}</p>
+      <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;letter-spacing:.04em">${left > 0 ? `Add ${inr(left)} more for free shipping` : "✦ You've unlocked free shipping"}</p>
       <div class="row"><span>Subtotal</span><b>${inr(total)}</b></div>
-      <button class="btn btn-primary btn-block" id="checkout">Checkout on WhatsApp</button>
-      <p style="font-size:12px;color:var(--muted);text-align:center;margin:10px 0 0">Our team confirms sizing & delivery before payment.</p>`;
+      <button class="btn btn-gold btn-block" id="checkout">Checkout on WhatsApp</button>
+      <p style="font-size:11.5px;color:var(--text-3);text-align:center;margin:12px 0 0">Our team confirms sizing & delivery before payment.</p>`;
     body.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const it = cart.items()[b.dataset.q]; cart.setQty(+b.dataset.q, it.qty + +b.dataset.d); renderCart(); });
     body.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { cart.setQty(+b.dataset.rm, 0); renderCart(); });
     $("#checkout").onclick = () => {
@@ -345,31 +335,39 @@ SANSKAAR.config = {
     };
   }
 
-  /* ---------- Media: real photo if present, otherwise illustration ---------- */
-  function media(p, view = "front") {
-    const src = p.photos && p.photos[view];
-    if (src) return `<img src="${src}" alt="${p.name} — ${view} view" loading="lazy">`;
-    return Art.garment(p, view);
+  /* ---------- Media: real photo if present, otherwise illustrated preview ----------
+     Drop a photo at images/products/<SKU>/<view>.jpg and it is picked up
+     automatically; until then the illustrated preview underneath shows. */
+  const esc = s => String(s).replace(/"/g, "&quot;");
+  function photoLayer(src, alt, eager) {
+    return `<img src="${src}" alt="${esc(alt)}" ${eager ? "" : 'loading="lazy"'} onerror="this.remove()">`;
+  }
+  function media(p, view = "front", eager) {
+    const src = (p.photos && p.photos[view]) || `images/products/${p.id}/${view}.jpg`;
+    return `<div class="ph">${Art.garment(p, view)}${photoLayer(src, `${p.name} — ${view} view`, eager)}</div>`;
+  }
+  // site imagery (hero, banners, collections) with an illustrated fallback
+  function sitePhoto(src, alt, fallbackSvg, eager) {
+    return `<div class="ph">${fallbackSvg}${photoLayer(src, alt, eager)}</div>`;
   }
   S.media = media;
 
   /* ---------- Product card ---------- */
   function card(p) {
     const off = p.mrp ? Math.round((1 - p.price / p.mrp) * 100) : 0;
-    const tag = p.tag === "new" ? `<span class="tag new">New</span>` : p.tag === "bestseller" ? `<span class="tag">Bestseller</span>` : "";
+    const tag = p.tag === "new" ? `<span class="tag">New</span>` : p.tag === "bestseller" ? `<span class="tag">Bestseller</span>` : `<span class="tag">${catName(p.category)}</span>`;
     return `<article class="product-card reveal">
-      <a href="product.html?id=${p.id}" class="media" aria-label="${p.name}">
+      <a href="product.html?id=${p.id}" class="media" aria-label="${esc(p.name)}">
         ${tag}
         <div class="v main">${media(p, "front")}</div>
-        <div class="v alt">${media(p, p.photos?.back ? "back" : "detail")}</div>
+        <div class="v alt">${media(p, "back")}</div>
         <span class="quick" data-quick="${p.id}">Quick add · Size ${p.sizes[2]}</span>
       </a>
       <button class="wish ${wish.has(p.id) ? "on" : ""}" data-wish="${p.id}" aria-label="Add to wishlist">${I.heart}</button>
       <div class="info">
-        <div class="coll">${collOf(p.collection)?.name || ""} · ${catName(p.category)}</div>
         <h3><a href="product.html?id=${p.id}">${p.name}</a></h3>
+        <div class="meta">${p.fabric} · ${p.work}</div>
         <div class="price">${inr(p.price)}${p.mrp ? `<s>${inr(p.mrp)}</s><span class="off">${off}% off</span>` : ""}</div>
-        <div class="swatches"><i style="background:${p.hex}" title="${p.colorName}"></i><i style="background:${p.accent}" title="Embroidery"></i></div>
       </div>
     </article>`;
   }
@@ -407,63 +405,110 @@ SANSKAAR.config = {
      HOME
      ===================================================================== */
   function home() {
-    const groom = byId("SK-M-SHW-001"), bride = byId("SK-W-LHG-001");
-    $("#hero-groom").innerHTML = Art.garment(groom, "front", { transparent: true });
-    $("#hero-bride").innerHTML = Art.garment(bride, "front", { transparent: true });
+    // hero
+    $("#hero-bg").innerHTML = sitePhoto("images/site/hero.jpg", "A Sanskaar bride in a hand-embroidered red lehenga",
+      Art.scene({ colors: ["#3a0d14", "#c8a45c"], w: 1600, h: 900, seed: 5, sunX: .68, sun: "#e0a85a",
+        figure: Art.figureGroup(byId("SK-M-SHW-002"), 860, 300, 1.45) + Art.figureGroup(byId("SK-W-LHG-001"), 1110, 290, 1.5) }), true);
 
-    // categories (5 men + 5 women, toggle)
-    const catGrid = $("#cat-grid");
-    const drawCats = g => {
-      catGrid.innerHTML = S.categories[g].map(c => {
-        const p = S.products.find(x => x.gender === g && x.category === c.key);
-        return `<a class="cat-tile reveal" href="catalog.html?gender=${g}&category=${c.key}">
-          <div class="frame">${media(p, "front")}</div><h3>${c.name}</h3><span>${c.hint}</span></a>`;
-      }).join("");
+    // bride / groom panels
+    $("#duo-bride .art").innerHTML = sitePhoto("images/site/bride.jpg", "Bridal couture",
+      Art.scene({ colors: ["#4a0f1c", "#c8a45c"], w: 600, h: 750, seed: 21, sunX: .5, sun: "#e7b07a",
+        figure: Art.figureGroup(byId("SK-W-LHG-002"), 150, 260, 1.05) }));
+    $("#duo-groom .art").innerHTML = sitePhoto("images/site/groom.jpg", "Groom couture",
+      Art.scene({ colors: ["#1d1a2e", "#c8a45c"], w: 600, h: 750, seed: 4, sunX: .5, sun: "#d9b06a",
+        figure: Art.figureGroup(byId("SK-M-SHW-001"), 150, 260, 1.05) }));
+
+    // couture catalog with tabs + search
+    const tabs = [["all", "All Collections"], ["lehenga", "Lehengas"], ["saree", "Royal Saris"], ["sharara", "Shararas"], ["anarkali", "Anarkalis"],
+      ["sherwani", "Sherwanis"], ["bandhgala", "Bandhgalas"], ["indowestern", "Indo-Western"]];
+    let active = "all", q = "";
+    $("#cc-tabs").innerHTML = tabs.map(([k, l], i) => `<button class="tab ${i ? "" : "active"}" data-k="${k}">${l}</button>`).join("");
+    const grid = $("#cc-grid");
+    const draw = () => {
+      let list = S.products.filter(p => active === "all" || p.category === active);
+      if (q) list = list.filter(p => (p.name + " " + p.fabric + " " + p.work + " " + p.colorName + " " + catName(p.category)).toLowerCase().includes(q));
+      if (active === "all" && !q) list = list.filter(p => p.tag === "bestseller" || p.tag === "new");
+      list = list.slice(0, 8);
+      grid.innerHTML = list.length ? list.map(card).join("") : `<div class="empty"><h3>No match yet</h3><p>Try another word, or <a href="catalog.html" style="color:var(--gold-2)">browse the full catalog</a>.</p></div>`;
       reveal();
     };
-    drawCats("men");
-    $$("#cat-tabs .tab").forEach(t => t.onclick = () => {
-      $$("#cat-tabs .tab").forEach(x => x.classList.toggle("active", x === t));
-      drawCats(t.dataset.g);
+    $$("#cc-tabs .tab").forEach(t => t.onclick = () => {
+      active = t.dataset.k; $$("#cc-tabs .tab").forEach(x => x.classList.toggle("active", x === t)); draw();
     });
-
-    // groom / bride split
-    $("#split-groom .art").innerHTML = Art.scene({ colors: ["#6b0f1a", "#c9a24a"], seed: 4, sunX: .3,
-      figure: Art.figureGroup(byId("SK-M-SHW-002"), 330, 236, .9) });
-    $("#split-bride .art").innerHTML = Art.scene({ colors: ["#9b1b30", "#e8a9b4"], seed: 21, sunX: .3, sun: "#ffd1a1",
-      figure: Art.figureGroup(byId("SK-W-LHG-002"), 330, 236, .9) });
-
-    // occasions
-    $("#occasion-grid").innerHTML = S.occasions.map(o => `
-      <a class="occasion reveal" style="--c:${o.color}" href="catalog.html?occasion=${o.key}">
-        <div class="ico">${occasionIcon[o.key]}</div><h3>${o.name}</h3><span>${o.hint}</span></a>`).join("");
-
-    // trending tabs
-    const grid = $("#trend-grid");
-    const drawTrend = f => {
-      const list = S.products.filter(p => f === "new" ? p.tag === "new" : f === "best" ? p.tag === "bestseller" : p.occasions.includes("wedding")).slice(0, 8);
-      grid.innerHTML = list.map(card).join(""); reveal();
-    };
-    drawTrend("best");
-    $$("#trend-tabs .tab").forEach(t => t.onclick = () => {
-      $$("#trend-tabs .tab").forEach(x => x.classList.toggle("active", x === t)); drawTrend(t.dataset.f);
-    });
+    $("#cc-search").addEventListener("input", e => { q = e.target.value.trim().toLowerCase(); draw(); });
     bindCards(grid);
+    draw();
+
+    advisor();
+    $("#cta-wa").href = `https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent("Namaste SANSKAAR, I would like to book a consultation.")}`;
 
     // collections
-    $("#coll-grid").innerHTML = S.collections.map((c, i) => {
-      const p = S.products.find(x => x.collection === c.key && x.gender === (i % 2 ? "women" : "men"));
+    $("#coll-row").innerHTML = S.collections.map((c, i) => {
+      const p = S.products.find(x => x.collection === c.key && x.gender === (i % 2 ? "men" : "women"));
       return `<a class="coll-card reveal" href="catalog.html?collection=${c.key}">
-        <div class="art">${Art.scene({ colors: [c.colors[0], c.colors[1]], w: 300, h: 450, seed: i * 7 + 3, sunX: .5,
-          figure: p ? Art.figureGroup(p, 40, 120, .74) : "" })}</div>
+        <div class="art">${sitePhoto(`images/collections/${c.key}.jpg`, `${c.name} collection`,
+          Art.scene({ colors: [Art.shade(c.colors[0], -.45), c.colors[1]], w: 300, h: 465, seed: i * 7 + 3, sunX: .5,
+            figure: p ? Art.figureGroup(p, 30, 120, .8) : "" }))}</div>
         <div class="txt"><span class="deva">${c.deva}</span><h3>${c.name}</h3><small>${c.hint}</small></div></a>`;
     }).join("");
 
-    // story
-    $("#story-art").innerHTML = Art.scene({ colors: ["#0f5257", "#c9a24a"], w: 400, h: 500, seed: 31, sunX: .5,
-      figure: Art.figureGroup(byId("SK-W-ANK-003"), 50, 140, 1) });
-
     reveal();
+  }
+
+  /* ---------- Style advisor (3-step quiz → recommendations) ---------- */
+  function advisor() {
+    const root = $("#advisor-card"); if (!root) return;
+    const palettes = {
+      classic: { label: "Classic Reds & Maroons", hint: "Timeless bridal tradition", colors: ["red", "maroon", "wine"] },
+      pastel: { label: "Soft Pastels", hint: "Blush, mint, lilac & ivory", colors: ["blush", "mint", "lilac", "peach", "ivory", "beige"] },
+      jewel: { label: "Jewel Tones", hint: "Emerald, sapphire & peacock", colors: ["green", "teal", "blue", "navy", "black"] },
+      sunshine: { label: "Sunshine & Rani", hint: "Haldi yellow, kesariya & pink", colors: ["yellow", "orange", "gold", "pink"] }
+    };
+    const steps = [
+      { key: "who", q: "Who are we dressing?", opts: [
+        ["women", "The Bride", "Lehengas, sarees & trousseau"], ["men", "The Groom", "Sherwanis & bandhgalas"],
+        ["any", "The Family", "Parents, siblings & friends"], ["festive", "A Festive Guest", "Diwali, Eid, Teej & more"]] },
+      { key: "occ", q: "Select the ceremony or event you are dressing for:", opts: [
+        ["wedding", "The Sacred Vows", "Main wedding ceremony / Pheras"], ["reception", "The Grand Soirée", "Reception dinner / Formal after-party"],
+        ["sangeet", "The Rhythmic Celebration", "Sangeet night / Cocktail / Dance gala"], ["mehendi", "The Henna Festival", "Mehendi / Haldi / Pre-wedding lunch"]] },
+      { key: "pal", q: "Which palette speaks to you?", opts: Object.entries(palettes).map(([k, v]) => [k, v.label, v.hint, v.colors]) }
+    ];
+    const ans = {};
+    let i = 0;
+    function render() {
+      if (i >= steps.length) return result();
+      const st = steps[i];
+      root.innerHTML = `<div class="progress"><i style="width:${(i + 1) / steps.length * 100}%"></i></div>
+        <div class="advisor-step active">
+          <span class="q-num">Question ${i + 1} of ${steps.length}</span>
+          <h3>${st.q}</h3>
+          <div class="advisor-opts">${st.opts.map(([k, l, h, cols]) => `<button class="advisor-opt" data-v="${k}"><b>${l}</b><span>${h}</span>${cols ? `<div class="sw">${cols.slice(0, 4).map(c => `<i style="background:${S.colors[c].hex}"></i>`).join("")}</div>` : ""}</button>`).join("")}</div>
+          ${i ? `<button class="advisor-back">← Back</button>` : ""}
+        </div>`;
+      $$(".advisor-opt", root).forEach(b => b.onclick = () => { ans[st.key] = b.dataset.v; i++; render(); });
+      const back = $(".advisor-back", root); if (back) back.onclick = () => { i--; render(); };
+    }
+    function result() {
+      const pal = palettes[ans.pal].colors;
+      const occ = ans.who === "festive" ? ["festive", ans.occ] : ans.occ === "mehendi" ? ["mehendi", "haldi"] : [ans.occ];
+      const scored = S.products
+        .filter(p => ans.who === "women" || ans.who === "men" ? p.gender === ans.who : true)
+        .map(p => ({ p, s: (p.occasions.some(o => occ.includes(o)) ? 3 : 0) + (pal.includes(p.color) ? 2 : 0) + (p.tag === "bestseller" ? .5 : 0) }))
+        .sort((a, b) => b.s - a.s).slice(0, 3).map(x => x.p);
+      const who = { women: "bride", men: "groom", any: "family", festive: "festive guest" }[ans.who];
+      root.innerHTML = `<div class="advisor-result advisor-step active">
+        <span class="q-num">Your curated edit</span>
+        <h3>Three looks for the ${who}, in ${palettes[ans.pal].label.toLowerCase()}</h3>
+        <div class="product-grid">${scored.map(card).join("")}</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:36px">
+          <a href="#" data-open="appointment" class="btn btn-gold">Book a consultation</a>
+          <button class="btn btn-outline" id="advisor-restart">Start again</button>
+        </div></div>`;
+      $("#advisor-restart").onclick = () => { i = 0; render(); };
+      bindCards(root.querySelector(".product-grid"));
+      reveal();
+    }
+    render();
   }
 
   /* =====================================================================
@@ -488,7 +533,7 @@ SANSKAAR.config = {
     if (!state.max) state.max = priceCeil;
 
     // title
-    let title = "The Complete Catalogue", sub = "Wedding and festive wear for him and her, handcrafted in Rajasthan.";
+    let title = "The Couture Catalog", sub = "Wedding and festive couture for the bride, the groom and the family, handcrafted in Rajasthan.";
     if (state.wishlist) { title = "Your Wishlist"; sub = "The pieces you've saved."; }
     else if (state.q) { title = `Results for “${state.q}”`; sub = ""; }
     else if (state.category.length === 1) { title = catName(state.category[0]); }
@@ -565,7 +610,7 @@ SANSKAAR.config = {
       $("#active-filters").innerHTML = chips.join("");
       $$("#active-filters button").forEach(b => b.onclick = () => {
         const g = b.dataset.rmg;
-        if (g === "tag" || g === "q") state[g] = "";
+        if (g === "tag" || g === "q") { state[g] = ""; if (g === "q" && $("#search-input")) $("#search-input").value = ""; }
         else if (g === "max") state.max = priceCeil;
         else state[g].splice(state[g].indexOf(b.dataset.v), 1);
         update();
@@ -602,6 +647,12 @@ SANSKAAR.config = {
 
     function update() { drawFilters(); drawActive(); drawGrid(); syncURL(); }
 
+    const si = $("#search-input");
+    if (si) {
+      si.value = state.q;
+      let t; si.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { state.q = si.value.trim(); update(); }, 200); });
+      if (location.hash === "#search") si.focus();
+    }
     $("#sort").value = state.sort;
     $("#sort").onchange = e => { state.sort = e.target.value; update(); };
     $("#clear-filters").onclick = () => {
@@ -624,7 +675,6 @@ SANSKAAR.config = {
     const off = p.mrp ? Math.round((1 - p.price / p.mrp) * 100) : 0;
     const views = ["front", "back", "side", "detail"];
     const viewNames = { front: "Front", back: "Back", side: "Side", detail: "Close-up" };
-    const hasPhotos = !!(p.photos && Object.keys(p.photos).length);
     const siblings = S.products.filter(x => x.category === p.category && x.id !== p.id);
     const includes = {
       sherwani: "Sherwani, churidar, stole", bandhgala: "Bandhgala jacket, trousers", indowestern: "Indo-western jacket, dhoti trousers",
@@ -637,7 +687,7 @@ SANSKAAR.config = {
     $("#pdp").innerHTML = `
       <div class="gallery">
         <div class="thumbs">${views.map((v, i) => `<button class="${i ? "" : "active"}" data-view="${v}" aria-label="${viewNames[v]} view">${media(p, v)}<small>${viewNames[v]}</small></button>`).join("")}</div>
-        <div class="main-view" id="main-view">${media(p, "front")}<span class="view-label" id="view-label">Front</span>${hasPhotos ? "" : `<span class="ai-note">Preview · photoshoot coming</span>`}</div>
+        <div class="main-view" id="main-view">${media(p, "front", true)}<span class="view-label" id="view-label">Front</span><span class="ai-note" id="ai-note">Preview · photoshoot coming</span></div>
       </div>
       <div class="pdp-info">
         <div class="coll">${c.name} Collection · <span class="deva">${c.deva}</span></div>
@@ -656,9 +706,9 @@ SANSKAAR.config = {
         <div class="sizes" id="sizes">${p.sizes.map(s => `<button data-size="${s}">${s}</button>`).join("")}<button data-size="Custom">Made to measure</button></div>
 
         <div class="pdp-actions">
-          <button class="btn btn-primary" id="add-cart">Add to bag</button>
+          <button class="btn btn-gold" id="add-cart">Add to bag</button>
           <button class="btn btn-outline" id="add-wish">${wish.has(p.id) ? "♥ Wishlisted" : "♡ Wishlist"}</button>
-          <a class="btn btn-gold btn-block" target="_blank" rel="noopener" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(`Namaste! I'm interested in ${p.name} (${p.id}). Could you share more details?`)}">${I.whatsapp.replace("<svg", '<svg width="18" height="18"')} Enquire on WhatsApp</a>
+          <a class="btn btn-wa btn-block" target="_blank" rel="noopener" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(`Namaste! I'm interested in ${p.name} (${p.id}). Could you share more details?`)}">${I.whatsapp.replace("<svg", '<svg width="18" height="18"')} Enquire on WhatsApp</a>
         </div>
 
         <div class="pdp-perks">
@@ -678,9 +728,16 @@ SANSKAAR.config = {
 
     // gallery
     const mv = $("#main-view");
+    // hide the "preview" badge once a real photo has loaded for the current view
+    const notePhoto = () => {
+      const img = mv.querySelector(".ph img"), note = $("#ai-note");
+      const upd = () => { note.hidden = !!(img && img.isConnected && img.naturalWidth); };
+      if (img && !img.complete) img.addEventListener("load", upd); upd();
+    };
+    notePhoto();
     $$(".thumbs button").forEach(b => b.onclick = () => {
       $$(".thumbs button").forEach(x => x.classList.toggle("active", x === b));
-      mv.querySelector("svg, img").outerHTML = media(p, b.dataset.view);
+      mv.querySelector(".ph").outerHTML = media(p, b.dataset.view, true); notePhoto();
       $("#view-label").textContent = viewNames[b.dataset.view];
     });
     mv.addEventListener("mousemove", e => {

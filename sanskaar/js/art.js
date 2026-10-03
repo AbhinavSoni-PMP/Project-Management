@@ -233,8 +233,11 @@
     const motifOpacity = luminance(main) > 0.75 ? 0.75 : 0.5;
     return `
     <defs>
-      <linearGradient id="${id}-bg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#f8f1e2"/><stop offset="1" stop-color="#ead8b5"/>
+      <radialGradient id="${id}-spot" cx=".5" cy=".18" r=".75">
+        <stop offset="0" stop-color="#4a3826" stop-opacity=".95"/><stop offset=".55" stop-color="#231a13" stop-opacity=".6"/><stop offset="1" stop-color="#0e0b09" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="${id}-alcove" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3a2c1f" stop-opacity=".7"/><stop offset="1" stop-color="#16110d" stop-opacity=".9"/>
       </linearGradient>
       <linearGradient id="${id}-main" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="${shade(main, .14)}"/>
@@ -264,7 +267,7 @@
         <circle cx="5" cy="5" r="1.3" fill="${shade(acc, .5)}"/>
       </pattern>
       <filter id="${id}-soft" x="-10%" y="-10%" width="120%" height="120%">
-        <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#3d070e" flood-opacity=".22"/>
+        <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".55"/>
       </filter>
     </defs>`;
   }
@@ -327,12 +330,14 @@
 
   function backdrop(id, opts) {
     if (opts.transparent) return "";
+    // dark boutique alcove with a warm spotlight from above
     return `
-      <rect width="300" height="400" fill="url(#${id}-bg)"/>
-      <path d="M52,400 L52,150 Q52,52 150,34 Q248,52 248,150 L248,400" fill="#fffaf0" fill-opacity=".45" stroke="#c9a24a" stroke-opacity=".35" stroke-width="1.5"/>
-      <path d="M64,400 L64,154 Q64,66 150,48 Q236,66 236,154 L236,400" fill="none" stroke="#c9a24a" stroke-opacity=".2" stroke-width="1"/>
-      <circle cx="150" cy="34" r="3" fill="#c9a24a" opacity=".5"/>
-      <rect y="388" width="300" height="12" fill="#d9c49b" opacity=".6"/>`;
+      <rect width="300" height="400" fill="#120f0d"/>
+      <rect width="300" height="400" fill="url(#${id}-spot)"/>
+      <path d="M46,400 L46,150 Q46,46 150,26 Q254,46 254,150 L254,400" fill="url(#${id}-alcove)" stroke="#c8a45c" stroke-opacity=".28" stroke-width="1"/>
+      <path d="M58,400 L58,154 Q58,60 150,40 Q242,60 242,154 L242,400" fill="none" stroke="#c8a45c" stroke-opacity=".12" stroke-width="1"/>
+      <rect y="384" width="300" height="16" fill="#0b0908"/>
+      <rect y="384" width="300" height="1" fill="#c8a45c" opacity=".18"/>`;
   }
 
   function colorsOf(product) {
@@ -385,9 +390,8 @@
       if (view === "side") tf = "translate(150 0) scale(.66 1) translate(-150 0)";
       if (view === "back") tf = "";
       body = `${backdrop(id, opts)}
-        <ellipse cx="150" cy="394" rx="${view === "side" ? 60 : 92}" ry="7" fill="#3d070e" opacity=".14"/>
+        <ellipse cx="150" cy="390" rx="${view === "side" ? 60 : 96}" ry="8" fill="#000" opacity=".55"/>
         <g filter="url(#${id}-soft)" transform="${tf}">${layers}</g>`;
-      if (view === "back") body += `<text x="150" y="24" text-anchor="middle" font-family="Jost, sans-serif" font-size="9" letter-spacing="3" fill="#7a6656" opacity=".7">BACK</text>`;
     }
     const label = `${product.name} — ${view} view`;
     return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label.replace(/"/g, "")}" preserveAspectRatio="xMidYMid slice">${defs(id, c)}${body}</svg>`;

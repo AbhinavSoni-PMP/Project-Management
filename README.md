@@ -1,18 +1,18 @@
 # SANSKAAR: Indian Wedding & Ethnic Wear website
 
-Static website for **SANSKAAR**, a men's and women's wedding and ethnic wear brand with a royal Rajasthani theme. It lives in [`sanskaar/`](sanskaar/).
+Static website for **SANSKAAR**, an Indian wedding couture brand for the bride and the groom: a modern dark-and-gold luxury design with Rajasthani heritage touches. It lives in [`sanskaar/`](sanskaar/).
 
 **Run it:** open `sanskaar/index.html` in a browser, or serve the folder (`cd sanskaar && python3 -m http.server`). No build step is needed. It can be hosted on GitHub Pages, Netlify or any static host.
 
 | Page | What it does |
 |------|--------------|
-| `index.html` | Home: hero, shop by category, groom & bride edits, occasions, bestsellers, collections, story, appointment booking |
+| `index.html` | Home: full-screen hero, bride & groom edits, couture catalog with tabs and search, 3-step Style Advisor quiz, collections, The Atelier, consultation booking |
 | `catalog.html` | Full catalogue with filters (men/women, category, occasion, collection, colour, price), search, sort and wishlist |
 | `product.html?id=SKU` | Product page: front/back/side/close-up gallery with zoom, sizes, bag, WhatsApp enquiry, complete-the-look |
 
 - **Edit products:** `sanskaar/js/catalog-data.js` (52 products across 10 categories).
 - **Business details** (WhatsApp number, phone, address): top of `sanskaar/js/app.js`.
-- **Add real photos:** see `sanskaar/images/README.md`.
+- **Add real photos:** drop them into `sanskaar/images/` with the names in `sanskaar/images/README.md`. They appear automatically, with no code changes.
 - Checkout and appointment requests go to WhatsApp, so no payment backend is needed yet.
 
 ---

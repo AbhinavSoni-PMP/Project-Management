@@ -1,38 +1,37 @@
-# Product photography: how to add real photos
+# Photography: how to add real photos
 
-Every product currently shows an **illustrated preview** generated from its colours.
-To replace one with real photography:
+**No code editing needed.** Save a photo with the right name in the right folder
+and it appears on the site automatically. Until then, the illustrated preview shows.
 
-1. Create a folder named after the product's SKU (find SKUs in `js/catalog-data.js`
-   or on each product page), e.g. `images/products/SK-M-SHW-001/`.
-2. Add up to four images with these exact names:
+## Product photos
 
-   | File         | Shot                                             |
-   |--------------|--------------------------------------------------|
-   | `front.jpg`  | Full-length front, model facing camera           |
-   | `back.jpg`   | Full-length back                                 |
-   | `side.jpg`   | Three-quarter or side angle                      |
-   | `detail.jpg` | Close-up of embroidery / fabric / buttons        |
+Create a folder named after the product's SKU (shown on every product page, and in
+`js/catalog-data.js`), e.g. `images/products/SK-W-LHG-001/`, and add:
 
-3. In `js/catalog-data.js`, set that product's `photos` (or add it right after the
-   product list):
+| File         | Shot                                             |
+|--------------|--------------------------------------------------|
+| `front.jpg`  | Full-length front, model facing camera           |
+| `back.jpg`   | Full-length back (also used as the hover image)  |
+| `side.jpg`   | Three-quarter or side angle                      |
+| `detail.jpg` | Close-up of embroidery / fabric / buttons        |
 
-   ```js
-   SANSKAAR.products.find(p => p.id === "SK-M-SHW-001").photos = {
-     front:  "images/products/SK-M-SHW-001/front.jpg",
-     back:   "images/products/SK-M-SHW-001/back.jpg",
-     side:   "images/products/SK-M-SHW-001/side.jpg",
-     detail: "images/products/SK-M-SHW-001/detail.jpg"
-   };
-   ```
+## Site photos (home page)
 
-   Any view you leave out keeps the illustrated version.
+| File                                  | Where it appears                          |
+|---------------------------------------|-------------------------------------------|
+| `images/site/hero.jpg`                | Full-screen banner at the top (landscape, 2400 × 1350 px, subject on the right half) |
+| `images/site/bride.jpg`               | "The Bridal Trousseau" panel (portrait 4:5) |
+| `images/site/groom.jpg`               | "The Groom's Durbar" panel (portrait 4:5)   |
+| `images/collections/rajwada.jpg` (also `gulabi`, `marwar`, `thar`, `udaipur`) | Collection arches (portrait 2:3) |
+
+File names are case-sensitive, and must be `.jpg`.
 
 ## Image specs (keeps the site looking consistent)
 
 - **Portrait 3:4**, at least **1200 × 1600 px**, JPG or WebP, under ~400 KB each.
-- Same backdrop for the whole catalogue: warm ivory / beige (#F3E7CF) or a soft
-  Rajasthani interior (arches, jharokha, sandstone).
+- Same mood for the whole catalogue: warm, low-key light against a dark or richly
+  textured Rajasthani interior (palace arches, jharokha, carved sandstone). This
+  matches the dark-and-gold site design.
 - Model centred, full outfit visible head to toe, same camera height for every product.
 
 ## AI-editing your raw photos
@@ -47,8 +46,8 @@ Example prompt (adjust per garment):
 
 > Professional Indian wedding-wear catalogue photo. A handsome Indian groom model
 > wearing exactly this ivory zardozi sherwani with matching churidar, safa and mojari.
-> Full-length, front view, standing straight, neutral expression. Background: soft-lit
-> Rajasthani palace arch in warm ivory sandstone. Studio lighting, 85mm lens, 3:4
+> Full-length, front view, standing straight, neutral expression. Background: a dimly lit
+> Rajasthani palace corridor with carved arches and warm lamp light. Studio lighting, 85mm lens, 3:4
 > portrait, high detail on embroidery. Do not change the garment's colour, pattern
 > or embroidery.
 
