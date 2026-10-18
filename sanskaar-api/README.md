@@ -1,56 +1,48 @@
-# SANSKAAR — Payments API
+# SANSKAAR — API (accounts, orders, payments, owner admin)
 
-A small server that lets the app take real payments through **Razorpay**:
-credit & debit cards, UPI (GPay, PhonePe, Paytm…), net banking, wallets and EMI.
+One small server that both the **website** (`../sanskaar`) and the **app** (`../sanskaar-app`) use:
 
-It does two things the phone must never do itself:
+- **Customer accounts:** sign up / log in with email or mobile number and password.
+- **Live catalogue:** MRP, discount % and ₹, selling price, delivery days, sizes and size unit, stock. The website and app show these values, so a change made by the owner shows everywhere.
+- **Payments with Razorpay:** credit and debit cards, UPI, net banking, wallets, EMI. Prices are always calculated here, never on the phone, and every payment is checked with Razorpay's signature.
+- **Orders and delivery tracking:** the customer sees Order confirmed → Being tailored → Shipped → Out for delivery → Delivered, with the expected date, courier, tracking number and link, and your notes.
+- **Owner admin:** edit prices, discounts, stock, sizes and delivery days, and update each order's delivery status. **Download the catalogue as Excel, edit it, upload it back.** Sold and remaining stock are counted automatically from paid orders on the app and website.
 
-| Endpoint | What it does |
-|---|---|
-| `POST /api/orders` | Prices the bag **from the catalogue** (so prices can't be tampered with), checks the delivery details and creates a Razorpay order. The customer's items and address are saved on the order, so you see everything in the Razorpay dashboard. |
-| `POST /api/verify` | Checks Razorpay's signature to confirm a payment is genuine before the app shows "Order confirmed". |
-
-Prices come from `data/catalog.json`, which `npm run sync` in `sanskaar-app/` regenerates from the website. Shipping rules (`freeShippingAbove`, `shippingFee`) live in `SANSKAAR.config` at the top of `sanskaar/js/app.js`.
-
-## Set it up (about 15 minutes)
+## Set it up (about 20 minutes)
 
 ### 1. Razorpay test keys
-1. Sign up at https://dashboard.razorpay.com (free).
-2. Make sure **Test mode** is on (toggle at the top).
-3. **Account & Settings → API Keys → Generate key.** Copy the **Key ID** (`rzp_test_…`) and **Key Secret**.
-
-Test mode needs no KYC and moves no real money.
+1. Sign up at https://dashboard.razorpay.com and keep **Test mode** on.
+2. **Account & Settings → API Keys → Generate key.** Copy the **Key ID** (`rzp_test_…`) and **Key Secret**.
 
 ### 2. Put the API online (Vercel, free)
-1. Sign in at https://vercel.com with GitHub and click **Add New → Project**.
-2. Import this repository and set **Root Directory** to `sanskaar-api`.
-3. Under **Environment Variables** add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`.
-4. Click **Deploy**. You'll get an address like `https://sanskaar-api.vercel.app`.
+1. Sign in at https://vercel.com with GitHub → **Add New → Project** → import this repository → set **Root Directory** to `sanskaar-api`.
+2. **Storage → Create → Neon (Postgres)** and connect it to the project. This adds `DATABASE_URL` for you.
+3. **Settings → Environment Variables**: add `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `AUTH_SECRET` (any long random text) and `OWNER_EMAILS` (your email). See `.env.example`.
+4. **Deploy.** You'll get an address like `https://sanskaar-api.vercel.app`. The database tables and all 57 products are created automatically on the first request.
 
-### 3. Point the app at it
-In `sanskaar-app/`, create a file named `.env` containing:
-```
-EXPO_PUBLIC_API_URL=https://sanskaar-api.vercel.app
-```
-Then restart the app with `npx expo start -c`.
+### 3. Connect the website and the app
+- **Website:** at the top of `sanskaar/js/app.js`, set `apiUrl: "https://sanskaar-api.vercel.app",`.
+- **App:** run `npm run sync` in `sanskaar-app/`. It picks up the same `apiUrl`. You can also set `EXPO_PUBLIC_API_URL` in `sanskaar-app/.env`.
 
-### 4. Make a test payment
-Add something to the bag → **Proceed to checkout** → fill in the address → **Pay**.
-In test mode, use Razorpay's test details from
-https://razorpay.com/docs/payments/payments/test-card-details/ (test cards, test UPI ID `success@razorpay`).
-The payment then appears under **Transactions → Payments** in the dashboard, with the order details under **Orders → Notes**.
+### 4. Become the owner
+Sign up on the website with the email you put in `OWNER_EMAILS`. **Owner admin** then appears in the menu and on your account page (`admin.html`).
 
-## Going live
-1. Complete KYC in the Razorpay dashboard (business and bank details).
-2. Generate **Live** keys (`rzp_live_…`) and replace both values in Vercel → Settings → Environment Variables, then redeploy.
-3. Every payment then settles to your bank account.
+## Using the Owner admin page
+- **Products & prices:** change MRP, Discount %, Discount ₹, delivery days, sizes, size unit (Standard / Inches / CM / UK / US), stock received, or hide a product, then press **Save**. Selling price = MRP − Discount % − Discount ₹.
+- **Orders & delivery:** set the status, expected delivery date, courier, tracking number and link, and add a note for the customer. They see it in **My orders** right away.
+- **Excel:** **Download Excel** → edit the **yellow** columns → upload the file. The grey columns (selling price, tentative delivery date, sold, remaining) are calculated. The file also has an **Orders** sheet. If any row has a mistake, nothing is saved and the page lists what to fix.
 
-## Run it on your computer instead
+New products (with photos and descriptions) are still added on the website (`sanskaar/js/catalog-data.js`). Run `npm run sync` in `sanskaar-app/` and redeploy, and they appear in the admin page and in Excel.
+
+## Going live with real payments
+Complete KYC in the Razorpay dashboard, generate **Live** keys (`rzp_live_…`), replace both values in Vercel and redeploy.
+
+## Run it on your computer
 ```bash
-cp .env.example .env      # then paste your test keys into .env
-npm run dev               # http://localhost:3001
+npm install
+cp .env.example .env      # paste your keys
+npm run dev               # http://localhost:3001 (data kept in ./.data)
 ```
-Your phone can't reach `localhost`, so set `EXPO_PUBLIC_API_URL` to your computer's Wi-Fi address (e.g. `http://192.168.1.20:3001`).
 
 ## Tests
 ```bash

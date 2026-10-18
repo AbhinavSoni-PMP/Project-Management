@@ -4,7 +4,8 @@ import { colors } from "../lib/theme";
 
 export type IconName =
   | "home" | "search" | "heart" | "heartFill" | "bag" | "sparkle" | "calendar" | "truck" | "scissors"
-  | "shield" | "whatsapp" | "close" | "back" | "filter" | "plus" | "minus" | "lotus" | "chevron";
+  | "shield" | "whatsapp" | "close" | "back" | "filter" | "plus" | "minus" | "lotus" | "chevron"
+  | "user" | "menu" | "globe" | "box";
 
 export function Icon({ name, size = 22, color = colors.text, strokeWidth = 1.6 }: {
   name: IconName; size?: number; color?: string; strokeWidth?: number;
@@ -29,6 +30,10 @@ export function Icon({ name, size = 22, color = colors.text, strokeWidth = 1.6 }
       {name === "filter" && <Path {...s} d="M4 6h16M7 12h10M10 18h4" />}
       {name === "plus" && <Path {...s} d="M12 5v14M5 12h14" />}
       {name === "minus" && <Path {...s} d="M5 12h14" />}
+      {name === "user" && <><Circle {...s} cx={12} cy={8} r={4} /><Path {...s} d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></>}
+      {name === "menu" && <Path {...s} d="M3 6h18M3 12h18M3 18h12" />}
+      {name === "globe" && <><Circle {...s} cx={12} cy={12} r={9} /><Path {...s} d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" /></>}
+      {name === "box" && <><Path {...s} d="M3 7l9-4 9 4v10l-9 4-9-4z" /><Path {...s} d="M3 7l9 4 9-4M12 11v10" /></>}
       {name === "lotus" && <><Path {...s} d="M12 4c2 2.5 2.5 5.5 0 9-2.5-3.5-2-6.5 0-9z" /><Path {...s} d="M12 13c-2.5-1.5-5.5-2-8-1 1 3 4 4.5 8 4.5s7-1.5 8-4.5c-2.5-1-5.5-.5-8 1z" /><Path {...s} d="M5 18h14" /></>}
     </Svg>
   );

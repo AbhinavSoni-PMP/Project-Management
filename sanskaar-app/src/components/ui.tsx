@@ -2,11 +2,13 @@
 import { ReactNode } from "react";
 import { ActivityIndicator, Pressable, StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { discount, inr, Product } from "../lib/catalog";
+import { useI18n } from "../lib/i18n";
 import { colors, fonts } from "../lib/theme";
 import { Icon, IconName } from "./Icon";
 
 export function Eyebrow({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
-  return <Text style={[styles.eyebrow, style]}>{typeof children === "string" ? children.toUpperCase() : children}</Text>;
+  const { ls } = useI18n();
+  return <Text style={[styles.eyebrow, { letterSpacing: ls(3) }, style]}>{typeof children === "string" ? children.toUpperCase() : children}</Text>;
 }
 
 /** Serif heading; wrap words in <Em> for the gold italic accent. */
@@ -16,6 +18,8 @@ export function Heading({ children, size = 30, style, center }: {
   return <Text style={[styles.heading, { fontSize: size, lineHeight: size * 1.12 }, center && { textAlign: "center" }, style]}>{children}</Text>;
 }
 export const Em = ({ children }: { children: ReactNode }) => <Text style={styles.em}>{children}</Text>;
+/** Translated text with *word* shown in gold italics. */
+export const rich = (text: string) => text.split(/\*([^*]+)\*/).map((part, i) => (i % 2 ? <Em key={i}>{part}</Em> : part));
 
 export function Body({ children, style, dim }: { children: ReactNode; style?: StyleProp<TextStyle>; dim?: boolean }) {
   return <Text style={[styles.body, dim && { color: colors.text3 }, style]}>{children}</Text>;
@@ -34,6 +38,7 @@ export function Button({ label, onPress, variant = "gold", icon, style, disabled
   label: string; onPress?: () => void; variant?: Variant; icon?: IconName;
   style?: StyleProp<ViewStyle>; disabled?: boolean; loading?: boolean;
 }) {
+  const { ls } = useI18n();
   const fg = variant === "gold" ? colors.bg : variant === "whatsapp" ? "#fff" : variant === "ghost" ? colors.gold2 : colors.text;
   return (
     <Pressable
@@ -44,19 +49,20 @@ export function Button({ label, onPress, variant = "gold", icon, style, disabled
     >
       {loading ? <ActivityIndicator color={fg} /> : <>
         {icon && <Icon name={icon} size={18} color={fg} />}
-        <Text style={[styles.btnText, { color: fg }]}>{label.toUpperCase()}</Text>
+        <Text style={[styles.btnText, { color: fg, letterSpacing: ls(2) }]}>{label.toUpperCase()}</Text>
       </>}
     </Pressable>
   );
 }
 
 export function Price({ product, size = 15 }: { product: Product; size?: number }) {
+  const { t } = useI18n();
   const off = discount(product);
   return (
     <View style={styles.priceRow}>
       <Text style={[styles.price, { fontSize: size }]}>{inr(product.price)}</Text>
       {product.mrp ? <Text style={[styles.mrp, { fontSize: size * 0.82 }]}>{inr(product.mrp)}</Text> : null}
-      {off ? <Text style={[styles.off, { fontSize: size * 0.75 }]}>{off}% off</Text> : null}
+      {off ? <Text style={[styles.off, { fontSize: size * 0.75 }]}>{t("p.off", { n: off })}</Text> : null}
     </View>
   );
 }

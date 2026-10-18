@@ -64,7 +64,7 @@ export function HeroCarousel({ width, height, top, children }: {
         <View style={styles.row} pointerEvents="box-none">
           {current?.product ? (
             <Pressable onPress={() => router.push(`/product/${current.product!.id}`)} style={styles.look} accessibilityRole="link"
-              accessibilityLabel={`Shop the look: ${current.product.name}`}>
+              accessibilityLabel={`${current.product.name} · ${inr(current.product.price)}`}>
               <Text style={styles.lookName} numberOfLines={1}>{current.product.name}</Text>
               <Text style={styles.lookPrice}>{inr(current.product.price)}  →</Text>
             </Pressable>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: 999, borderWidth: 1, borderColor: colors.line, backgroundColor: "rgba(14,12,11,0.6)"
   },
   lookName: { flexShrink: 1, fontFamily: fonts.serifBold, fontSize: 15, color: colors.text },
-  lookPrice: { flexShrink: 0, fontFamily: fonts.sansBold, fontSize: 11, letterSpacing: 0.6, color: colors.gold2 },
+  lookPrice: { flexShrink: 0, fontFamily: fonts.sansBold, fontSize: 11, color: colors.gold2 },
   dots: { flexDirection: "row", gap: 5 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(243,236,224,0.3)" },
   dotOn: { width: 18, backgroundColor: colors.gold }

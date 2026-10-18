@@ -1,19 +1,23 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Body, Heading } from "../components/ui";
 import { sizeGuide } from "../lib/catalog";
+import { useI18n } from "../lib/i18n";
 import { colors, fonts, gutter, radius } from "../lib/theme";
 
+const HEAD = { groom: ["sg.size", "sg.chest", "sg.waist", "sg.shoulder"], bride: ["sg.size", "sg.bust", "sg.waist", "sg.hip"] };
+
 export default function SizeGuide() {
+  const { t, ls } = useI18n();
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.bg }} contentContainerStyle={{ padding: gutter, paddingBottom: 48 }}>
-      <Body>All measurements in inches. Every outfit can also be made to your measurements.</Body>
-      {([["Groom", sizeGuide.groom], ["Bride", sizeGuide.bride]] as const).map(([title, t]) => (
-        <View key={title} style={{ marginTop: 26 }}>
-          <Heading size={24} style={{ marginBottom: 12 }}>{title}</Heading>
+      <Body>{t("sg.intro")}</Body>
+      {(["groom", "bride"] as const).map(key => (
+        <View key={key} style={{ marginTop: 26 }}>
+          <Heading size={24} style={{ marginBottom: 12 }}>{t(key === "groom" ? "sg.groom" : "sg.bride")}</Heading>
           <View style={styles.table}>
-            {[t.head, ...t.rows].map((row, r) => (
+            {[HEAD[key].map(k => t(k)), ...sizeGuide[key].rows].map((row, r) => (
               <View key={r} style={[styles.row, r === 0 && styles.headRow]}>
-                {row.map((v, i) => <Text key={i} style={[styles.cell, r === 0 && styles.headCell]}>{v}</Text>)}
+                {row.map((v, i) => <Text key={i} style={[styles.cell, r === 0 && [styles.headCell, { letterSpacing: ls(1.4) }]]}>{v}</Text>)}
               </View>
             ))}
           </View>
@@ -28,5 +32,5 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.line },
   headRow: { borderTopWidth: 0, backgroundColor: colors.surface2 },
   cell: { flex: 1, paddingVertical: 11, textAlign: "center", fontFamily: fonts.sans, fontSize: 13.5, color: colors.text2 },
-  headCell: { fontFamily: fonts.sansBold, fontSize: 11, letterSpacing: 1.4, color: colors.gold }
+  headCell: { fontFamily: fonts.sansBold, fontSize: 11, color: colors.gold }
 });

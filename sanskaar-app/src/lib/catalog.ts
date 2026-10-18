@@ -1,6 +1,7 @@
 /* Typed access to the catalogue synced from the website (see scripts/sync-from-website.js) */
 import data from "../data/catalog.json";
 import { images } from "../data/images.generated";
+import type { LiveProduct } from "./api";
 
 export type Gender = "men" | "women";
 export type View = "front" | "back" | "side" | "detail" | "flatlay";
@@ -25,6 +26,12 @@ export interface Product {
   description: string;
   sizes: string[];
   photos: View[] | null;
+  /* set from the live catalogue (owner admin) */
+  sizeUnit?: string;
+  deliveryDays?: number;
+  inStock?: boolean;
+  lowStock?: number | null;
+  active?: boolean;
 }
 
 export interface Named { key: string; name: string; hint: string }
@@ -36,12 +43,17 @@ export const categories = data.categories as Record<Gender, Named[]>;
 export const occasions = data.occasions as Occasion[];
 export const collections = data.collections as Collection[];
 export const colorTable = data.colors as Record<string, { name: string; hex: string }>;
-export const products = data.products as Product[];
+/** Every product, including ones the owner has hidden (for artwork and old orders). */
+export const allProducts = data.products as Product[];
+/** Products currently for sale. Updated in place by applyLive(). */
+export const products: Product[] = allProducts.slice();
 
 export const inr = (n: number) => "₹" + Number(n).toLocaleString("en-IN");
 export const byId = (id: string) => products.find(p => p.id === id);
 export const catName = (key: string) =>
   [...categories.men, ...categories.women].find(c => c.key === key)?.name ?? key;
+export const isSoldOut = (p: Product) => p.inStock === false;
+export const quickSize = (p: Product) => p.sizes[Math.min(2, p.sizes.length - 1)];
 export const collOf = (key: string) => collections.find(c => c.key === key) ?? collections[0];
 export const occName = (key: string) => occasions.find(o => o.key === key)?.name ?? key;
 export const discount = (p: Product) => (p.mrp ? Math.round((1 - p.price / p.mrp) * 100) : 0);
@@ -92,3 +104,22 @@ export function heroSlides(): HeroSlide[] {
     .map(p => ({ key: p.id, image: productPhoto(p, "front")!, product: p }))
     .filter(s => s.image);
 }
+
+/** Applies the owner's live prices, discounts, sizes, stock and delivery times. */
+export function applyLive(list: LiveProduct[]) {
+  const live = new Map(list.map(l => [l.id, l]));
+  for (const p of allProducts) {
+    const l = live.get(p.id);
+    if (!l) continue;
+    p.price = l.price;
+    p.mrp = l.mrp > l.price ? l.mrp : null;
+    p.sizes = l.sizes;
+    p.sizeUnit = l.sizeUnit;
+    p.deliveryDays = l.deliveryDays;
+    p.inStock = l.inStock;
+    p.lowStock = l.lowStock;
+    p.active = l.active;
+  }
+  products.splice(0, products.length, ...allProducts.filter(p => p.active !== false));
+}
+

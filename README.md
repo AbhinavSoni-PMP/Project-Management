@@ -8,16 +8,23 @@ Static website for **SANSKAAR**, an Indian wedding couture brand for the bride a
 |------|--------------|
 | `index.html` | Home: full-screen hero, bride & groom edits, couture catalog with tabs and search, 3-step Style Advisor quiz, collections, The Atelier, consultation booking |
 | `catalog.html` | Full catalogue with filters (men/women, category, occasion, collection, colour, price), search, sort and wishlist |
-| `product.html#id.SKU` | Product page: front/back/side/close-up gallery with zoom, sizes, bag, WhatsApp enquiry, complete-the-look |
+| `product.html#id.SKU` | Product page: front/back/side/close-up gallery with zoom, live price and stock, delivery date, sizes, bag, WhatsApp enquiry, complete-the-look |
+| `checkout.html` | Log in, delivery address, order summary and Razorpay payment |
+| `account.html` | Log in / sign up, My orders, delivery tracking |
+| `admin.html` | Owner admin: prices, discounts, stock, delivery status, Excel |
 
-- **Edit products:** `sanskaar/js/catalog-data.js` (52 products across 10 categories).
+- **Edit products:** `sanskaar/js/catalog-data.js` (57 products across 10 categories).
 - **Business details** (WhatsApp number, phone, address): top of `sanskaar/js/app.js`.
 - **Add real photos:** drop them into `sanskaar/images/` with the names in `sanskaar/images/README.md`. They appear automatically, with no code changes.
-- Checkout and appointment requests go to WhatsApp, so no payment backend is needed yet.
+- **Online services** (log in, checkout, tracking, admin) need the API address in `apiUrl` at the top of `sanskaar/js/app.js`. Consultation requests still go to WhatsApp.
 
-### Mobile app
+### Mobile app, accounts and owner admin
 
-An iOS & Android app for the same store lives in [`sanskaar-app/`](sanskaar-app/) (Expo / React Native): home, shop with filters, product pages, Style Advisor, wishlist, bag, card / UPI checkout and consultation booking. It reads products, prices and photos from the website, so after editing the site run `npm run sync` in `sanskaar-app/`. Checkout takes card, UPI, net banking, wallet and EMI payments through Razorpay via the small payments API in [`sanskaar-api/`](sanskaar-api/) (setup steps in its README). See [`sanskaar-app/README.md`](sanskaar-app/README.md) to run it on your phone with Expo Go or publish it to the stores.
+- [`sanskaar-app/`](sanskaar-app/): iOS and Android app (Expo / React Native) with the same catalogue, menu, languages, checkout and order tracking as the website.
+- [`sanskaar-api/`](sanskaar-api/): the shared backend. It handles customer accounts, live prices and stock, Razorpay payments (cards, UPI, net banking, wallets, EMI), order delivery tracking, and the **Owner admin** page (`sanskaar/admin.html`). There you edit prices, discounts, stock, sizes and delivery days, update delivery status, and download / upload the catalogue as **Excel**. Sold and remaining stock are counted automatically from app and website orders.
+- Languages: English, Hindi, Gujarati, Marathi and Kannada (`sanskaar/js/i18n.js`, shared by the website and the app).
+
+Setup steps are in [`sanskaar-api/README.md`](sanskaar-api/README.md), then [`sanskaar-app/README.md`](sanskaar-app/README.md).
 
 ---
 

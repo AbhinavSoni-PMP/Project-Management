@@ -5,20 +5,23 @@ import { Icon } from "../../components/Icon";
 import { ProductMedia } from "../../components/Media";
 import { Body, Button, Eyebrow, Heading } from "../../components/ui";
 import { byId, config, inr } from "../../lib/catalog";
+import { useI18n } from "../../lib/i18n";
 import { useStore } from "../../lib/store";
 import { colors, fonts, gutter, radius } from "../../lib/theme";
 
 export default function Bag() {
   const { cart, setQty, cartTotal, cartCount } = useStore();
+  const { t } = useI18n();
   const left = config.freeShippingAbove - cartTotal;
+  const sizeLabel = (s: string) => t("bag.size", { size: s === "Custom" ? t("p.madeToMeasure") : s });
 
   if (!cart.length) {
     return (
       <SafeAreaView style={[styles.screen, styles.empty]}>
         <Icon name="bag" size={40} color={colors.gold} strokeWidth={1.2} />
-        <Heading size={26} center>Your bag is empty</Heading>
-        <Body>Let’s find something beautiful.</Body>
-        <Button label="Explore the catalog" variant="ghost" onPress={() => router.navigate("/shop")} />
+        <Heading size={26} center>{t("bag.empty")}</Heading>
+        <Body>{t("bag.emptyText")}</Body>
+        <Button label={t("bag.explore")} variant="ghost" onPress={() => router.navigate("/shop")} />
       </SafeAreaView>
     );
   }
@@ -26,8 +29,8 @@ export default function Bag() {
   return (
     <SafeAreaView style={styles.screen} edges={["top"]}>
       <ScrollView contentContainerStyle={{ padding: gutter, paddingBottom: 24 }}>
-        <Eyebrow>{`${cartCount} ${cartCount === 1 ? "piece" : "pieces"}`}</Eyebrow>
-        <Heading size={34} style={{ marginBottom: 18 }}>Your Bag</Heading>
+        <Eyebrow>{cartCount === 1 ? t("shop.piece") : t("shop.pieces", { n: cartCount })}</Eyebrow>
+        <Heading size={34} style={{ marginBottom: 18 }}>{t("bag.title")}</Heading>
         {cart.map((it, idx) => {
           const p = byId(it.id);
           if (!p) return null;
@@ -38,15 +41,15 @@ export default function Bag() {
               </Pressable>
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={styles.name}>{p.name}</Text>
-                <Text style={styles.meta}>Size {it.size} · {p.colorName}</Text>
+                <Text style={styles.meta}>{sizeLabel(it.size)} · {p.colorName}</Text>
                 <Text style={styles.price}>{inr(p.price * it.qty)}</Text>
                 <View style={styles.qtyRow}>
                   <View style={styles.qty}>
-                    <Pressable onPress={() => setQty(idx, it.qty - 1)} hitSlop={8} style={styles.qtyBtn} accessibilityLabel="Decrease quantity"><Icon name="minus" size={16} /></Pressable>
+                    <Pressable onPress={() => setQty(idx, it.qty - 1)} hitSlop={8} style={styles.qtyBtn} accessibilityLabel="−"><Icon name="minus" size={16} /></Pressable>
                     <Text style={styles.qtyNum}>{it.qty}</Text>
-                    <Pressable onPress={() => setQty(idx, it.qty + 1)} hitSlop={8} style={styles.qtyBtn} accessibilityLabel="Increase quantity"><Icon name="plus" size={16} /></Pressable>
+                    <Pressable onPress={() => setQty(idx, it.qty + 1)} hitSlop={8} style={styles.qtyBtn} accessibilityLabel="+"><Icon name="plus" size={16} /></Pressable>
                   </View>
-                  <Pressable onPress={() => setQty(idx, 0)} hitSlop={8}><Text style={styles.remove}>Remove</Text></Pressable>
+                  <Pressable onPress={() => setQty(idx, 0)} hitSlop={8}><Text style={styles.remove}>{t("bag.remove")}</Text></Pressable>
                 </View>
               </View>
             </View>
@@ -54,10 +57,10 @@ export default function Bag() {
         })}
       </ScrollView>
       <View style={styles.foot}>
-        <Text style={styles.ship}>{left > 0 ? `Add ${inr(left)} more for free shipping` : "✦ You've unlocked free shipping"}</Text>
-        <View style={styles.row}><Text style={styles.subLabel}>Subtotal</Text><Text style={styles.sub}>{inr(cartTotal)}</Text></View>
-        <Button label="Proceed to checkout" icon="shield" onPress={() => router.push("/checkout")} />
-        <Text style={styles.note}>Cards · UPI · Net banking · Wallets · EMI — secured by Razorpay</Text>
+        <Text style={styles.ship}>{left > 0 ? t("bag.freeShipLeft", { amount: inr(left) }) : `✦ ${t("bag.freeShip")}`}</Text>
+        <View style={styles.row}><Text style={styles.subLabel}>{t("bag.subtotal")}</Text><Text style={styles.sub}>{inr(cartTotal)}</Text></View>
+        <Button label={t("bag.checkout")} icon="shield" onPress={() => router.push("/checkout")} />
+        <Text style={styles.note}>{t("bag.methods")}</Text>
       </View>
     </SafeAreaView>
   );
@@ -77,7 +80,7 @@ const styles = StyleSheet.create({
   qtyNum: { fontFamily: fonts.sansBold, fontSize: 13, color: colors.text, minWidth: 22, textAlign: "center" },
   remove: { fontFamily: fonts.sansMedium, fontSize: 12, color: colors.text3, textDecorationLine: "underline" },
   foot: { padding: gutter, borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.bg2, gap: 10 },
-  ship: { fontFamily: fonts.sans, fontSize: 12, color: colors.gold, letterSpacing: 0.3 },
+  ship: { fontFamily: fonts.sans, fontSize: 12, color: colors.gold },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   subLabel: { fontFamily: fonts.sansMedium, fontSize: 13, color: colors.text2 },
   sub: { fontFamily: fonts.serifBold, fontSize: 26, color: colors.text },

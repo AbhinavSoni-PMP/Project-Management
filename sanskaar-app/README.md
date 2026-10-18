@@ -5,38 +5,36 @@ Built with Expo (React Native), so one codebase runs on iPhone and Android.
 
 ## What's inside
 
-| Tab / screen | What it does |
+| Screen | What it does |
 |---|---|
-| **Home** | Full-screen swipeable hero (campaign photos `sanskaar/images/site/hero-mobile-*.jpg`, or the studio product photos until those exist), Bride / Groom edits, signature catalogue with category tabs, the five Rajasthan collections, atelier story, testimonials, consultation CTA |
-| **Shop** | Full catalogue: search, Bride / Groom toggle, category chips, and a filter sheet (occasion, collection, colour, price, new / bestsellers, sort) |
-| **Product** | Swipeable photo gallery, colourways, size picker with size guide, "Made to measure", sticky **Add to bag**, WhatsApp enquiry, details / fit / shipping / care, "Complete the look" and similar pieces |
-| **Stylist** | The 3-question Bridal Style Advisor, same scoring as the website |
-| **Wishlist** | Saved pieces |
-| **Bag** | Quantities, free-shipping progress, **Proceed to checkout** |
-| **Checkout** | Delivery address (remembered for next time), order summary, then **Pay** with Razorpay: credit & debit cards, UPI, net banking, wallets, EMI. Order confirmation screen after a verified payment. |
-| **Book a consultation** | Appointment form sent to the atelier on WhatsApp |
+| **Home** | Full-screen swipeable hero, bride / groom section, bestsellers, Style advisor, collections, our workshop, reviews, consultation |
+| **☰ Menu** | Amazon-style list of the whole catalogue (women's and men's categories, occasions, collections), plus account, language and help |
+| **Shop** | Search, women / men, category chips and a filter sheet (occasion, collection, colour, price, new / bestsellers, sort) |
+| **Product** | Photos, live price and discount, "Only N left" / Sold out, **Delivery by** date, sizes with their unit, size guide, made to measure, add to bag |
+| **Wishlist / Bag** | Saved pieces; bag with quantities and free-shipping progress |
+| **Checkout** | Log in or sign up, delivery name, mobile, email and address (prefilled next time), order summary, **Pay** with Razorpay (cards, UPI, net banking, wallets, EMI) |
+| **Account** | Log in / create account, **My orders**, language, log out |
+| **Order tracking** | Expected delivery date, status timeline (confirmed → being tailored → shipped → out for delivery → delivered), courier, tracking number and link, items and address |
+| **Languages** | English, हिन्दी, ગુજરાતી, मराठी, ಕನ್ನಡ: the same translations as the website (`sanskaar/js/i18n.js`) |
 
-Bag, wishlist, recently viewed and the delivery address are saved on the phone.
+Bag, wishlist, recently viewed, language, sign-in and the delivery address are remembered on the phone.
 
-## Payments
+## Connecting to the SANSKAAR API
 
-Checkout needs the payments API in [`../sanskaar-api`](../sanskaar-api) (it holds your Razorpay secret key and prices orders from the catalogue). Follow its README to get Razorpay test keys and put it online, then create `sanskaar-app/.env` with:
+Accounts, live prices and stock, checkout and order tracking come from the API in [`../sanskaar-api`](../sanskaar-api); its README has the setup steps. Once it's online, set its address in **one** place, the website's `SANSKAAR.config.apiUrl` (top of `sanskaar/js/app.js`), then run `npm run sync` here. You can also set `EXPO_PUBLIC_API_URL` in `sanskaar-app/.env` (see `.env.example`). Restart with `npx expo start -c`.
 
-```
-EXPO_PUBLIC_API_URL=https://your-api.vercel.app
-```
-
-and restart with `npx expo start -c`. Until this is set, the Pay button stays disabled.
+Without it the app still works as a catalogue, but log in, checkout and order tracking stay switched off.
 
 ## One source of truth: the website
 
 The app does not keep its own copy of the catalogue. `npm run sync` reads the website and regenerates:
 
-- `src/data/catalog.json` ← `sanskaar/js/catalog-data.js` (products, prices, collections) and `SANSKAAR.config` in `sanskaar/js/app.js` (WhatsApp number, phone, address, free-shipping threshold)
+- `src/data/catalog.json` ← `sanskaar/js/catalog-data.js` (products, collections) and `SANSKAAR.config` in `sanskaar/js/app.js` (API address, WhatsApp number, phone, address, shipping rules)
+- `src/data/i18n.json` ← `sanskaar/js/i18n.js` (all translations)
 - `src/data/art.generated.js` ← `sanskaar/js/art.js` (the illustrated previews shown until a product is photographed)
 - `assets/site/**` and `src/data/images.generated.ts` ← every photo in `sanskaar/images/`
 
-So to change a price, add a product or add photos: edit the website as usual (see `sanskaar/images/README.md`), then run `npm run sync` here. The same command also updates the prices the payments API charges (`../sanskaar-api/data/catalog.json`). Don't edit the generated files by hand.
+**Prices, discounts, stock, sizes and delivery days** are managed on the website's Owner admin page (or in its Excel file) and reach the app live. **New products, photos and wording** are added on the website; then run `npm run sync` here (it also refreshes `../sanskaar-api/data/catalog.json`). Don't edit the generated files by hand.
 
 ## Run it on your phone
 
