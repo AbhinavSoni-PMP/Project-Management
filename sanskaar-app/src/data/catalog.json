@@ -1,0 +1,2008 @@
+{
+ "config": {
+  "brand": "SANSKAAR",
+  "whatsapp": "919999999999",
+  "phone": "+91 99999 99999",
+  "email": "hello@sanskaar.in",
+  "address": "MI Road, Jaipur, Rajasthan 302001",
+  "freeShippingAbove": 4999,
+  "instagram": "#",
+  "facebook": "#",
+  "youtube": "#",
+  "pinterest": "#"
+ },
+ "categories": {
+  "men": [
+   {
+    "key": "sherwani",
+    "name": "Sherwani",
+    "hint": "For the groom"
+   },
+   {
+    "key": "bandhgala",
+    "name": "Bandhgala & Jodhpuri",
+    "hint": "Royal Rajput cut"
+   },
+   {
+    "key": "indowestern",
+    "name": "Indo-Western",
+    "hint": "Modern drape"
+   },
+   {
+    "key": "kurta",
+    "name": "Kurta Pajama",
+    "hint": "Festive essentials"
+   },
+   {
+    "key": "jacket",
+    "name": "Nehru Jacket Sets",
+    "hint": "Layered elegance"
+   }
+  ],
+  "women": [
+   {
+    "key": "lehenga",
+    "name": "Bridal Lehenga",
+    "hint": "For the bride"
+   },
+   {
+    "key": "saree",
+    "name": "Saree",
+    "hint": "Six yards of grace"
+   },
+   {
+    "key": "anarkali",
+    "name": "Anarkali",
+    "hint": "Mughal flare"
+   },
+   {
+    "key": "sharara",
+    "name": "Sharara & Gharara",
+    "hint": "Sangeet ready"
+   },
+   {
+    "key": "suit",
+    "name": "Kurta & Palazzo",
+    "hint": "Everyday festive"
+   }
+  ]
+ },
+ "occasions": [
+  {
+   "key": "wedding",
+   "name": "Wedding",
+   "hint": "Pheras & baraat",
+   "color": "#9b1b30"
+  },
+  {
+   "key": "reception",
+   "name": "Reception",
+   "hint": "Evening glamour",
+   "color": "#3a2a6b"
+  },
+  {
+   "key": "sangeet",
+   "name": "Sangeet",
+   "hint": "Dance the night",
+   "color": "#0f5257"
+  },
+  {
+   "key": "mehendi",
+   "name": "Mehendi",
+   "hint": "Greens & florals",
+   "color": "#4f7a2a"
+  },
+  {
+   "key": "haldi",
+   "name": "Haldi",
+   "hint": "Sunshine yellows",
+   "color": "#d1951a"
+  },
+  {
+   "key": "festive",
+   "name": "Festive",
+   "hint": "Diwali, Eid, Teej",
+   "color": "#c2531b"
+  }
+ ],
+ "collections": [
+  {
+   "key": "rajwada",
+   "name": "Rajwada",
+   "deva": "रजवाड़ा",
+   "hint": "Royal heirloom couture",
+   "colors": [
+    "#6b0f1a",
+    "#c9a24a"
+   ]
+  },
+  {
+   "key": "gulabi",
+   "name": "Gulabi Nagar",
+   "deva": "गुलाबी नगर",
+   "hint": "The pink city of Jaipur",
+   "colors": [
+    "#d9677f",
+    "#f3c6cf"
+   ]
+  },
+  {
+   "key": "marwar",
+   "name": "Marwar",
+   "deva": "मारवाड़",
+   "hint": "Jodhpur blues & bandhej",
+   "colors": [
+    "#1f3f7a",
+    "#e8d39a"
+   ]
+  },
+  {
+   "key": "thar",
+   "name": "Thar Sands",
+   "deva": "थार",
+   "hint": "Desert ivory & gold",
+   "colors": [
+    "#e9d8b4",
+    "#a8782b"
+   ]
+  },
+  {
+   "key": "udaipur",
+   "name": "Udaipur Lakes",
+   "deva": "उदयपुर",
+   "hint": "Pastels of the lake palace",
+   "colors": [
+    "#7fb2a8",
+    "#f6efe0"
+   ]
+  }
+ ],
+ "colors": {
+  "maroon": {
+   "name": "Maroon",
+   "hex": "#6b0f1a"
+  },
+  "red": {
+   "name": "Bridal Red",
+   "hex": "#b3122e"
+  },
+  "ivory": {
+   "name": "Ivory",
+   "hex": "#efe4cc"
+  },
+  "gold": {
+   "name": "Antique Gold",
+   "hex": "#c9a24a"
+  },
+  "pink": {
+   "name": "Rani Pink",
+   "hex": "#c8336b"
+  },
+  "blush": {
+   "name": "Blush Pink",
+   "hex": "#e8a9b4"
+  },
+  "blue": {
+   "name": "Royal Blue",
+   "hex": "#1f3f7a"
+  },
+  "navy": {
+   "name": "Midnight Navy",
+   "hex": "#1a2340"
+  },
+  "green": {
+   "name": "Emerald",
+   "hex": "#0f6b4f"
+  },
+  "mint": {
+   "name": "Mint",
+   "hex": "#a9d5c1"
+  },
+  "yellow": {
+   "name": "Haldi Yellow",
+   "hex": "#e9b425"
+  },
+  "peach": {
+   "name": "Peach",
+   "hex": "#f0b48f"
+  },
+  "wine": {
+   "name": "Wine",
+   "hex": "#4a1030"
+  },
+  "black": {
+   "name": "Black",
+   "hex": "#1c1a1a"
+  },
+  "teal": {
+   "name": "Peacock Teal",
+   "hex": "#0f5257"
+  },
+  "lilac": {
+   "name": "Lilac",
+   "hex": "#b7a3d1"
+  },
+  "orange": {
+   "name": "Kesariya",
+   "hex": "#df6d1d"
+  },
+  "beige": {
+   "name": "Sand Beige",
+   "hex": "#d8c3a0"
+  }
+ },
+ "products": [
+  {
+   "id": "SK-M-IWS-101",
+   "name": "Neel Kamal Velvet Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "marwar",
+   "occasions": [
+    "reception",
+    "sangeet",
+    "wedding"
+   ],
+   "color": "black",
+   "colorName": "Black",
+   "hex": "#1c1a1a",
+   "accent": "#8fb3e0",
+   "second": "#1c1a1a",
+   "price": 24999,
+   "mrp": 28999,
+   "fabric": "Velvet with sequin jaal",
+   "work": "Blue & silver floral thread embroidery",
+   "tag": "new",
+   "description": "Midnight-black velvet worked with an all-over sequin jaal and cascading blue and silver florals along the hem and sleeves. Open-front cut over a black satin bandhgala kurta with antique-gold buttons, paired with tailored satin trousers.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": [
+    "front",
+    "detail"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-102",
+   "name": "Gulnaar Velvet Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "rajwada",
+   "occasions": [
+    "reception",
+    "sangeet",
+    "festive"
+   ],
+   "color": "black",
+   "colorName": "Black",
+   "hex": "#1c1a1a",
+   "accent": "#e46a8f",
+   "second": "#1c1a1a",
+   "price": 24999,
+   "mrp": 28999,
+   "fabric": "Velvet with sequin jaal",
+   "work": "Multicolour floral thread embroidery",
+   "tag": "new",
+   "description": "Black sequinned velvet blooming with rose, coral and sage florals across the hem, cuffs and shoulders, finished with an embroidered border. Worn open over a black satin inner kurta with gold buttons.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": [
+    "front",
+    "detail"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-103",
+   "name": "Phoolbagh Sequin Velvet Jacket",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "gulabi",
+   "occasions": [
+    "sangeet",
+    "reception",
+    "festive"
+   ],
+   "color": "black",
+   "colorName": "Black",
+   "hex": "#1c1a1a",
+   "accent": "#e7a3c4",
+   "second": "#1c1a1a",
+   "price": 23999,
+   "mrp": 27999,
+   "fabric": "Velvet with sequin jaal",
+   "work": "Pastel daisy thread embroidery",
+   "tag": "new",
+   "description": "A garden of pink, lilac and ivory daisies scattered over black sequinned velvet, growing into a dense floral border at the hem. Open-front jacket over a black satin inner kurta.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": [
+    "flatlay",
+    "detail"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-104",
+   "name": "Chandni Ivory Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "thar",
+   "occasions": [
+    "wedding",
+    "reception",
+    "festive"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#c9b28a",
+   "second": "#efe4cc",
+   "price": 26999,
+   "mrp": 30999,
+   "fabric": "Silk blend",
+   "work": "Champagne threadwork & scalloped sequin border",
+   "tag": "new",
+   "description": "Ivory silk-blend with delicate champagne butis, a floral vine at the hem and a scalloped sequin border. Layered over a matching ivory bandhgala kurta with pearl-tone buttons and a pocket square.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": [
+    "front",
+    "detail"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-105",
+   "name": "Gulabi Chandni Ivory Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "udaipur",
+   "occasions": [
+    "wedding",
+    "reception",
+    "festive"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#a8737f",
+   "second": "#efe4cc",
+   "price": 26999,
+   "mrp": 30999,
+   "fabric": "Silk blend",
+   "work": "Rosewood threadwork & scalloped sequin border",
+   "tag": "new",
+   "description": "Ivory silk-blend embroidered in soft rosewood tones: scattered butis, a blossoming vine and a scalloped sequin border at the hem and cuffs. Over a matching ivory bandhgala kurta with a pocket square.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": [
+    "front",
+    "detail"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-001",
+   "name": "Maharaja Zardozi Sherwani",
+   "gender": "men",
+   "category": "sherwani",
+   "collection": "rajwada",
+   "occasions": [
+    "wedding"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 64999,
+   "mrp": 79999,
+   "fabric": "Raw silk",
+   "work": "Hand zardozi, dabka & sequin",
+   "tag": "bestseller",
+   "description": "An heirloom ivory sherwani hand-embroidered with zardozi peacocks along the hem and cuffs. Paired with a matching churidar and a silk stole.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-SHW-002",
+   "name": "Shahi Maroon Velvet Sherwani",
+   "gender": "men",
+   "category": "sherwani",
+   "collection": "rajwada",
+   "occasions": [
+    "wedding",
+    "reception"
+   ],
+   "color": "maroon",
+   "colorName": "Maroon",
+   "hex": "#6b0f1a",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 72999,
+   "mrp": null,
+   "fabric": "Silk velvet",
+   "work": "Antique gold marodi & cutdana",
+   "tag": "new",
+   "description": "Rich maroon velvet with dense antique-gold embroidery at the collar and placket, inspired by the durbar halls of Amer.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-SHW-003",
+   "name": "Gulabi Rose Sherwani",
+   "gender": "men",
+   "category": "sherwani",
+   "collection": "gulabi",
+   "occasions": [
+    "wedding"
+   ],
+   "color": "blush",
+   "colorName": "Blush Pink",
+   "hex": "#e8a9b4",
+   "accent": "#d4af5a",
+   "second": "#f6efe0",
+   "price": 54999,
+   "mrp": 61999,
+   "fabric": "Silk blend",
+   "work": "Resham threadwork & pearl",
+   "tag": null,
+   "description": "A soft blush sherwani with tonal resham jaal and pearl buttons — made for the day-wedding groom.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-SHW-004",
+   "name": "Thar Gold Brocade Sherwani",
+   "gender": "men",
+   "category": "sherwani",
+   "collection": "thar",
+   "occasions": [
+    "wedding",
+    "reception"
+   ],
+   "color": "gold",
+   "colorName": "Antique Gold",
+   "hex": "#c9a24a",
+   "accent": "#7a5a1e",
+   "second": "#efe4cc",
+   "price": 58999,
+   "mrp": null,
+   "fabric": "Banarasi brocade",
+   "work": "Woven zari brocade",
+   "tag": null,
+   "description": "Woven Banarasi brocade in antique gold, finished with a hand-knotted silk button loop.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-SHW-005",
+   "name": "Mewar Wine Sherwani",
+   "gender": "men",
+   "category": "sherwani",
+   "collection": "rajwada",
+   "occasions": [
+    "reception"
+   ],
+   "color": "wine",
+   "colorName": "Wine",
+   "hex": "#4a1030",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 61999,
+   "mrp": 69999,
+   "fabric": "Raw silk",
+   "work": "Kasab & sequin",
+   "tag": null,
+   "description": "Deep wine raw silk with kasab-embroidered lotus borders, cut close in the Mewar tradition.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-SHW-006",
+   "name": "Udaipur Mint Sherwani",
+   "gender": "men",
+   "category": "sherwani",
+   "collection": "udaipur",
+   "occasions": [
+    "wedding"
+   ],
+   "color": "mint",
+   "colorName": "Mint",
+   "hex": "#a9d5c1",
+   "accent": "#e8e2d6",
+   "second": "#f6efe0",
+   "price": 49999,
+   "mrp": null,
+   "fabric": "Silk blend",
+   "work": "Silver threadwork",
+   "tag": "new",
+   "description": "A cool mint sherwani with silver threadwork that recalls the lake palace at dusk.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-BND-001",
+   "name": "Jodhpuri Navy Bandhgala",
+   "gender": "men",
+   "category": "bandhgala",
+   "collection": "marwar",
+   "occasions": [
+    "reception",
+    "festive"
+   ],
+   "color": "navy",
+   "colorName": "Midnight Navy",
+   "hex": "#1a2340",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 28999,
+   "mrp": 32999,
+   "fabric": "Terry rayon",
+   "work": "Antique metal buttons",
+   "tag": "bestseller",
+   "description": "The classic Jodhpuri bandhgala in midnight navy with antique brass buttons and breeches-style trousers.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-BND-002",
+   "name": "Royal Blue Jodhpuri Suit",
+   "gender": "men",
+   "category": "bandhgala",
+   "collection": "marwar",
+   "occasions": [
+    "reception",
+    "sangeet"
+   ],
+   "color": "blue",
+   "colorName": "Royal Blue",
+   "hex": "#1f3f7a",
+   "accent": "#d4af5a",
+   "second": "#1a2340",
+   "price": 31999,
+   "mrp": null,
+   "fabric": "Wool silk",
+   "work": "Embroidered collar",
+   "tag": null,
+   "description": "Royal blue wool-silk with a gold embroidered mandarin collar.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-BND-003",
+   "name": "Black Rajputana Bandhgala",
+   "gender": "men",
+   "category": "bandhgala",
+   "collection": "rajwada",
+   "occasions": [
+    "reception"
+   ],
+   "color": "black",
+   "colorName": "Black",
+   "hex": "#1c1a1a",
+   "accent": "#d4af5a",
+   "second": "#1c1a1a",
+   "price": 33999,
+   "mrp": 37999,
+   "fabric": "Velvet",
+   "work": "Zari collar & cuffs",
+   "tag": "new",
+   "description": "Black velvet bandhgala with zari-edged collar and cuffs — evening royalty.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-BND-004",
+   "name": "Ivory Thar Bandhgala",
+   "gender": "men",
+   "category": "bandhgala",
+   "collection": "thar",
+   "occasions": [
+    "wedding",
+    "festive"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#d4af5a",
+   "second": "#d8c3a0",
+   "price": 26999,
+   "mrp": null,
+   "fabric": "Linen silk",
+   "work": "Tonal threadwork",
+   "tag": null,
+   "description": "Ivory linen-silk with tonal threadwork, paired with sand-beige trousers.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-BND-005",
+   "name": "Emerald Jodhpuri Bandhgala",
+   "gender": "men",
+   "category": "bandhgala",
+   "collection": "rajwada",
+   "occasions": [
+    "mehendi",
+    "festive"
+   ],
+   "color": "green",
+   "colorName": "Emerald",
+   "hex": "#0f6b4f",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 29999,
+   "mrp": null,
+   "fabric": "Jacquard",
+   "work": "Woven buti",
+   "tag": null,
+   "description": "Emerald jacquard with woven gold buti, a statement for mehendi.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-IWS-001",
+   "name": "Asymmetric Drape Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "udaipur",
+   "occasions": [
+    "sangeet",
+    "reception"
+   ],
+   "color": "beige",
+   "colorName": "Sand Beige",
+   "hex": "#d8c3a0",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 34999,
+   "mrp": 39999,
+   "fabric": "Silk blend",
+   "work": "Sequin placket",
+   "tag": "bestseller",
+   "description": "An asymmetric overlap with a sequinned diagonal placket and draped stole.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-IWS-002",
+   "name": "Midnight Mirror Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "marwar",
+   "occasions": [
+    "sangeet"
+   ],
+   "color": "navy",
+   "colorName": "Midnight Navy",
+   "hex": "#1a2340",
+   "accent": "#e8e2d6",
+   "second": "#1a2340",
+   "price": 36999,
+   "mrp": null,
+   "fabric": "Suede",
+   "work": "Mirror & thread",
+   "tag": "new",
+   "description": "Midnight suede with mirror-work from Kutch artisans — built for the dance floor.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-IWS-003",
+   "name": "Wine Cape Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "rajwada",
+   "occasions": [
+    "reception"
+   ],
+   "color": "wine",
+   "colorName": "Wine",
+   "hex": "#4a1030",
+   "accent": "#d4af5a",
+   "second": "#1c1a1a",
+   "price": 39999,
+   "mrp": 44999,
+   "fabric": "Velvet",
+   "work": "Cutdana",
+   "tag": null,
+   "description": "Wine velvet long-line jacket with cutdana embroidery and a cape detail.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-IWS-004",
+   "name": "Peacock Teal Indo-Western",
+   "gender": "men",
+   "category": "indowestern",
+   "collection": "udaipur",
+   "occasions": [
+    "sangeet",
+    "mehendi"
+   ],
+   "color": "teal",
+   "colorName": "Peacock Teal",
+   "hex": "#0f5257",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 32999,
+   "mrp": null,
+   "fabric": "Jacquard silk",
+   "work": "Peacock motif",
+   "tag": null,
+   "description": "Peacock teal with jacquard motifs and a dhoti-style trouser.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-KUR-001",
+   "name": "Haldi Yellow Kurta Set",
+   "gender": "men",
+   "category": "kurta",
+   "collection": "thar",
+   "occasions": [
+    "haldi",
+    "festive"
+   ],
+   "color": "yellow",
+   "colorName": "Haldi Yellow",
+   "hex": "#e9b425",
+   "accent": "#fff4c2",
+   "second": "#efe4cc",
+   "price": 6999,
+   "mrp": 8499,
+   "fabric": "Cotton silk",
+   "work": "Chikankari yoke",
+   "tag": "bestseller",
+   "description": "Sunshine yellow cotton-silk with a hand chikankari yoke — the haldi essential.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-KUR-002",
+   "name": "Ivory Chikankari Kurta Set",
+   "gender": "men",
+   "category": "kurta",
+   "collection": "thar",
+   "occasions": [
+    "festive",
+    "mehendi"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#ffffff",
+   "second": "#efe4cc",
+   "price": 7999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "Lucknowi chikankari",
+   "tag": null,
+   "description": "All-over Lucknowi chikankari on soft georgette, paired with an ivory pajama.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-KUR-003",
+   "name": "Kesariya Festive Kurta",
+   "gender": "men",
+   "category": "kurta",
+   "collection": "marwar",
+   "occasions": [
+    "festive",
+    "haldi"
+   ],
+   "color": "orange",
+   "colorName": "Kesariya",
+   "hex": "#df6d1d",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 5999,
+   "mrp": 6999,
+   "fabric": "Art silk",
+   "work": "Gota patti placket",
+   "tag": null,
+   "description": "Kesariya saffron kurta with a gota-patti placket from Jaipur.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-KUR-004",
+   "name": "Mint Mehendi Kurta Set",
+   "gender": "men",
+   "category": "kurta",
+   "collection": "udaipur",
+   "occasions": [
+    "mehendi"
+   ],
+   "color": "mint",
+   "colorName": "Mint",
+   "hex": "#a9d5c1",
+   "accent": "#ffffff",
+   "second": "#f6efe0",
+   "price": 6499,
+   "mrp": null,
+   "fabric": "Cotton linen",
+   "work": "Thread embroidery",
+   "tag": "new",
+   "description": "Breathable cotton-linen in mint with tonal thread embroidery.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-KUR-005",
+   "name": "Maroon Silk Kurta Set",
+   "gender": "men",
+   "category": "kurta",
+   "collection": "rajwada",
+   "occasions": [
+    "festive"
+   ],
+   "color": "maroon",
+   "colorName": "Maroon",
+   "hex": "#6b0f1a",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 8499,
+   "mrp": 9999,
+   "fabric": "Dupion silk",
+   "work": "Woven buti",
+   "tag": null,
+   "description": "Dupion silk kurta in maroon with a woven gold buti, made for Diwali evenings.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-KUR-006",
+   "name": "Lilac Pastel Kurta Set",
+   "gender": "men",
+   "category": "kurta",
+   "collection": "udaipur",
+   "occasions": [
+    "sangeet",
+    "festive"
+   ],
+   "color": "lilac",
+   "colorName": "Lilac",
+   "hex": "#b7a3d1",
+   "accent": "#ffffff",
+   "second": "#f6efe0",
+   "price": 6999,
+   "mrp": null,
+   "fabric": "Silk blend",
+   "work": "Mirror placket",
+   "tag": null,
+   "description": "Lilac silk-blend with a mirror-work placket.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-JKT-001",
+   "name": "Bandhani Nehru Jacket Set",
+   "gender": "men",
+   "category": "jacket",
+   "collection": "marwar",
+   "occasions": [
+    "mehendi",
+    "festive"
+   ],
+   "color": "red",
+   "colorName": "Bridal Red",
+   "hex": "#b3122e",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 12999,
+   "mrp": 14999,
+   "fabric": "Silk",
+   "work": "Bandhani print & zari",
+   "tag": "bestseller",
+   "description": "Hand-tied bandhani Nehru jacket over an ivory kurta — pure Rajasthan.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-JKT-002",
+   "name": "Emerald Brocade Jacket Set",
+   "gender": "men",
+   "category": "jacket",
+   "collection": "rajwada",
+   "occasions": [
+    "sangeet",
+    "festive"
+   ],
+   "color": "green",
+   "colorName": "Emerald",
+   "hex": "#0f6b4f",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 13999,
+   "mrp": null,
+   "fabric": "Brocade",
+   "work": "Woven zari",
+   "tag": null,
+   "description": "Emerald brocade jacket with an ivory silk kurta and churidar.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-JKT-003",
+   "name": "Navy Velvet Jacket Set",
+   "gender": "men",
+   "category": "jacket",
+   "collection": "marwar",
+   "occasions": [
+    "reception",
+    "festive"
+   ],
+   "color": "navy",
+   "colorName": "Midnight Navy",
+   "hex": "#1a2340",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 14999,
+   "mrp": 16999,
+   "fabric": "Velvet",
+   "work": "Zari edging",
+   "tag": "new",
+   "description": "Navy velvet Nehru jacket edged in zari, layered over a cream kurta.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-M-JKT-004",
+   "name": "Gulabi Printed Jacket Set",
+   "gender": "men",
+   "category": "jacket",
+   "collection": "gulabi",
+   "occasions": [
+    "haldi",
+    "mehendi"
+   ],
+   "color": "pink",
+   "colorName": "Rani Pink",
+   "hex": "#c8336b",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 11999,
+   "mrp": null,
+   "fabric": "Chanderi",
+   "work": "Block print",
+   "tag": null,
+   "description": "Hand block-printed Jaipur jacket in rani pink over an ivory kurta.",
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-001",
+   "name": "Rajkumari Bridal Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "rajwada",
+   "occasions": [
+    "wedding"
+   ],
+   "color": "red",
+   "colorName": "Bridal Red",
+   "hex": "#b3122e",
+   "accent": "#d4af5a",
+   "second": "#b3122e",
+   "price": 184999,
+   "mrp": 219999,
+   "fabric": "Raw silk",
+   "work": "Zardozi, dabka, nakshi",
+   "tag": "bestseller",
+   "description": "Bridal red raw silk lehenga with 52 kalis, hand-embroidered in zardozi and dabka. Comes with a double-border net dupatta.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-002",
+   "name": "Gulabi Nagar Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "gulabi",
+   "occasions": [
+    "wedding",
+    "sangeet"
+   ],
+   "color": "pink",
+   "colorName": "Rani Pink",
+   "hex": "#c8336b",
+   "accent": "#d4af5a",
+   "second": "#e8a9b4",
+   "price": 124999,
+   "mrp": 139999,
+   "fabric": "Silk organza",
+   "work": "Gota patti & mirror",
+   "tag": "new",
+   "description": "Rani pink organza with Jaipuri gota-patti florals and tiny mirrors that catch every light.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-003",
+   "name": "Maroon Heritage Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "rajwada",
+   "occasions": [
+    "wedding"
+   ],
+   "color": "maroon",
+   "colorName": "Maroon",
+   "hex": "#6b0f1a",
+   "accent": "#d4af5a",
+   "second": "#b3122e",
+   "price": 164999,
+   "mrp": null,
+   "fabric": "Velvet",
+   "work": "Antique zardozi",
+   "tag": null,
+   "description": "Maroon velvet with antique-gold zardozi — for the bride who loves old-world grandeur.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-004",
+   "name": "Udaipur Pastel Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "udaipur",
+   "occasions": [
+    "reception",
+    "sangeet"
+   ],
+   "color": "mint",
+   "colorName": "Mint",
+   "hex": "#a9d5c1",
+   "accent": "#e8e2d6",
+   "second": "#f6efe0",
+   "price": 98999,
+   "mrp": 109999,
+   "fabric": "Georgette",
+   "work": "Sequin & pearl",
+   "tag": null,
+   "description": "Mint georgette with silver sequin jaal and pearl tassels.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-005",
+   "name": "Blush Floral Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "gulabi",
+   "occasions": [
+    "reception",
+    "mehendi"
+   ],
+   "color": "blush",
+   "colorName": "Blush Pink",
+   "hex": "#e8a9b4",
+   "accent": "#d4af5a",
+   "second": "#f6efe0",
+   "price": 89999,
+   "mrp": null,
+   "fabric": "Organza",
+   "work": "3D floral appliqué",
+   "tag": "new",
+   "description": "Blush organza with hand-cut 3D florals — light, romantic and photogenic.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-006",
+   "name": "Wine Velvet Reception Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "rajwada",
+   "occasions": [
+    "reception"
+   ],
+   "color": "wine",
+   "colorName": "Wine",
+   "hex": "#4a1030",
+   "accent": "#d4af5a",
+   "second": "#4a1030",
+   "price": 134999,
+   "mrp": 149999,
+   "fabric": "Velvet",
+   "work": "Cutdana & kasab",
+   "tag": null,
+   "description": "Wine velvet with cutdana and kasab work — dramatic for the reception.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-007",
+   "name": "Emerald Bandhej Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "marwar",
+   "occasions": [
+    "mehendi",
+    "sangeet"
+   ],
+   "color": "green",
+   "colorName": "Emerald",
+   "hex": "#0f6b4f",
+   "accent": "#d4af5a",
+   "second": "#c9a24a",
+   "price": 74999,
+   "mrp": null,
+   "fabric": "Gaji silk",
+   "work": "Bandhej & gota",
+   "tag": null,
+   "description": "Gaji silk bandhej in emerald with gota-trimmed tiers from Marwar.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-LHG-008",
+   "name": "Lilac Dreams Lehenga",
+   "gender": "women",
+   "category": "lehenga",
+   "collection": "udaipur",
+   "occasions": [
+    "sangeet",
+    "reception"
+   ],
+   "color": "lilac",
+   "colorName": "Lilac",
+   "hex": "#b7a3d1",
+   "accent": "#e8e2d6",
+   "second": "#f6efe0",
+   "price": 84999,
+   "mrp": 92999,
+   "fabric": "Net",
+   "work": "Sequin & thread",
+   "tag": null,
+   "description": "Lilac net with silver sequin waves, a lehenga made for twirling.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SAR-001",
+   "name": "Banarasi Kadhua Saree",
+   "gender": "women",
+   "category": "saree",
+   "collection": "rajwada",
+   "occasions": [
+    "wedding",
+    "festive"
+   ],
+   "color": "red",
+   "colorName": "Bridal Red",
+   "hex": "#b3122e",
+   "accent": "#d4af5a",
+   "second": "#6b0f1a",
+   "price": 38999,
+   "mrp": 44999,
+   "fabric": "Katan silk",
+   "work": "Kadhua woven zari",
+   "tag": "bestseller",
+   "description": "Handwoven Banarasi katan silk in bridal red with kadhua zari motifs.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SAR-002",
+   "name": "Leheriya Chiffon Saree",
+   "gender": "women",
+   "category": "saree",
+   "collection": "marwar",
+   "occasions": [
+    "haldi",
+    "festive"
+   ],
+   "color": "yellow",
+   "colorName": "Haldi Yellow",
+   "hex": "#e9b425",
+   "accent": "#df6d1d",
+   "second": "#e9b425",
+   "price": 12999,
+   "mrp": null,
+   "fabric": "Chiffon",
+   "work": "Leheriya tie-dye & gota",
+   "tag": null,
+   "description": "Rajasthani leheriya waves on chiffon with a gota border.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SAR-003",
+   "name": "Ivory Gota Saree",
+   "gender": "women",
+   "category": "saree",
+   "collection": "thar",
+   "occasions": [
+    "reception",
+    "festive"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 18999,
+   "mrp": 21999,
+   "fabric": "Organza",
+   "work": "Gota patti",
+   "tag": "new",
+   "description": "Sheer ivory organza bordered in gota patti — understated luxury.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SAR-004",
+   "name": "Royal Blue Kanjeevaram",
+   "gender": "women",
+   "category": "saree",
+   "collection": "marwar",
+   "occasions": [
+    "wedding",
+    "reception"
+   ],
+   "color": "blue",
+   "colorName": "Royal Blue",
+   "hex": "#1f3f7a",
+   "accent": "#d4af5a",
+   "second": "#c9a24a",
+   "price": 34999,
+   "mrp": null,
+   "fabric": "Kanjeevaram silk",
+   "work": "Temple border",
+   "tag": null,
+   "description": "Royal blue Kanjeevaram with a contrast temple border.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SAR-005",
+   "name": "Rani Pink Bandhani Saree",
+   "gender": "women",
+   "category": "saree",
+   "collection": "gulabi",
+   "occasions": [
+    "mehendi",
+    "sangeet"
+   ],
+   "color": "pink",
+   "colorName": "Rani Pink",
+   "hex": "#c8336b",
+   "accent": "#d4af5a",
+   "second": "#c8336b",
+   "price": 15999,
+   "mrp": 17999,
+   "fabric": "Gaji silk",
+   "work": "Bandhani & zari",
+   "tag": null,
+   "description": "Rani pink gaji silk with thousands of hand-tied bandhani dots.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SAR-006",
+   "name": "Black Sequin Saree",
+   "gender": "women",
+   "category": "saree",
+   "collection": "rajwada",
+   "occasions": [
+    "reception"
+   ],
+   "color": "black",
+   "colorName": "Black",
+   "hex": "#1c1a1a",
+   "accent": "#d4af5a",
+   "second": "#1c1a1a",
+   "price": 21999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "All-over sequin",
+   "tag": null,
+   "description": "Black georgette with all-over gold sequins for the cocktail night.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-ANK-001",
+   "name": "Mughal Maroon Anarkali",
+   "gender": "women",
+   "category": "anarkali",
+   "collection": "rajwada",
+   "occasions": [
+    "wedding",
+    "festive"
+   ],
+   "color": "maroon",
+   "colorName": "Maroon",
+   "hex": "#6b0f1a",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 32999,
+   "mrp": 36999,
+   "fabric": "Silk",
+   "work": "Zari & resham",
+   "tag": "bestseller",
+   "description": "A floor-length maroon anarkali with zari kalis and a resham yoke.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-ANK-002",
+   "name": "Peach Floral Anarkali",
+   "gender": "women",
+   "category": "anarkali",
+   "collection": "udaipur",
+   "occasions": [
+    "mehendi",
+    "sangeet"
+   ],
+   "color": "peach",
+   "colorName": "Peach",
+   "hex": "#f0b48f",
+   "accent": "#d4af5a",
+   "second": "#f6efe0",
+   "price": 24999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "Thread & sequin",
+   "tag": "new",
+   "description": "Peach georgette with a floral thread hem — light enough to dance in.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-ANK-003",
+   "name": "Peacock Teal Anarkali",
+   "gender": "women",
+   "category": "anarkali",
+   "collection": "udaipur",
+   "occasions": [
+    "festive",
+    "reception"
+   ],
+   "color": "teal",
+   "colorName": "Peacock Teal",
+   "hex": "#0f5257",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 27999,
+   "mrp": 29999,
+   "fabric": "Silk blend",
+   "work": "Zari border",
+   "tag": null,
+   "description": "Peacock teal anarkali with a broad zari border and organza dupatta.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-ANK-004",
+   "name": "Ivory Chikankari Anarkali",
+   "gender": "women",
+   "category": "anarkali",
+   "collection": "thar",
+   "occasions": [
+    "mehendi",
+    "festive"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#ffffff",
+   "second": "#efe4cc",
+   "price": 19999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "Lucknowi chikankari",
+   "tag": null,
+   "description": "All-over Lucknowi chikankari in ivory with a mukaish dupatta.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-ANK-005",
+   "name": "Navy Gota Anarkali",
+   "gender": "women",
+   "category": "anarkali",
+   "collection": "marwar",
+   "occasions": [
+    "festive",
+    "sangeet"
+   ],
+   "color": "navy",
+   "colorName": "Midnight Navy",
+   "hex": "#1a2340",
+   "accent": "#d4af5a",
+   "second": "#efe4cc",
+   "price": 22999,
+   "mrp": 25999,
+   "fabric": "Chanderi silk",
+   "work": "Gota patti",
+   "tag": null,
+   "description": "Midnight navy chanderi edged in Jaipuri gota.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SHR-001",
+   "name": "Haldi Gota Sharara Set",
+   "gender": "women",
+   "category": "sharara",
+   "collection": "marwar",
+   "occasions": [
+    "haldi"
+   ],
+   "color": "yellow",
+   "colorName": "Haldi Yellow",
+   "hex": "#e9b425",
+   "accent": "#d4af5a",
+   "second": "#e9b425",
+   "price": 16999,
+   "mrp": 18999,
+   "fabric": "Mul cotton",
+   "work": "Gota patti",
+   "tag": "bestseller",
+   "description": "Marigold yellow sharara with gota-patti tiers — haldi's favourite.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SHR-002",
+   "name": "Mint Mirror Sharara",
+   "gender": "women",
+   "category": "sharara",
+   "collection": "udaipur",
+   "occasions": [
+    "mehendi",
+    "sangeet"
+   ],
+   "color": "mint",
+   "colorName": "Mint",
+   "hex": "#a9d5c1",
+   "accent": "#e8e2d6",
+   "second": "#a9d5c1",
+   "price": 18999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "Mirror & sequin",
+   "tag": "new",
+   "description": "Mint georgette with mirror-work kurti and flared sharara.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SHR-003",
+   "name": "Rani Pink Gharara Set",
+   "gender": "women",
+   "category": "sharara",
+   "collection": "gulabi",
+   "occasions": [
+    "sangeet",
+    "mehendi"
+   ],
+   "color": "pink",
+   "colorName": "Rani Pink",
+   "hex": "#c8336b",
+   "accent": "#d4af5a",
+   "second": "#c8336b",
+   "price": 21999,
+   "mrp": 23999,
+   "fabric": "Silk",
+   "work": "Zari & gota",
+   "tag": null,
+   "description": "A Lucknowi-style gharara in rani pink with zari gota at the knee.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SHR-004",
+   "name": "Lilac Sequin Sharara",
+   "gender": "women",
+   "category": "sharara",
+   "collection": "udaipur",
+   "occasions": [
+    "sangeet",
+    "reception"
+   ],
+   "color": "lilac",
+   "colorName": "Lilac",
+   "hex": "#b7a3d1",
+   "accent": "#e8e2d6",
+   "second": "#b7a3d1",
+   "price": 19999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "Sequin",
+   "tag": null,
+   "description": "Lilac sequins from yoke to hem — built for the sangeet stage.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SUT-001",
+   "name": "Jaipuri Block Print Suit",
+   "gender": "women",
+   "category": "suit",
+   "collection": "gulabi",
+   "occasions": [
+    "festive",
+    "haldi"
+   ],
+   "color": "blush",
+   "colorName": "Blush Pink",
+   "hex": "#e8a9b4",
+   "accent": "#c8336b",
+   "second": "#f6efe0",
+   "price": 6999,
+   "mrp": 7999,
+   "fabric": "Cotton",
+   "work": "Sanganeri block print",
+   "tag": "bestseller",
+   "description": "Hand block-printed Sanganeri cotton suit with palazzo and mulmul dupatta.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SUT-002",
+   "name": "Emerald Silk Kurta Set",
+   "gender": "women",
+   "category": "suit",
+   "collection": "rajwada",
+   "occasions": [
+    "festive"
+   ],
+   "color": "green",
+   "colorName": "Emerald",
+   "hex": "#0f6b4f",
+   "accent": "#d4af5a",
+   "second": "#c9a24a",
+   "price": 9999,
+   "mrp": null,
+   "fabric": "Chanderi silk",
+   "work": "Zari yoke",
+   "tag": null,
+   "description": "Emerald chanderi with a zari yoke and golden palazzo.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SUT-003",
+   "name": "Kesariya Leheriya Suit",
+   "gender": "women",
+   "category": "suit",
+   "collection": "marwar",
+   "occasions": [
+    "haldi",
+    "festive"
+   ],
+   "color": "orange",
+   "colorName": "Kesariya",
+   "hex": "#df6d1d",
+   "accent": "#d4af5a",
+   "second": "#e9b425",
+   "price": 7499,
+   "mrp": 8499,
+   "fabric": "Cotton silk",
+   "work": "Leheriya & gota",
+   "tag": "new",
+   "description": "Kesariya leheriya in cotton silk with gota-trimmed sleeves.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  },
+  {
+   "id": "SK-W-SUT-004",
+   "name": "Ivory Mukaish Kurta Set",
+   "gender": "women",
+   "category": "suit",
+   "collection": "thar",
+   "occasions": [
+    "mehendi",
+    "festive"
+   ],
+   "color": "ivory",
+   "colorName": "Ivory",
+   "hex": "#efe4cc",
+   "accent": "#e8e2d6",
+   "second": "#efe4cc",
+   "price": 8999,
+   "mrp": null,
+   "fabric": "Georgette",
+   "work": "Mukaish work",
+   "tag": null,
+   "description": "Ivory georgette sprinkled with silver mukaish.",
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "photos": null
+  }
+ ]
+}

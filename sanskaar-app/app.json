@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "SANSKAAR",
+    "slug": "sanskaar",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.sanskaar.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0e0c0b",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "in.sanskaar.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-image",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#0e0c0b"
+        }
+      ]
+    ],
+    "scheme": "sanskaar",
+    "backgroundColor": "#0e0c0b"
+  }
+}
