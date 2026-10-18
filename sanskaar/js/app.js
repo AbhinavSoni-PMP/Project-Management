@@ -219,7 +219,7 @@ SANSKAAR.config = {
       </div>
       <div class="container footer-bottom">
         <span>© ${new Date().getFullYear()} SANSKAAR. ${t("foot.rights")}</span>
-        <span>${t("foot.made")}</span>
+        <span>${t("foot.made")} · <a href="admin.html">Owner admin</a></span>
       </div>
     </footer>`;
     $$("[data-lang-select]").forEach(s => s.onchange = () => S.setLang(s.value));

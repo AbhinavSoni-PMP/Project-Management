@@ -16,6 +16,26 @@
   const info = id => S.allProducts.find(p => p.id === id) || {};
 
   let products = [], orders = [], statuses = [];
+  // Preview: until the API is online the page runs on the website's own catalogue
+  // and one example order. Nothing is saved and customers don't see any change.
+  let preview = false;
+  const PREVIEW_STATUSES = Object.keys(STATUS_LABEL);
+  function previewProduct(p, edits = {}) {
+    const x = { id: p.id, name: p.name, mrp: p.mrp || p.price, discountPct: 0, discountAmt: (p.mrp || p.price) - p.price,
+      deliveryDays: 10, sizes: p.sizes || [], sizeUnit: p.sizeUnit || "Standard", inventory: 10, sold: 0, active: true, ...edits };
+    x.price = price(x.mrp, x.discountPct, x.discountAmt);
+    x.remaining = Math.max(0, x.inventory - x.sold);
+    return x;
+  }
+  function previewData() {
+    products = S.allProducts.map(p => previewProduct(p));
+    const p = S.allProducts[0], d = new Date(Date.now() + 9 * 864e5).toISOString().slice(0, 10);
+    statuses = PREVIEW_STATUSES;
+    orders = [{ receipt: "EXAMPLE-0001", status: "tailoring", createdAt: new Date().toISOString(), total: p.price, paymentId: "example order",
+      expectedDelivery: d, courier: "", trackingNo: "", trackingUrl: "",
+      customer: { name: "Example Customer", phone: "9876543210", email: "customer@example.com", line1: "12 MG Road", line2: "", city: "Jaipur", state: "Rajasthan", pincode: "302001" },
+      items: [{ id: p.id, name: p.name, size: (p.sizes || ["M"])[0], qty: 1 }] }];
+  }
 
   function flash(msg, bad) {
     const el = $("#admin-flash");
@@ -61,6 +81,12 @@
     };
     const btn = $("[data-save]", tr);
     btn.disabled = true;
+    if (preview) {
+      const product = previewProduct(info(tr.dataset.id), { ...body, sizes: body.sizes.split(",").map(x => x.trim()).filter(Boolean) });
+      products = products.map(p => (p.id === product.id ? product : p));
+      tr.outerHTML = productRow(product);
+      return flash(`Preview: ${product.id} would now cost ${inr(product.price)} with ${product.remaining} in stock. Not saved — connect the API to save.`);
+    }
     try {
       const { product } = await S.api(`/api/admin/products/${encodeURIComponent(tr.dataset.id)}`, { method: "PUT", body });
       products = products.map(p => (p.id === product.id ? product : p));
@@ -100,6 +126,12 @@
     if (!body.note) delete body.note;
     const btn = $("[data-save-order]", box);
     btn.disabled = true;
+    if (preview) {
+      const order = { ...orders.find(o => o.receipt === box.dataset.receipt), ...body };
+      orders = orders.map(o => (o.receipt === order.receipt ? order : o));
+      box.outerHTML = orderRow(order);
+      return flash(`Preview: the customer would now see “${STATUS_LABEL[order.status]}”. Not saved — connect the API to save.`);
+    }
     try {
       const { order } = await S.api(`/api/admin/orders/${encodeURIComponent(box.dataset.receipt)}`, { method: "PUT", body });
       orders = orders.map(o => (o.receipt === order.receipt ? order : o));
@@ -110,6 +142,7 @@
 
   /* ---------- Excel ---------- */
   async function download() {
+    if (preview) return flash("Excel download and upload work once the API is online.", true);
     try {
       const blob = await S.api("/api/admin/catalog.xlsx", { blob: true });
       const a = document.createElement("a");
@@ -120,6 +153,7 @@
     } catch (e) { flash(e.message, true); }
   }
   async function upload(file) {
+    if (preview) return flash("Excel download and upload work once the API is online.", true);
     const out = $("#x-result");
     out.innerHTML = `<p class="muted">Uploading ${esc(file.name)}…</p>`;
     const b64 = await new Promise((res, rej) => {
@@ -142,11 +176,11 @@
 
   async function admin() {
     const root = $("#admin-root");
-    if (!S.apiReady()) { root.innerHTML = `<div class="panel center"><h3>${S.t("co.notConfigured")}</h3><p class="muted">Set SANSKAAR.config.apiUrl in js/app.js.</p></div>`; return; }
-    if (!S.session.token) { root.innerHTML = `<div class="panel center"><h3>Owner admin</h3><p class="muted">Log in with your owner account.</p><a class="btn btn-gold" href="account.html">${S.t("nav.login")}</a></div>`; return; }
-    try { await S.api("/api/auth/me"); } catch (e) { root.innerHTML = `<div class="panel center"><p class="form-error">${esc(e.message)}</p></div>`; return; }
+    preview = !S.apiReady();
+    if (!preview && !S.session.token) { root.innerHTML = `<div class="panel center"><h3>Owner admin</h3><p class="muted">Log in with your owner account.</p><a class="btn btn-gold" href="account.html">${S.t("nav.login")}</a></div>`; return; }
+    if (!preview) try { await S.api("/api/auth/me"); } catch (e) { root.innerHTML = `<div class="panel center"><p class="form-error">${esc(e.message)}</p></div>`; return; }
 
-    root.innerHTML = `
+    root.innerHTML = `${preview ? `<div class="admin-flash bad"><b>Preview mode.</b> The backend (API) isn't connected yet, so this page shows your catalogue with starting values and one example order. You can try every control, but nothing is saved and customers see no change. Once the API is online, log in with your owner email and changes save for real.</div>` : ""}
       <p class="admin-flash" id="admin-flash" hidden></p>
       <div class="tabs" role="tablist">
         <button class="tab active" data-tab="products">Products &amp; prices</button>
@@ -197,6 +231,7 @@
     $("#x-download").onclick = download;
     $("#x-file").onchange = e => { if (e.target.files[0]) upload(e.target.files[0]); e.target.value = ""; };
 
+    if (preview) { previewData(); drawProducts(); drawOrders(); return; }
     try { await Promise.all([loadProducts(), loadOrders()]); }
     catch (e) { root.innerHTML = `<div class="panel center"><h3>Owner admin</h3><p class="form-error">${esc(e.message)}</p></div>`; }
   }
