@@ -6,6 +6,7 @@
    app:
      - the catalogue (js/catalog-data.js)      -> src/data/catalog.json
      - business settings (SANSKAAR.config)     -> src/data/catalog.json
+     - translations (js/i18n.js)               -> src/data/i18n.json
      - the illustrated previews (js/art.js)    -> src/data/art.generated.js
      - every photo under images/               -> assets/site/...
        plus a require() map Metro can bundle   -> src/data/images.generated.ts
@@ -32,6 +33,14 @@ sandbox.window = sandbox;
 vm.runInContext(read("js/catalog-data.js"), sandbox);
 const S = JSON.parse(JSON.stringify(sandbox.SANSKAAR));
 
+// 1b. Translations (shared with the website)
+const i18n = vm.createContext({});
+i18n.window = i18n;
+vm.runInContext(read("js/i18n.js"), i18n);
+fs.mkdirSync(OUT_DATA, { recursive: true });
+fs.writeFileSync(path.join(OUT_DATA, "i18n.json"),
+  JSON.stringify({ languages: i18n.SANSKAAR.languages, strings: i18n.SANSKAAR.strings }) + "\n");
+
 // 2. Business settings live at the top of app.js
 const cfgSrc = read("js/app.js").match(/SANSKAAR\.config\s*=\s*(\{[\s\S]*?\n\});/);
 if (!cfgSrc) throw new Error("Could not find SANSKAAR.config in js/app.js");
@@ -48,12 +57,15 @@ const catalog = {
 fs.mkdirSync(OUT_DATA, { recursive: true });
 fs.writeFileSync(path.join(OUT_DATA, "catalog.json"), JSON.stringify(catalog, null, 1) + "\n");
 
-// The payments API prices orders from the same catalogue (never from the phone)
+// The API seeds its product table from the same catalogue (prices are then managed by the owner)
 const API_DATA = path.resolve(APP, "../sanskaar-api/data");
 fs.mkdirSync(API_DATA, { recursive: true });
 fs.writeFileSync(path.join(API_DATA, "catalog.json"), JSON.stringify({
   config: { freeShippingAbove: config.freeShippingAbove, shippingFee: config.shippingFee },
-  products: S.products.map(p => ({ id: p.id, name: p.name, price: p.price, sizes: p.sizes }))
+  products: S.products.map(p => ({
+    id: p.id, name: p.name, category: p.category, price: p.price, mrp: p.mrp, sizes: p.sizes,
+    sizeUnit: p.gender === "men" ? "Inches" : "Standard"
+  }))
 }, null, 1) + "\n");
 
 // 3. Illustrated previews: same drawing code, exported as a CommonJS module

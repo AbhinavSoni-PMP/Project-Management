@@ -1,7 +1,9 @@
 /* ==========================================================================
    SANSKAAR — Site behaviour
-   Shared header/footer, cart, wishlist, appointment booking and the
-   home / catalogue / product page renderers.
+   Shared header, side menu and footer, cart, wishlist, appointment booking
+   and the home / catalogue / product page renderers. Language, sign-in and
+   live prices come from js/platform.js; account, checkout and admin pages
+   register themselves in SANSKAAR.pages.
    ========================================================================== */
 
 /* ---------- Business settings: edit these ---------- */
@@ -11,6 +13,7 @@ SANSKAAR.config = {
   phone: "+91 99999 99999",
   email: "hello@sanskaar.in",
   address: "MI Road, Jaipur, Rajasthan 302001",
+  apiUrl: "",                        // your SANSKAAR API address, e.g. https://sanskaar-api.vercel.app
   freeShippingAbove: 4999,
   shippingFee: 250,                  // charged below freeShippingAbove
   instagram: "#", facebook: "#", youtube: "#", pinterest: "#"
@@ -31,7 +34,10 @@ SANSKAAR.config = {
     });
     return u;
   }
-  const catName = key => [...S.categories.men, ...S.categories.women].find(c => c.key === key)?.name || key;
+  // js/platform.js loads after this file, so look its helpers up when called
+  const t = (key, vars) => S.t(key, vars), rich = (key, vars) => S.rich(key, vars);
+  const catName = key => t("cat." + key);
+  const occName = key => t("occ." + key);
   const collOf = key => S.collections.find(c => c.key === key);
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
@@ -56,6 +62,7 @@ SANSKAAR.config = {
     facebook: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H8v4h2v8h4v-8h3l1-4h-4V8z"/></svg>',
     youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2a3 3 0 0 0-2-2C18.2 5.7 12 5.7 12 5.7s-6.2 0-8 .5a3 3 0 0 0-2 2A31 31 0 0 0 1.7 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2 2c1.8.5 8 .5 8 .5s6.2 0 8-.5a3 3 0 0 0 2-2 31 31 0 0 0 .3-3.8 31 31 0 0 0-.3-3.8zM10 15V9l5.2 3L10 15z"/></svg>',
     pinterest: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.5 1.8-2.5.9 0 1.3.7 1.3 1.4 0 .9-.6 2.2-.8 3.4-.2 1 .5 1.9 1.6 1.9 1.9 0 3.3-2 3.3-4.9 0-2.5-1.8-4.3-4.4-4.3a4.6 4.6 0 0 0-4.8 4.6c0 .9.3 1.9.8 2.4l.1.4-.3 1.2c0 .2-.2.3-.4.2-1.4-.6-2.2-2.6-2.2-4.2 0-3.4 2.5-6.6 7.2-6.6 3.8 0 6.7 2.7 6.7 6.3 0 3.8-2.4 6.8-5.7 6.8-1.1 0-2.2-.6-2.5-1.3l-.7 2.6c-.2 1-.9 2.2-1.4 2.9A10 10 0 1 0 12 2z"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
     lotus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 4c2 2.5 2.5 5.5 0 9-2.5-3.5-2-6.5 0-9z"/><path d="M12 13c-2.5-1.5-5.5-2-8-1 1 3 4 4.5 8 4.5s7-1.5 8-4.5c-2.5-1-5.5-.5-8 1z"/><path d="M5 18h14"/></svg>'
   };
   S.icons = I;
@@ -75,72 +82,96 @@ SANSKAAR.config = {
   function megaMenu(gender) {
     const cats = S.categories[gender];
     const feature = S.products.find(p => p.gender === gender && p.tag === "bestseller");
-    const g = gender === "men" ? "Groom" : "Bride";
     return `<div class="mega"><div class="container mega-inner">
-      <div><h4>Shop ${gender === "men" ? "Men" : "Women"}</h4><ul>
-        <li><a href="catalog.html#gender.${gender}">View all</a></li>
-        ${cats.map(c => `<li><a href="catalog.html#gender.${gender}~category.${c.key}">${c.name}</a></li>`).join("")}
+      <div><h4>${gender === "men" ? t("nav.men") : t("nav.women")}</h4><ul>
+        <li><a href="catalog.html#gender.${gender}">${t("nav.viewAll")}</a></li>
+        ${cats.map(c => `<li><a href="catalog.html#gender.${gender}~category.${c.key}">${catName(c.key)}</a></li>`).join("")}
       </ul></div>
-      <div><h4>By occasion</h4><ul>
-        ${S.occasions.map(o => `<li><a href="catalog.html#gender.${gender}~occasion.${o.key}">${o.name}</a></li>`).join("")}
+      <div><h4>${t("nav.occasions")}</h4><ul>
+        ${S.occasions.map(o => `<li><a href="catalog.html#gender.${gender}~occasion.${o.key}">${occName(o.key)}</a></li>`).join("")}
       </ul></div>
-      <div><h4>Collections</h4><ul>
+      <div><h4>${t("nav.collections")}</h4><ul>
         ${S.collections.map(c => `<li><a href="catalog.html#gender.${gender}~collection.${c.key}">${c.name}</a></li>`).join("")}
       </ul></div>
       <a class="mega-feature" href="catalog.html#gender.${gender}~occasion.wedding">
         <div class="art">${feature ? media(feature, "front") : ""}</div>
-        <div class="txt"><span class="eyebrow">The ${g} Edit</span><h3>Wedding ${g === "Groom" ? "Sherwanis" : "Lehengas"}</h3></div>
+        <div class="txt"><span class="eyebrow">${gender === "men" ? t("home.groomEyebrow") : t("home.brideEyebrow")}</span><h3>${gender === "men" ? t("home.groomTitle") : t("home.brideTitle")}</h3></div>
       </a>
     </div></div>`;
   }
 
+  const langPicker = id => `<label class="lang-pick" for="${id}">${I.globe}<span class="sr-only">${t("nav.language")}</span>
+    <select id="${id}" data-lang-select>${S.languages.map(l => `<option value="${l.code}" ${l.code === S.lang ? "selected" : ""}>${l.name}</option>`).join("")}</select></label>`;
+
   function header(active) {
     const el = $("#site-header");
     if (!el) return;
+    const user = S.session.user;
     el.outerHTML = `
-    <div class="announce">Complimentary shipping across India above ${inr(S.config.freeShippingAbove)} &nbsp;·&nbsp; <a href="#" data-open="appointment">Book a private bridal consultation</a></div>
+    <div class="announce">${esc(t("home.freeShipping", { amount: inr(S.config.freeShippingAbove) }))} &nbsp;·&nbsp; <a href="#" data-open="appointment">${t("nav.consult")}</a></div>
     <header class="site-header" id="header">
       <div class="container header-row">
-        <button class="icon-btn menu-toggle" data-open="mobile-nav" aria-label="Open menu">${I.menu}</button>
-        <a href="index.html" class="logo" aria-label="Sanskaar home">
-          <span class="logo-mark">SANSKAAR</span><span class="logo-sub">Indian Wedding Couture</span>
-        </a>
+        <div class="header-left">
+          <button class="icon-btn menu-toggle" data-open="mobile-nav" aria-label="${t("nav.menu")}">${I.menu}<span class="menu-label">${t("nav.menu")}</span></button>
+          <a href="index.html" class="logo" aria-label="SANSKAAR">
+            <span class="logo-mark">SANSKAAR</span><span class="logo-sub">Indian Wedding Couture</span>
+          </a>
+        </div>
         <nav class="main-nav" aria-label="Main">
           <ul>
-            <li><a href="index.html" class="${active === "home" ? "active" : ""}">Home</a></li>
-            <li><a href="catalog.html#gender.women" class="${active === "women" ? "active" : ""}">Bride</a>${megaMenu("women")}</li>
-            <li><a href="catalog.html#gender.men" class="${active === "men" ? "active" : ""}">Groom</a>${megaMenu("men")}</li>
-            <li><a href="index.html#advisor">Style Advisor</a></li>
-            <li><a href="catalog.html" class="${active === "catalog" ? "active" : ""}">Couture Catalog</a></li>
-            <li><a href="index.html#atelier">The Atelier</a></li>
+            <li><a href="index.html" class="${active === "home" ? "active" : ""}">${t("nav.home")}</a></li>
+            <li><a href="catalog.html#gender.women" class="${active === "women" ? "active" : ""}">${t("nav.bride")}</a>${megaMenu("women")}</li>
+            <li><a href="catalog.html#gender.men" class="${active === "men" ? "active" : ""}">${t("nav.groom")}</a>${megaMenu("men")}</li>
+            <li><a href="index.html#advisor">${t("nav.advisor")}</a></li>
+            <li><a href="catalog.html" class="${active === "catalog" ? "active" : ""}">${t("nav.catalog")}</a></li>
           </ul>
         </nav>
         <div class="header-right">
-          <a class="icon-btn hide-sm" href="catalog.html#search" aria-label="Search">${I.search}</a>
-          <a class="icon-btn" href="catalog.html#wishlist.1" aria-label="Wishlist">${I.heart}<span class="badge" id="wish-count"></span></a>
-          <button class="icon-btn" data-open="cart" aria-label="Shopping bag">${I.bag}<span class="badge" id="cart-count"></span></button>
-          <a href="#" data-open="appointment" class="btn btn-ghost-gold header-cta">Book Consultation</a>
+          <span class="hide-sm">${langPicker("lang-head")}</span>
+          <a class="icon-btn hide-sm" href="catalog.html#search" aria-label="${t("nav.search")}">${I.search}</a>
+          <a class="icon-btn account-btn" href="account.html" aria-label="${t("nav.account")}">${I.user}<span class="account-name">${user ? esc(user.name.split(" ")[0]) : t("nav.login")}</span></a>
+          <a class="icon-btn" href="catalog.html#wishlist.1" aria-label="${t("nav.wishlist")}">${I.heart}<span class="badge" id="wish-count"></span></a>
+          <button class="icon-btn" data-open="cart" aria-label="${t("nav.bag")}">${I.bag}<span class="badge" id="cart-count"></span></button>
         </div>
       </div>
     </header>`;
 
+    // Amazon-style side menu: the whole catalogue as a list, plus account, language and help
+    const link = (href, label, extra = "") => `<a class="menu-link" href="${href}" ${extra}><span>${label}</span><i aria-hidden="true">›</i></a>`;
     document.body.insertAdjacentHTML("beforeend", `
-    <aside class="mobile-nav" id="mobile-nav" aria-label="Menu">
-      <div class="drawer-head" style="padding:0 0 18px;border:0"><span class="logo-mark" style="font-size:24px">SANSKAAR</span><button class="close" data-close aria-label="Close menu">&times;</button></div>
-      <form action="catalog.html" class="search-pill" id="m-search">${I.search}<input type="search" name="q" placeholder="Search lehenga, sherwani…" aria-label="Search"></form>
-      <a href="index.html">Home</a>
-      ${["women", "men"].map(g => `<details><summary>${g === "men" ? "Groom" : "Bride"}</summary><ul>
-        <li><a href="catalog.html#gender.${g}">View all</a></li>
-        ${S.categories[g].map(c => `<li><a href="catalog.html#gender.${g}~category.${c.key}">${c.name}</a></li>`).join("")}
-      </ul></details>`).join("")}
-      <details><summary>Occasions</summary><ul>${S.occasions.map(o => `<li><a href="catalog.html#occasion.${o.key}">${o.name}</a></li>`).join("")}</ul></details>
-      <details><summary>Collections</summary><ul>${S.collections.map(c => `<li><a href="catalog.html#collection.${c.key}">${c.name}</a></li>`).join("")}</ul></details>
-      <a href="index.html#advisor">Style Advisor</a>
-      <a href="catalog.html">Couture Catalog</a>
-      <a href="catalog.html#wishlist.1">Wishlist</a>
-      <a href="#" data-open="appointment" class="btn btn-gold btn-block" style="font-family:var(--sans);font-size:11px;margin-top:24px;border:0">Book Consultation</a>
+    <aside class="mobile-nav side-menu" id="mobile-nav" aria-label="${t("nav.menu")}">
+      <div class="menu-hello">
+        <a href="account.html">${I.user}<b>${user ? esc(t("nav.hello", { name: user.name.split(" ")[0] })) : t("nav.helloGuest")}</b></a>
+        <button class="close" data-close aria-label="${t("nav.close")}">&times;</button>
+      </div>
+      <div class="menu-body">
+        <form action="catalog.html" class="search-pill" id="m-search">${I.search}<input type="search" name="q" placeholder="${esc(t("nav.searchPlaceholder"))}" aria-label="${t("nav.search")}"></form>
+        <h4>${t("nav.shopByCategory")}</h4>
+        ${["women", "men"].map(g => `<h5>${g === "men" ? t("nav.men") : t("nav.women")}</h5>
+          ${link(`catalog.html#gender.${g}`, t("nav.viewAll"))}
+          ${S.categories[g].map(c => link(`catalog.html#gender.${g}~category.${c.key}`, catName(c.key))).join("")}`).join("")}
+        <h4>${t("nav.occasions")}</h4>
+        ${S.occasions.map(o => link(`catalog.html#occasion.${o.key}`, occName(o.key))).join("")}
+        <h4>${t("nav.collections")}</h4>
+        ${S.collections.map(c => link(`catalog.html#collection.${c.key}`, `${c.name} <small>${t("coll." + c.key)}</small>`)).join("")}
+        <h4>${t("nav.account")}</h4>
+        ${link("account.html#orders", t("nav.orders"))}
+        ${link("catalog.html#wishlist.1", t("nav.wishlist"))}
+        ${user && user.isOwner ? link("admin.html", t("nav.admin")) : ""}
+        ${user ? link("#", t("nav.logout"), "data-logout") : link("account.html", t("nav.login"))}
+        <h4>${t("nav.language")}</h4>
+        <div class="menu-langs">${S.languages.map(l => `<button data-lang="${l.code}" class="${l.code === S.lang ? "on" : ""}">${l.name}</button>`).join("")}</div>
+        <h4>${t("nav.help")}</h4>
+        ${link("index.html#advisor", t("nav.advisor"))}
+        ${link("#", t("nav.consult"), 'data-open="appointment"')}
+        ${link(`https://wa.me/${S.config.whatsapp}`, t("foot.whatsapp"), 'target="_blank" rel="noopener"')}
+      </div>
     </aside>
-    <a class="wa-float" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent("Namaste SANSKAAR, I'd like some help choosing an outfit.")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">${I.whatsapp}</a>`);
+    <a class="wa-float" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent("Namaste SANSKAAR, I'd like some help choosing an outfit.")}" target="_blank" rel="noopener" aria-label="${t("foot.whatsapp")}">${I.whatsapp}</a>`);
+
+    $$("[data-lang-select]").forEach(s => s.onchange = () => S.setLang(s.value));
+    $$("[data-lang]").forEach(b => b.onclick = () => S.setLang(b.dataset.lang));
+    $$("[data-logout]").forEach(a => a.onclick = e => { e.preventDefault(); S.logout(); location.href = "index.html"; });
 
     const h = $("#header");
     const onScroll = () => h.classList.toggle("scrolled", window.scrollY > 40);
@@ -153,93 +184,86 @@ SANSKAAR.config = {
     if (!el) return;
     const cf = S.config;
     el.outerHTML = `
-    <section class="container trust" aria-label="Why shop with us">
-      <div>${I.truck}<p><b>Insured shipping</b><span>Pan-India & worldwide</span></p></div>
-      <div>${I.scissors}<p><b>Bespoke fittings</b><span>Free alterations, made to measure</span></p></div>
-      <div>${I.hand}<p><b>Handcrafted</b><span>By master karigars of Rajasthan</span></p></div>
-      <div>${I.shield}<p><b>Authenticity</b><span>Pure handloom & silk-mark fabrics</span></p></div>
+    <section class="container trust" aria-label="SANSKAAR">
+      <div>${I.truck}<p><b>${t("foot.trust1")}</b><span>${t("foot.trust1Text")}</span></p></div>
+      <div>${I.scissors}<p><b>${t("foot.trust2")}</b><span>${t("foot.trust2Text")}</span></p></div>
+      <div>${I.hand}<p><b>${t("foot.trust3")}</b><span>${t("foot.trust3Text")}</span></p></div>
+      <div>${I.shield}<p><b>${t("foot.trust4")}</b><span>${t("foot.trust4Text")}</span></p></div>
     </section>
     <footer class="site-footer">
       <div class="container footer-grid">
         <div>
           <div class="logo"><span class="logo-mark">SANSKAAR</span><span class="logo-sub">Indian Wedding Couture</span></div>
-          <p style="margin-top:22px;max-width:340px">Heirloom wedding couture for the bride, the groom and the family, rooted in the ateliers of Jaipur.</p>
-          <form class="newsletter-inline" id="newsletter"><input type="email" required placeholder="Your email for private previews" aria-label="Email"><button>Join</button></form>
+          <p style="margin-top:22px;max-width:340px">${t("foot.about")}</p>
+          <form class="newsletter-inline" id="newsletter"><input type="email" required placeholder="${esc(t("foot.newsletter"))}" aria-label="${t("co.email")}"><button>${t("foot.join")}</button></form>
           <div class="socials">
             <a href="${cf.instagram}" aria-label="Instagram">${I.instagram}</a><a href="${cf.facebook}" aria-label="Facebook">${I.facebook}</a>
             <a href="${cf.youtube}" aria-label="YouTube">${I.youtube}</a><a href="${cf.pinterest}" aria-label="Pinterest">${I.pinterest}</a>
           </div>
+          <div style="margin-top:20px">${langPicker("lang-foot")}</div>
         </div>
-        <div><h4>Bride</h4><ul>${S.categories.women.map(c => `<li><a href="catalog.html#gender.women~category.${c.key}">${c.name}</a></li>`).join("")}</ul></div>
-        <div><h4>Groom</h4><ul>${S.categories.men.map(c => `<li><a href="catalog.html#gender.men~category.${c.key}">${c.name}</a></li>`).join("")}</ul></div>
-        <div><h4>Client care</h4><ul>
-          <li><a href="#" data-open="appointment">Book consultation</a></li>
-          <li><a href="#" data-open="sizeguide">Size guide</a></li>
-          <li><a href="index.html#advisor">Style advisor</a></li>
-          <li><a href="#">Shipping & exchange</a></li>
+        <div><h4>${t("nav.women")}</h4><ul>${S.categories.women.map(c => `<li><a href="catalog.html#gender.women~category.${c.key}">${catName(c.key)}</a></li>`).join("")}</ul></div>
+        <div><h4>${t("nav.men")}</h4><ul>${S.categories.men.map(c => `<li><a href="catalog.html#gender.men~category.${c.key}">${catName(c.key)}</a></li>`).join("")}</ul></div>
+        <div><h4>${t("foot.care")}</h4><ul>
+          <li><a href="account.html#orders">${t("nav.orders")}</a></li>
+          <li><a href="#" data-open="appointment">${t("nav.consult")}</a></li>
+          <li><a href="#" data-open="sizeguide">${t("p.sizeGuide")}</a></li>
+          <li><a href="index.html#advisor">${t("nav.advisor")}</a></li>
         </ul></div>
-        <div><h4>Visit the atelier</h4><ul>
+        <div><h4>${t("foot.visit")}</h4><ul>
           <li>${cf.address}</li>
           <li><a href="tel:${cf.phone.replace(/\s/g, "")}">${cf.phone}</a></li>
           <li><a href="mailto:${cf.email}">${cf.email}</a></li>
-          <li><a href="https://wa.me/${cf.whatsapp}" target="_blank" rel="noopener">WhatsApp us</a></li>
+          <li><a href="https://wa.me/${cf.whatsapp}" target="_blank" rel="noopener">${t("foot.whatsapp")}</a></li>
         </ul></div>
       </div>
       <div class="container footer-bottom">
-        <span>© ${new Date().getFullYear()} SANSKAAR. All rights reserved.</span>
-        <span>Crafted in Jaipur, Rajasthan</span>
+        <span>© ${new Date().getFullYear()} SANSKAAR. ${t("foot.rights")}</span>
+        <span>${t("foot.made")}</span>
       </div>
     </footer>`;
+    $$("[data-lang-select]").forEach(s => s.onchange = () => S.setLang(s.value));
   }
-
   /* ---------- Overlays: cart, appointment, size guide ---------- */
   function overlays() {
+    const opt = (v, key) => `<option value="${v}">${t(key)}</option>`;
+    const table = (head, rows) => `<table><tr>${head.map(h => `<th>${t(h)}</th>`).join("")}</tr>
+      ${rows.map(r => `<tr>${r.map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}</table>`;
     document.body.insertAdjacentHTML("beforeend", `
     <div class="overlay" id="overlay"></div>
-    <aside class="drawer" id="cart" aria-label="Shopping bag">
-      <div class="drawer-head"><h3>Your Bag</h3><button class="close" data-close aria-label="Close">&times;</button></div>
+    <aside class="drawer" id="cart" aria-label="${t("bag.title")}">
+      <div class="drawer-head"><h3>${t("bag.title")}</h3><button class="close" data-close aria-label="${t("nav.close")}">&times;</button></div>
       <div class="drawer-body" id="cart-body"></div>
       <div class="drawer-foot" id="cart-foot"></div>
     </aside>
     <div class="modal" id="appointment" role="dialog" aria-modal="true" aria-labelledby="appt-title">
       <div class="modal-card">
-        <button class="close" data-close aria-label="Close">&times;</button>
+        <button class="close" data-close aria-label="${t("nav.close")}">&times;</button>
         ${ornament}
-        <span class="eyebrow">Private consultation</span>
-        <h3 id="appt-title">Book your <em>bespoke</em> session</h3>
-        <p class="intro">Meet our couturiers at the Jaipur atelier or over a video call. We'll confirm on WhatsApp.</p>
+        <span class="eyebrow">${t("appt.eyebrow")}</span>
+        <h3 id="appt-title">${rich("appt.title")}</h3>
+        <p class="intro">${t("appt.intro")}</p>
         <form id="appt-form" class="form-grid">
-          <div class="field"><label>Name</label><input name="name" required></div>
-          <div class="field"><label>Phone</label><input name="phone" type="tel" required></div>
-          <div class="field"><label>Shopping for</label><select name="for"><option>Groom</option><option>Bride</option><option>Family</option><option>Festive</option></select></div>
-          <div class="field"><label>Mode</label><select name="mode"><option>In-store (Jaipur)</option><option>Video call</option></select></div>
-          <div class="field"><label>Preferred date</label><input name="date" type="date"></div>
-          <div class="field"><label>Wedding date</label><input name="wedding" type="date"></div>
-          <div class="field full"><label>Anything we should know?</label><textarea name="notes" rows="3"></textarea></div>
-          <div class="full"><button class="btn btn-gold btn-block">Request consultation</button></div>
+          <div class="field"><label>${t("appt.name")}</label><input name="name" required></div>
+          <div class="field"><label>${t("appt.phone")}</label><input name="phone" type="tel" required></div>
+          <div class="field"><label>${t("appt.for")}</label><select name="for">${opt("Groom", "appt.forGroom")}${opt("Bride", "appt.forBride")}${opt("Family", "appt.forFamily")}${opt("Festive", "appt.forFestive")}</select></div>
+          <div class="field"><label>${t("appt.mode")}</label><select name="mode">${opt("In-store (Jaipur)", "appt.inStore")}${opt("Video call", "appt.video")}</select></div>
+          <div class="field"><label>${t("appt.date")}</label><input name="date" type="date"></div>
+          <div class="field"><label>${t("appt.wedding")}</label><input name="wedding" type="date"></div>
+          <div class="field full"><label>${t("appt.notes")}</label><textarea name="notes" rows="3"></textarea></div>
+          <div class="full"><button class="btn btn-gold btn-block">${t("appt.send")}</button></div>
         </form>
-        <div id="appt-done" hidden style="text-align:center">
-          <p class="intro">Your details are ready. Send them to us on WhatsApp and we'll confirm your slot.</p>
-          <a class="btn btn-gold btn-block" target="_blank" rel="noopener" href="#">Send on WhatsApp</a>
-          <button type="button" class="advisor-back" id="appt-again">Edit details</button>
-        </div>
       </div>
     </div>
     <div class="modal" id="sizeguide" role="dialog" aria-modal="true" aria-labelledby="sg-title">
       <div class="modal-card" style="width:min(680px,100%)">
-        <button class="close" data-close aria-label="Close">&times;</button>
-        <h3 id="sg-title">Size Guide</h3>
-        <p class="intro">All measurements in inches. Every outfit can also be made to your measurements.</p>
-        <h4>Groom</h4>
-        <table>
-          <tr><th>Size</th><th>Chest</th><th>Waist</th><th>Shoulder</th></tr>
-          ${[["36", 36, 30, 16.5], ["38", 38, 32, 17], ["40", 40, 34, 17.5], ["42", 42, 36, 18], ["44", 44, 38, 18.5], ["46", 46, 40, 19]].map(r => `<tr>${r.map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}
-        </table>
-        <h4>Bride</h4>
-        <table>
-          <tr><th>Size</th><th>Bust</th><th>Waist</th><th>Hip</th></tr>
-          ${[["XS", 32, 26, 35], ["S", 34, 28, 37], ["M", 36, 30, 39], ["L", 38, 32, 41], ["XL", 40, 34, 43], ["XXL", 42, 36, 45]].map(r => `<tr>${r.map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}
-        </table>
+        <button class="close" data-close aria-label="${t("nav.close")}">&times;</button>
+        <h3 id="sg-title">${t("sg.title")}</h3>
+        <p class="intro">${t("sg.intro")}</p>
+        <h4>${t("sg.groom")}</h4>
+        ${table(["sg.size", "sg.chest", "sg.waist", "sg.shoulder"], [["36", 36, 30, 16.5], ["38", 38, 32, 17], ["40", 40, 34, 17.5], ["42", 42, 36, 18], ["44", 44, 38, 18.5], ["46", 46, 40, 19]])}
+        <h4>${t("sg.bride")}</h4>
+        ${table(["sg.size", "sg.bust", "sg.waist", "sg.hip"], [["XS", 32, 26, 35], ["S", 34, 28, 37], ["M", 36, 30, 39], ["L", 38, 32, 41], ["XL", 40, 34, 43], ["XXL", 42, 36, 45]])}
       </div>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>`);
@@ -255,11 +279,9 @@ SANSKAAR.config = {
       e.preventDefault();
       const f = Object.fromEntries(new FormData(e.target));
       const msg = `Namaste SANSKAAR! I'd like to book a consultation.\nName: ${f.name}\nPhone: ${f.phone}\nShopping for: ${f.for}\nMode: ${f.mode}\nPreferred date: ${f.date || "-"}\nWedding date: ${f.wedding || "-"}\nNotes: ${f.notes || "-"}`;
-      const done = $("#appt-done");
-      done.querySelector("a").href = `https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(msg)}`;
-      e.target.hidden = true; done.hidden = false;
+      window.open(`https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+      closeAll(); e.target.reset();
     });
-    $("#appt-again").onclick = () => { $("#appt-form").reset(); $("#appt-form").hidden = false; $("#appt-done").hidden = true; };
     document.addEventListener("submit", e => {
       if (e.target.id === "m-search") {
         e.preventDefault();
@@ -267,7 +289,7 @@ SANSKAAR.config = {
         location.href = "catalog.html#search"; if (document.body.dataset.page === "catalog") location.reload();
         return;
       }
-      if (e.target.id === "newsletter") { e.preventDefault(); toast("Thank you — you're on the list for private previews."); e.target.reset(); }
+      if (e.target.id === "newsletter") { e.preventDefault(); toast(t("foot.thanks")); e.target.reset(); }
     });
   }
   function open(id) {
@@ -329,35 +351,32 @@ SANSKAAR.config = {
     const body = $("#cart-body"), foot = $("#cart-foot");
     const items = cart.items();
     if (!items.length) {
-      body.innerHTML = `<div class="empty" style="padding:60px 0">${ornament}<h3>Your bag is empty</h3><p>Let's find something beautiful.</p><a class="btn btn-ghost-gold" href="catalog.html">Explore the catalog</a></div>`;
+      body.innerHTML = `<div class="empty" style="padding:60px 0">${ornament}<h3>${t("bag.empty")}</h3><p>${t("bag.emptyText")}</p><a class="btn btn-ghost-gold" href="catalog.html">${t("bag.explore")}</a></div>`;
       foot.innerHTML = ""; return;
     }
     body.innerHTML = items.map((it, idx) => {
       const p = byId(it.id); if (!p) return "";
       return `<div class="cart-item">
         <a class="thumb" href="product.html#id.${p.id}">${media(p, "front")}</a>
-        <div><h4>${p.name}</h4><small>Size ${it.size} · ${p.colorName}</small><span class="price">${inr(p.price)}</span>
-          <div class="qty"><button data-q="${idx}" data-d="-1" aria-label="Decrease">−</button><span>${it.qty}</span><button data-q="${idx}" data-d="1" aria-label="Increase">+</button></div></div>
-        <button class="rm" data-rm="${idx}">Remove</button>
+        <div><h4>${p.name}</h4><small>${t("bag.size", { size: it.size === "Custom" ? t("p.madeToMeasure") : it.size })} · ${p.colorName}</small><span class="price">${inr(p.price)}</span>
+          <div class="qty"><button data-q="${idx}" data-d="-1" aria-label="−">−</button><span>${it.qty}</span><button data-q="${idx}" data-d="1" aria-label="+">+</button></div></div>
+        <button class="rm" data-rm="${idx}">${t("bag.remove")}</button>
       </div>`;
     }).join("");
     const total = cart.total();
     const left = S.config.freeShippingAbove - total;
     foot.innerHTML = `
-      <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;letter-spacing:.04em">${left > 0 ? `Add ${inr(left)} more for free shipping` : "✦ You've unlocked free shipping"}</p>
-      <div class="row"><span>Subtotal</span><b>${inr(total)}</b></div>
-      <a class="btn btn-gold btn-block" id="checkout" target="_blank" rel="noopener" href="#">Checkout on WhatsApp</a>
-      <p style="font-size:11.5px;color:var(--text-3);text-align:center;margin:12px 0 0">Our team confirms sizing & delivery before payment.</p>`;
+      <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;letter-spacing:.04em">${left > 0 ? t("bag.freeShipLeft", { amount: inr(left) }) : "✦ " + t("bag.freeShip")}</p>
+      <div class="row"><span>${t("bag.subtotal")}</span><b>${inr(total)}</b></div>
+      <a class="btn btn-gold btn-block" href="checkout.html">${t("bag.checkout")}</a>
+      <p style="font-size:11.5px;color:var(--text-3);text-align:center;margin:12px 0 0">${t("bag.methods")}</p>`;
     body.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const it = cart.items()[b.dataset.q]; cart.setQty(+b.dataset.q, it.qty + +b.dataset.d); renderCart(); });
     body.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { cart.setQty(+b.dataset.rm, 0); renderCart(); });
-    const lines = cart.items().map(i => { const p = byId(i.id); return `• ${p.name} (${p.id}) — Size ${i.size} × ${i.qty} — ${inr(p.price * i.qty)}`; });
-    $("#checkout").href = `https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(`Namaste SANSKAAR! I'd like to place an order:\n${lines.join("\n")}\nTotal: ${inr(cart.total())}`)}`;
   }
-
   /* ---------- Media: real photo if present, otherwise illustrated preview ----------
      Drop a photo at images/products/<SKU>/<view>.jpg and it is picked up
      automatically; until then the illustrated preview underneath shows. */
-  const esc = s => String(s).replace(/"/g, "&quot;");
+  const esc = s => S.esc(s);
   function photoLayer(src, alt, eager) {
     return `<img src="${src}" alt="${esc(alt)}" ${eager ? "" : 'loading="lazy"'} onerror="this.remove()">`;
   }
@@ -377,21 +396,23 @@ SANSKAAR.config = {
   S.media = media;
 
   /* ---------- Product card ---------- */
+  const quickSize = p => p.sizes[Math.min(2, p.sizes.length - 1)];
+  const soldOut = p => p.inStock === false;
   function card(p) {
     const off = p.mrp ? Math.round((1 - p.price / p.mrp) * 100) : 0;
-    const tag = p.tag === "new" ? `<span class="tag">New</span>` : p.tag === "bestseller" ? `<span class="tag">Bestseller</span>` : `<span class="tag">${catName(p.category)}</span>`;
-    return `<article class="product-card reveal">
+    const tag = soldOut(p) ? `<span class="tag tag-out">${t("tag.soldOut")}</span>` : p.tag === "new" ? `<span class="tag">${t("tag.new")}</span>` : p.tag === "bestseller" ? `<span class="tag">${t("tag.bestseller")}</span>` : `<span class="tag">${catName(p.category)}</span>`;
+    return `<article class="product-card reveal${soldOut(p) ? " is-out" : ""}">
       <a href="product.html#id.${p.id}" class="media" aria-label="${esc(p.name)}">
         ${tag}
         <div class="v main">${media(p, "front")}</div>
         <div class="v alt">${media(p, p.photos ? (p.photos[1] || p.photos[0]) : "back")}</div>
-        <span class="quick" data-quick="${p.id}">Quick add · Size ${p.sizes[2]}</span>
+        ${soldOut(p) ? "" : `<span class="quick" data-quick="${p.id}">+ ${t("nav.bag")} · ${quickSize(p)}</span>`}
       </a>
-      <button class="wish ${wish.has(p.id) ? "on" : ""}" data-wish="${p.id}" aria-label="Add to wishlist">${I.heart}</button>
+      <button class="wish ${wish.has(p.id) ? "on" : ""}" data-wish="${p.id}" aria-label="${t("p.wishlist")}">${I.heart}</button>
       <div class="info">
         <h3><a href="product.html#id.${p.id}">${p.name}</a></h3>
         <div class="meta">${p.fabric} · ${p.work}</div>
-        <div class="price">${inr(p.price)}${p.mrp ? `<s>${inr(p.mrp)}</s><span class="off">${off}% off</span>` : ""}</div>
+        <div class="price">${inr(p.price)}${p.mrp ? `<s>${inr(p.mrp)}</s><span class="off">${t("p.off", { n: off })}</span>` : ""}</div>
       </div>
     </article>`;
   }
@@ -404,19 +425,18 @@ SANSKAAR.config = {
         e.preventDefault();
         const on = wish.toggle(w.dataset.wish);
         w.classList.toggle("on", on);
-        toast(on ? "Added to wishlist" : "Removed from wishlist");
+        toast(on ? t("p.wishAdded") : t("p.wishRemoved"));
         return;
       }
       const q = e.target.closest("[data-quick]");
       if (q) {
         e.preventDefault();
         const p = byId(q.dataset.quick);
-        cart.add(p.id, p.sizes[2]);
-        toast(`${p.name} (size ${p.sizes[2]}) added to bag`);
+        cart.add(p.id, quickSize(p));
+        toast(t("p.added", { name: p.name }));
       }
     });
   }
-
   /* ---------- Reveal on scroll ---------- */
   function reveal() {
     const els = $$(".reveal:not(.in):not(.pre)");
@@ -433,22 +453,22 @@ SANSKAAR.config = {
      HOME
      ===================================================================== */
   function home() {
-    // hero
-    $("#hero-bg").innerHTML = sitePhoto("images/site/hero.jpg", "A Sanskaar bride in a hand-embroidered red lehenga",
+    // artwork may show products the owner has hidden, so look them up in the full list
+    const art = id => S.allProducts.find(p => p.id === id);
+    $("#hero-bg").innerHTML = sitePhoto("images/site/hero.jpg", "SANSKAAR wedding wear",
       Art.scene({ colors: ["#3a0d14", "#c8a45c"], w: 1600, h: 900, seed: 5, sunX: .68, sun: "#e0a85a",
-        figure: Art.figureGroup(byId("SK-M-SHW-002"), 860, 300, 1.45) + Art.figureGroup(byId("SK-W-LHG-001"), 1110, 290, 1.5) }), true);
+        figure: Art.figureGroup(art("SK-M-SHW-002"), 860, 300, 1.45) + Art.figureGroup(art("SK-W-LHG-001"), 1110, 290, 1.5) }), true);
 
     // bride / groom panels
-    $("#duo-bride .art").innerHTML = sitePhoto("images/site/bride.jpg", "Bridal couture",
+    $("#duo-bride .art").innerHTML = sitePhoto("images/site/bride.jpg", t("home.brideTitle"),
       Art.scene({ colors: ["#4a0f1c", "#c8a45c"], w: 600, h: 750, seed: 21, sunX: .5, sun: "#e7b07a",
-        figure: Art.figureGroup(byId("SK-W-LHG-002"), 150, 260, 1.05) }));
-    $("#duo-groom .art").innerHTML = sitePhoto("images/site/groom.jpg", "Groom couture",
+        figure: Art.figureGroup(art("SK-W-LHG-002"), 150, 260, 1.05) }));
+    $("#duo-groom .art").innerHTML = sitePhoto("images/site/groom.jpg", t("home.groomTitle"),
       Art.scene({ colors: ["#1d1a2e", "#c8a45c"], w: 600, h: 750, seed: 4, sunX: .5, sun: "#d9b06a",
-        figure: Art.figureGroup(byId("SK-M-SHW-001"), 150, 260, 1.05) }));
+        figure: Art.figureGroup(art("SK-M-SHW-001"), 150, 260, 1.05) }));
 
-    // couture catalog with tabs + search
-    const tabs = [["all", "All Collections"], ["lehenga", "Lehengas"], ["saree", "Royal Saris"], ["sharara", "Shararas"], ["anarkali", "Anarkalis"],
-      ["sherwani", "Sherwanis"], ["bandhgala", "Bandhgalas"], ["indowestern", "Indo-Western"]];
+    // bestsellers & new arrivals with tabs + search
+    const tabs = [["all", t("home.tabAll")], ...["lehenga", "saree", "sharara", "anarkali", "sherwani", "bandhgala", "indowestern"].map(k => [k, catName(k)])];
     let active = "all", q = "";
     $("#cc-tabs").innerHTML = tabs.map(([k, l], i) => `<button class="tab ${i ? "" : "active"}" data-k="${k}">${l}</button>`).join("");
     const grid = $("#cc-grid");
@@ -457,11 +477,11 @@ SANSKAAR.config = {
       if (q) list = list.filter(p => (p.name + " " + p.fabric + " " + p.work + " " + p.colorName + " " + catName(p.category)).toLowerCase().includes(q));
       if (active === "all" && !q) list = list.filter(p => p.tag === "bestseller" || p.tag === "new");
       list = list.slice(0, 8);
-      grid.innerHTML = list.length ? list.map(card).join("") : `<div class="empty"><h3>No match yet</h3><p>Try another word, or <a href="catalog.html" style="color:var(--gold-2)">browse the full catalog</a>.</p></div>`;
+      grid.innerHTML = list.length ? list.map(card).join("") : `<div class="empty"><h3>${t("shop.noMatch")}</h3><p>${t("shop.noMatchText")} <a href="catalog.html" style="color:var(--gold-2)">${t("home.viewFull")}</a></p></div>`;
       reveal();
     };
-    $$("#cc-tabs .tab").forEach(t => t.onclick = () => {
-      active = t.dataset.k; $$("#cc-tabs .tab").forEach(x => x.classList.toggle("active", x === t)); draw();
+    $$("#cc-tabs .tab").forEach(tb => tb.onclick = () => {
+      active = tb.dataset.k; $$("#cc-tabs .tab").forEach(x => x.classList.toggle("active", x === tb)); draw();
     });
     $("#cc-search").addEventListener("input", e => { q = e.target.value.trim().toLowerCase(); draw(); });
     bindCards(grid);
@@ -472,12 +492,12 @@ SANSKAAR.config = {
 
     // collections
     $("#coll-row").innerHTML = S.collections.map((c, i) => {
-      const p = S.products.find(x => x.collection === c.key && x.gender === (i % 2 ? "men" : "women"));
+      const p = S.allProducts.find(x => x.collection === c.key && x.gender === (i % 2 ? "men" : "women"));
       return `<a class="coll-card reveal" href="catalog.html#collection.${c.key}">
-        <div class="art">${sitePhoto(`images/collections/${c.key}.jpg`, `${c.name} collection`,
+        <div class="art">${sitePhoto(`images/collections/${c.key}.jpg`, `${c.name}`,
           Art.scene({ colors: [Art.shade(c.colors[0], -.45), c.colors[1]], w: 300, h: 465, seed: i * 7 + 3, sunX: .5,
             figure: p ? Art.figureGroup(p, 30, 120, .8) : "" }))}</div>
-        <div class="txt"><span class="deva">${c.deva}</span><h3>${c.name}</h3><small>${c.hint}</small></div></a>`;
+        <div class="txt"><span class="deva">${c.deva}</span><h3>${c.name}</h3><small>${t("coll." + c.key)}</small></div></a>`;
     }).join("");
 
     reveal();
@@ -487,19 +507,15 @@ SANSKAAR.config = {
   function advisor() {
     const root = $("#advisor-card"); if (!root) return;
     const palettes = {
-      classic: { label: "Classic Reds & Maroons", hint: "Timeless bridal tradition", colors: ["red", "maroon", "wine"] },
-      pastel: { label: "Soft Pastels", hint: "Blush, mint, lilac & ivory", colors: ["blush", "mint", "lilac", "peach", "ivory", "beige"] },
-      jewel: { label: "Jewel Tones", hint: "Emerald, sapphire & peacock", colors: ["green", "teal", "blue", "navy", "black"] },
-      sunshine: { label: "Sunshine & Rani", hint: "Haldi yellow, kesariya & pink", colors: ["yellow", "orange", "gold", "pink"] }
+      classic: ["red", "maroon", "wine"],
+      pastel: ["blush", "mint", "lilac", "peach", "ivory", "beige"],
+      jewel: ["green", "teal", "blue", "navy", "black"],
+      sunshine: ["yellow", "orange", "gold", "pink"]
     };
     const steps = [
-      { key: "who", q: "Who are we dressing?", opts: [
-        ["women", "The Bride", "Lehengas, sarees & trousseau"], ["men", "The Groom", "Sherwanis & bandhgalas"],
-        ["any", "The Family", "Parents, siblings & friends"], ["festive", "A Festive Guest", "Diwali, Eid, Teej & more"]] },
-      { key: "occ", q: "Select the ceremony or event you are dressing for:", opts: [
-        ["wedding", "The Sacred Vows", "Main wedding ceremony / Pheras"], ["reception", "The Grand Soirée", "Reception dinner / Formal after-party"],
-        ["sangeet", "The Rhythmic Celebration", "Sangeet night / Cocktail / Dance gala"], ["mehendi", "The Henna Festival", "Mehendi / Haldi / Pre-wedding lunch"]] },
-      { key: "pal", q: "Which palette speaks to you?", opts: Object.entries(palettes).map(([k, v]) => [k, v.label, v.hint, v.colors]) }
+      { key: "who", q: "adv.q1", opts: ["women", "men", "any", "festive"].map(k => [k, t(`adv.who.${k}`), t(`adv.who.${k}Hint`)]) },
+      { key: "occ", q: "adv.q2", opts: ["wedding", "reception", "sangeet", "mehendi"].map(k => [k, t(`adv.occ.${k}`), t(`adv.occ.${k}Hint`)]) },
+      { key: "pal", q: "adv.q3", opts: Object.entries(palettes).map(([k, cols]) => [k, t(`adv.pal.${k}`), t(`adv.pal.${k}Hint`), cols]) }
     ];
     const ans = {};
     let i = 0;
@@ -508,29 +524,28 @@ SANSKAAR.config = {
       const st = steps[i];
       root.innerHTML = `<div class="progress"><i style="width:${(i + 1) / steps.length * 100}%"></i></div>
         <div class="advisor-step active">
-          <span class="q-num">Question ${i + 1} of ${steps.length}</span>
-          <h3>${st.q}</h3>
+          <span class="q-num">${t("adv.q", { i: i + 1, n: steps.length })}</span>
+          <h3>${t(st.q)}</h3>
           <div class="advisor-opts">${st.opts.map(([k, l, h, cols]) => `<button class="advisor-opt" data-v="${k}"><b>${l}</b><span>${h}</span>${cols ? `<div class="sw">${cols.slice(0, 4).map(c => `<i style="background:${S.colors[c].hex}"></i>`).join("")}</div>` : ""}</button>`).join("")}</div>
-          ${i ? `<button class="advisor-back">← Back</button>` : ""}
+          ${i ? `<button class="advisor-back">${t("adv.back")}</button>` : ""}
         </div>`;
       $$(".advisor-opt", root).forEach(b => b.onclick = () => { ans[st.key] = b.dataset.v; i++; render(); });
       const back = $(".advisor-back", root); if (back) back.onclick = () => { i--; render(); };
     }
     function result() {
-      const pal = palettes[ans.pal].colors;
+      const pal = palettes[ans.pal];
       const occ = ans.who === "festive" ? ["festive", ans.occ] : ans.occ === "mehendi" ? ["mehendi", "haldi"] : [ans.occ];
       const scored = S.products
         .filter(p => ans.who === "women" || ans.who === "men" ? p.gender === ans.who : true)
-        .map(p => ({ p, s: (p.occasions.some(o => occ.includes(o)) ? 3 : 0) + (pal.includes(p.color) ? 2 : 0) + (p.tag === "bestseller" ? .5 : 0) }))
+        .map(p => ({ p, s: (p.occasions.some(o => occ.includes(o)) ? 3 : 0) + (pal.includes(p.color) ? 2 : 0) + (p.tag === "bestseller" ? .5 : 0) + (p.inStock === false ? -10 : 0) }))
         .sort((a, b) => b.s - a.s).slice(0, 3).map(x => x.p);
-      const who = { women: "bride", men: "groom", any: "family", festive: "festive guest" }[ans.who];
       root.innerHTML = `<div class="advisor-result advisor-step active">
-        <span class="q-num">Your curated edit</span>
-        <h3>Three looks for the ${who}, in ${palettes[ans.pal].label.toLowerCase()}</h3>
+        <span class="q-num">${t("adv.eyebrow")}</span>
+        <h3>${t("adv.result")}</h3>
         <div class="product-grid">${scored.map(card).join("")}</div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:36px">
-          <a href="#" data-open="appointment" class="btn btn-gold">Book a consultation</a>
-          <button class="btn btn-outline" id="advisor-restart">Start again</button>
+          <a href="#" data-open="appointment" class="btn btn-gold">${t("adv.book")}</a>
+          <button class="btn btn-outline" id="advisor-restart">${t("adv.restart")}</button>
         </div></div>`;
       $("#advisor-restart").onclick = () => { i = 0; render(); };
       bindCards(root.querySelector(".product-grid"));
@@ -538,7 +553,6 @@ SANSKAAR.config = {
     }
     render();
   }
-
   /* =====================================================================
      CATALOGUE
      ===================================================================== */
@@ -561,24 +575,24 @@ SANSKAAR.config = {
     if (!state.max) state.max = priceCeil;
 
     // title
-    let title = "The Couture Catalog", sub = "Wedding and festive couture for the bride, the groom and the family, handcrafted in Rajasthan.";
-    if (state.wishlist) { title = "Your Wishlist"; sub = "The pieces you've saved."; }
-    else if (state.q) { title = `Results for “${state.q}”`; sub = ""; }
+    let title = t("shop.title"), sub = t("shop.sub");
+    if (state.wishlist) { title = t("wl.title"); sub = t("wl.emptyText"); }
+    else if (state.q) { title = t("shop.results", { q: state.q }); sub = ""; }
     else if (state.category.length === 1) { title = catName(state.category[0]); }
     else if (state.collection.length === 1) { const c = collOf(state.collection[0]); title = `${c.name} Collection`; sub = c.hint; }
-    else if (state.occasion.length === 1) { const o = S.occasions.find(o => o.key === state.occasion[0]); title = `${o.name} Edit`; sub = o.hint; }
-    else if (state.tag === "new") title = "New Arrivals";
-    else if (state.tag === "bestseller") title = "Bestsellers";
-    else if (state.gender.length === 1) { const m = state.gender[0] === "men"; title = m ? "Men's Ethnic Wear" : "Women's Ethnic Wear"; sub = m ? "Sherwanis, bandhgalas, kurtas and more, handcrafted in Rajasthan." : "Lehengas, sarees, anarkalis and more, handcrafted in Rajasthan."; }
+    else if (state.occasion.length === 1) { title = occName(state.occasion[0]); sub = ""; }
+    else if (state.tag === "new") title = t("shop.newArrivals");
+    else if (state.tag === "bestseller") title = t("shop.bestsellers");
+    else if (state.gender.length === 1) { const m = state.gender[0] === "men"; title = m ? t("shop.menTitle") : t("shop.womenTitle"); sub = m ? t("home.groomText") : t("home.brideText"); }
     $("#cat-title").textContent = title;
     $("#cat-sub").textContent = sub;
     document.title = `${title} · SANSKAAR`;
 
     const groups = [
-      { key: "gender", label: "Shop for", opts: [["men", "Men"], ["women", "Women"]] },
-      { key: "category", label: "Category", opts: [...S.categories.men, ...S.categories.women].map(c => [c.key, c.name]) },
-      { key: "occasion", label: "Occasion", opts: S.occasions.map(o => [o.key, o.name]) },
-      { key: "collection", label: "Collection", opts: S.collections.map(c => [c.key, c.name]) }
+      { key: "gender", label: t("shop.all"), opts: [["men", t("nav.men")], ["women", t("nav.women")]] },
+      { key: "category", label: t("nav.shopByCategory"), opts: [...S.categories.men, ...S.categories.women].map(c => [c.key, catName(c.key)]) },
+      { key: "occasion", label: t("shop.occasion"), opts: S.occasions.map(o => [o.key, occName(o.key)]) },
+      { key: "collection", label: t("shop.collection"), opts: S.collections.map(c => [c.key, c.name]) }
     ];
 
     function matches(p, skip) {
@@ -608,12 +622,12 @@ SANSKAAR.config = {
           }).join("")}
         </div></details>`;
       }).join("") + `
-        <details class="filter-group" open><summary>Colour</summary><div class="opts color-opts">
+        <details class="filter-group" open><summary>${t("shop.colour")}</summary><div class="opts color-opts">
           ${usedColors.map(k => `<label class="color-opt" style="background:${S.colors[k].hex}" title="${S.colors[k].name}"><input type="checkbox" data-g="color" value="${k}" ${state.color.includes(k) ? "checked" : ""} aria-label="${S.colors[k].name}"></label>`).join("")}
         </div></details>
-        <details class="filter-group price-range" open><summary>Price</summary><div class="opts">
+        <details class="filter-group price-range" open><summary>${t("shop.priceUpTo")}</summary><div class="opts">
           <input type="range" id="price-max" min="5000" max="${priceCeil}" step="1000" value="${state.max}" aria-label="Maximum price">
-          <div class="vals"><span>₹5,000</span><span>Up to <b id="price-val">${inr(state.max)}</b></span></div>
+          <div class="vals"><span>₹5,000</span><span><b id="price-val">${inr(state.max)}</b></span></div>
         </div></details>`;
       $$("#filters-body input[type=checkbox]").forEach(i => i.onchange = () => {
         const arr = state[i.dataset.g]; const at = arr.indexOf(i.value);
@@ -628,13 +642,13 @@ SANSKAAR.config = {
     function drawActive() {
       const chips = [];
       ["gender", "category", "occasion", "collection", "color"].forEach(g => state[g].forEach(v => {
-        const label = g === "color" ? S.colors[v].name : g === "gender" ? (v === "men" ? "Men" : "Women") :
-          g === "category" ? catName(v) : g === "occasion" ? S.occasions.find(o => o.key === v).name : collOf(v).name;
+        const label = g === "color" ? S.colors[v].name : g === "gender" ? (v === "men" ? t("nav.men") : t("nav.women")) :
+          g === "category" ? catName(v) : g === "occasion" ? occName(v) : collOf(v).name;
         chips.push(`<button data-rmg="${g}" data-v="${v}">${label}</button>`);
       }));
-      if (state.tag) chips.push(`<button data-rmg="tag">${state.tag === "new" ? "New in" : "Bestseller"}</button>`);
+      if (state.tag) chips.push(`<button data-rmg="tag">${state.tag === "new" ? t("shop.newArrivals") : t("shop.bestsellers")}</button>`);
       if (state.q) chips.push(`<button data-rmg="q">“${state.q}”</button>`);
-      if (state.max < priceCeil) chips.push(`<button data-rmg="max">Under ${inr(state.max)}</button>`);
+      if (state.max < priceCeil) chips.push(`<button data-rmg="max">≤ ${inr(state.max)}</button>`);
       $("#active-filters").innerHTML = chips.join("");
       $$("#active-filters button").forEach(b => b.onclick = () => {
         const g = b.dataset.rmg;
@@ -656,9 +670,9 @@ SANSKAAR.config = {
 
     function drawGrid() {
       const list = sortList(S.products.filter(p => matches(p)));
-      $("#result-count").textContent = `${list.length} ${list.length === 1 ? "design" : "designs"}`;
+      $("#result-count").textContent = list.length === 1 ? t("shop.piece") : t("shop.pieces", { n: list.length });
       $("#catalog-grid").innerHTML = list.length ? list.map(card).join("") :
-        `<div class="empty">${ornament}<h3>${state.wishlist ? "No saved pieces yet" : "Nothing matches just yet"}</h3><p>${state.wishlist ? "Tap the heart on any outfit to save it here." : "Try removing a filter or two."}</p><a class="btn btn-outline" href="catalog.html">View full catalogue</a></div>`;
+        `<div class="empty">${ornament}<h3>${state.wishlist ? t("wl.empty") : t("shop.noMatch")}</h3><p>${state.wishlist ? t("wl.emptyText") : t("shop.noMatchText")}</p><a class="btn btn-outline" href="catalog.html">${t("bag.explore")}</a></div>`;
       reveal();
     }
 
@@ -680,6 +694,8 @@ SANSKAAR.config = {
       let t; si.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { state.q = si.value.trim(); update(); }, 200); });
       if (location.hash === "#search") si.focus();
     }
+    const sortLabels = { featured: "sort.featured", new: "sort.new", "price-asc": "sort.low", "price-desc": "sort.high", discount: "shop.highlights" };
+    $$("#sort option").forEach(o => { o.textContent = t(sortLabels[o.value]); });
     $("#sort").value = state.sort;
     $("#sort").onchange = e => { state.sort = e.target.value; update(); };
     $("#clear-filters").onclick = () => {
@@ -708,48 +724,52 @@ SANSKAAR.config = {
       kurta: "Kurta, pajama", jacket: "Nehru jacket, kurta, churidar", lehenga: "Lehenga, blouse (unstitched option), dupatta",
       saree: "Saree with unstitched blouse piece", anarkali: "Anarkali, churidar, dupatta", sharara: "Kurti, sharara, dupatta", suit: "Kurta, palazzo, dupatta"
     }[p.category];
+    const out = soldOut(p);
+    const unit = p.sizeUnit && p.sizeUnit !== "Standard" ? p.sizeUnit : "";
 
-    $("#breadcrumb").innerHTML = `<a href="index.html">Home</a> / <a href="catalog.html#gender.${p.gender}">${p.gender === "men" ? "Men" : "Women"}</a> / <a href="catalog.html#gender.${p.gender}~category.${p.category}">${catName(p.category)}</a> / <span>${p.name}</span>`;
+    $("#breadcrumb").innerHTML = `<a href="index.html">${t("nav.home")}</a> / <a href="catalog.html#gender.${p.gender}">${p.gender === "men" ? t("nav.men") : t("nav.women")}</a> / <a href="catalog.html#gender.${p.gender}~category.${p.category}">${catName(p.category)}</a> / <span>${p.name}</span>`;
 
     $("#pdp").innerHTML = `
       <div class="gallery">
-        <div class="thumbs">${views.map((v, i) => `<button class="${i ? "" : "active"}" data-view="${v}" aria-label="${viewNames[v]} view">${media(p, v)}<small>${viewNames[v]}</small></button>`).join("")}</div>
+        <div class="thumbs">${views.map((v, i) => `<button class="${i ? "" : "active"}" data-view="${v}" aria-label="${viewNames[v]}">${media(p, v)}<small>${viewNames[v]}</small></button>`).join("")}</div>
         <div class="main-view" id="main-view">${media(p, "front", true)}<span class="view-label" id="view-label">Front</span><span class="ai-note" id="ai-note">Preview · photoshoot coming</span></div>
       </div>
       <div class="pdp-info">
-        <div class="coll">${c.name} Collection · <span class="deva">${c.deva}</span></div>
+        <div class="coll">${t("p.collection", { name: c.name })} · <span class="deva">${c.deva}</span></div>
         <h1>${p.name}</h1>
         <div class="sku">SKU ${p.id} · ${p.colorName}</div>
-        <span class="price">${inr(p.price)}${p.mrp ? `<s>${inr(p.mrp)}</s><span class="off">${off}% off</span>` : ""}</span>
-        <div class="tax">Inclusive of all taxes · Free alterations</div>
+        <span class="price">${inr(p.price)}${p.mrp ? `<s>${inr(p.mrp)}</s><span class="off">${t("p.off", { n: off })}</span>` : ""}</span>
+        <div class="tax">${t("p.taxes")}</div>
+        ${out ? `<div class="stock-note out">${t("p.soldOut")}</div>` : p.lowStock ? `<div class="stock-note">${t("p.onlyLeft", { n: p.lowStock })}</div>` : ""}
+        ${!out && p.deliveryDays ? `<div class="delivery-note">${I.truck}<span>${t("p.deliveryBy", { date: S.fmtDate(S.inDays(p.deliveryDays)) })}</span></div>` : ""}
         <p class="desc">${p.description}</p>
 
-        <div class="opt-label"><span>Colour: ${p.colorName}</span></div>
+        <div class="opt-label"><span>${t("p.colour")}: ${p.colorName}</span></div>
         <div class="color-row">
-          ${[p, ...siblings.filter(s => s.color !== p.color).slice(0, 4)].map(s => `<a href="product.html#id.${s.id}" class="${s.id === p.id ? "active" : ""}" style="background:${s.hex}" title="${s.colorName} — ${s.name}" aria-label="${s.colorName}"></a>`).join("")}
+          ${[p, ...siblings.filter(s => s.color !== p.color).slice(0, 4)].map(s => `<a href="product.html#id.${s.id}" class="${s.id === p.id ? "active" : ""}" style="background:${s.hex}" title="${esc(s.colorName)} — ${esc(s.name)}" aria-label="${esc(s.colorName)}"></a>`).join("")}
         </div>
 
-        <div class="opt-label"><span>Select size</span><a href="#" data-open="sizeguide">Size guide</a></div>
-        <div class="sizes" id="sizes">${p.sizes.map(s => `<button data-size="${s}">${s}</button>`).join("")}<button data-size="Custom">Made to measure</button></div>
+        <div class="opt-label"><span>${unit ? t("p.sizeUnit", { unit }) : t("p.selectSize")}</span><a href="#" data-open="sizeguide">${t("p.sizeGuide")}</a></div>
+        <div class="sizes" id="sizes">${p.sizes.map(s => `<button data-size="${esc(s)}" ${out ? "disabled" : ""}>${esc(s)}</button>`).join("")}<button data-size="Custom" ${out ? "disabled" : ""}>${t("p.madeToMeasure")}</button></div>
 
         <div class="pdp-actions">
-          <button class="btn btn-gold" id="add-cart">Add to bag</button>
-          <button class="btn btn-outline" id="add-wish">${wish.has(p.id) ? "♥ Wishlisted" : "♡ Wishlist"}</button>
-          <a class="btn btn-wa btn-block" target="_blank" rel="noopener" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(`Namaste! I'm interested in ${p.name} (${p.id}). Could you share more details?`)}">${I.whatsapp.replace("<svg", '<svg width="18" height="18"')} Enquire on WhatsApp</a>
+          <button class="btn btn-gold" id="add-cart" ${out ? "disabled" : ""}>${out ? t("p.soldOut") : t("p.addToBag")}</button>
+          <button class="btn btn-outline" id="add-wish">${wish.has(p.id) ? "♥ " + t("p.wishlisted") : "♡ " + t("p.wishlist")}</button>
+          <a class="btn btn-wa btn-block" target="_blank" rel="noopener" href="https://wa.me/${S.config.whatsapp}?text=${encodeURIComponent(`Namaste! I'm interested in ${p.name} (${p.id}). Could you share more details?`)}">${I.whatsapp.replace("<svg", '<svg width="18" height="18"')} ${t("p.enquire")}</a>
         </div>
 
         <div class="pdp-perks">
-          <div>${I.truck}Ships in 7–10 days</div><div>${I.scissors}Free alterations</div><div>${I.shield}Quality assured</div>
+          <div>${I.truck}${t("p.perk1")}</div><div>${I.scissors}${t("p.perk2")}</div><div>${I.shield}${t("p.perk3")}</div>
         </div>
 
         <div class="accordion">
-          <details open><summary>Product details</summary><div class="body"><ul>
-            <li><b>Fabric:</b> ${p.fabric}</li><li><b>Work:</b> ${p.work}</li><li><b>Colour:</b> ${p.colorName}</li>
-            <li><b>Includes:</b> ${includes}</li><li><b>Occasion:</b> ${p.occasions.map(o => S.occasions.find(x => x.key === o).name).join(", ")}</li>
+          <details open><summary>${t("p.details")}</summary><div class="body"><ul>
+            <li><b>${t("p.fabric")}:</b> ${p.fabric}</li><li><b>${t("p.work")}:</b> ${p.work}</li><li><b>${t("p.colour")}:</b> ${p.colorName}</li>
+            <li><b>${t("p.includes")}:</b> ${includes}</li><li><b>${t("p.occasion")}:</b> ${p.occasions.map(occName).join(", ")}</li>
           </ul></div></details>
-          <details><summary>Size & fit</summary><div class="body">Tailored to a classic fit. Every Sanskaar outfit includes free alterations, or choose <i>Made to measure</i> and our master tailor will call you for measurements.</div></details>
-          <details><summary>Shipping & exchange</summary><div class="body">Free shipping across India above ${inr(S.config.freeShippingAbove)}. International shipping available. 7-day size exchange on unworn pieces with tags intact.</div></details>
-          <details><summary>Care</summary><div class="body">Dry clean only. Store folded in a muslin bag, away from direct sunlight and moisture. Refold every few months to protect the zari.</div></details>
+          <details><summary>${t("p.sizeFit")}</summary><div class="body">${t("p.sizeFitText")}</div></details>
+          <details><summary>${t("p.shipping")}</summary><div class="body">${t("p.shippingText", { amount: inr(S.config.freeShippingAbove) })}</div></details>
+          <details><summary>${t("p.care")}</summary><div class="body">${t("p.careText")}</div></details>
         </div>
       </div>`;
 
@@ -780,20 +800,21 @@ SANSKAAR.config = {
       size = b.dataset.size; $$("#sizes button").forEach(x => x.classList.toggle("active", x === b));
     });
     $("#add-cart").onclick = () => {
-      if (!size) { toast("Please select a size"); $("#sizes").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
-      cart.add(p.id, size); toast(`${p.name} added to your bag`);
+      if (out) return;
+      if (!size) { toast(t("p.pleaseSize")); $("#sizes").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+      cart.add(p.id, size); toast(t("p.added", { name: p.name }));
       setTimeout(() => open("cart"), 500);
     };
     $("#add-wish").onclick = e => {
       const on = wish.toggle(p.id);
-      e.target.textContent = on ? "♥ Wishlisted" : "♡ Wishlist";
-      toast(on ? "Added to wishlist" : "Removed from wishlist");
+      e.target.textContent = on ? "♥ " + t("p.wishlisted") : "♡ " + t("p.wishlist");
+      toast(on ? t("p.wishAdded") : t("p.wishRemoved"));
     };
 
     // complete the look: same collection, opposite gender
     const look = S.products.filter(x => x.collection === p.collection && x.gender !== p.gender).slice(0, 4);
     $("#look-grid").innerHTML = look.map(card).join("");
-    $("#look-sub").textContent = `Coordinated pieces from the ${c.name} collection for your ${p.gender === "men" ? "partner" : "partner"}.`;
+    $("#look-sub").textContent = t("p.forPartner");
     const similar = siblings.slice(0, 4);
     $("#similar-grid").innerHTML = similar.map(card).join("");
     bindCards($("#look-grid")); bindCards($("#similar-grid"));
@@ -805,8 +826,10 @@ SANSKAAR.config = {
   }
 
   /* ---------- Boot ---------- */
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    await S.loadLive();
     const page = document.body.dataset.page;
+    S.applyStatic();
     header(document.body.dataset.nav);
     footer();
     overlays();
@@ -815,6 +838,7 @@ SANSKAAR.config = {
     if (page === "catalog" || page === "product") window.addEventListener("hashchange", () => { if (location.hash !== "#search") location.reload(); });
     if (page === "catalog") catalog();
     if (page === "product") product();
+    if (S.pages[page]) await S.pages[page]();
     reveal();
   });
 })();

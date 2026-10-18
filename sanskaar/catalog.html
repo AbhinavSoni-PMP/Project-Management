@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Couture Catalog · SANSKAAR</title>
+<title>Catalogue · SANSKAAR</title>
 <meta name="description" content="Browse the SANSKAAR couture catalog of Indian wedding and festive wear for the bride, groom and family.">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0e0c0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@400;500;600&family=Tiro+Devanagari+Hindi&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%230e0c0b%27/%3E%3Ctext x=%2732%27 y=%2745%27 font-family=%27Georgia%27 font-size=%2738%27 text-anchor=%27middle%27 fill=%27%23e3c886%27%3ES%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,21 +17,21 @@
 <main>
   <section class="page-hero">
     <div class="container">
-      <div class="breadcrumb"><a href="index.html">Home</a> / Couture Catalog</div>
-      <h1 id="cat-title">The Couture Catalog</h1>
+      <div class="breadcrumb"><a href="index.html" data-i18n="nav.home">Home</a> / <span data-i18n="nav.catalog">Full catalogue</span></div>
+      <h1 id="cat-title"></h1>
       <p id="cat-sub"></p>
     </div>
   </section>
   <div class="container catalog-layout">
     <aside class="filters" id="filters" aria-label="Filters">
-      <h3>Refine <button class="clear" id="clear-filters">Clear all</button></h3>
+      <h3><span data-i18n="shop.filter">Filter</span> <button class="clear" id="clear-filters" data-i18n="shop.clearAll">Clear all</button></h3>
       <div id="filters-body"></div>
-      <button class="btn btn-gold btn-block filter-toggle" data-close style="margin-top:18px">Show results</button>
+      <button class="btn btn-gold btn-block filter-toggle" data-close style="margin-top:18px" data-i18n="shop.filterSort">Show results</button>
     </aside>
     <section>
       <div class="toolbar">
-        <button class="btn btn-outline filter-toggle" id="filter-toggle" style="padding:11px 20px">Filters</button>
-        <label class="search-pill" style="flex:1;max-width:360px;border-bottom:1px solid var(--line)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Search the catalog…" aria-label="Search the catalog"></label>
+        <button class="btn btn-outline filter-toggle" id="filter-toggle" style="padding:11px 20px" data-i18n="shop.filter">Filters</button>
+        <label class="search-pill" style="flex:1;max-width:360px;border-bottom:1px solid var(--line)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" data-i18n-ph="nav.searchPlaceholder" placeholder="Search…" aria-label="Search"></label>
         <span class="count" id="result-count"></span>
         <label>
           <span class="sr-only">Sort by</span>
@@ -51,7 +51,9 @@
 </main>
 <div id="site-footer"></div>
 <script src="js/catalog-data.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/art.js"></script>
 <script src="js/app.js"></script>
+<script src="js/platform.js"></script>
 </body>
 </html>

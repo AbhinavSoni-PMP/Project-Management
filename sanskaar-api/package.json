@@ -2,10 +2,19 @@
   "name": "sanskaar-api",
   "version": "1.0.0",
   "private": true,
-  "description": "SANSKAAR payments API (Razorpay): creates orders and verifies payments",
-  "engines": { "node": ">=20" },
+  "description": "SANSKAAR API: accounts, live catalogue, Razorpay orders, delivery tracking and owner admin",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node --env-file=.env server.js",
     "test": "node --test"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10"
   }
 }
