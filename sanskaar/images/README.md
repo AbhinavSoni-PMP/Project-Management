@@ -28,6 +28,7 @@ named `flatlay.jpg`.
 | `images/site/bride.jpg`               | "The Bridal Trousseau" panel (portrait 4:5) |
 | `images/site/groom.jpg`               | "The Groom's Durbar" panel (portrait 4:5)   |
 | `images/collections/rajwada.jpg` (also `gulabi`, `marwar`, `thar`, `udaipur`) | Collection arches (portrait 2:3) |
+| `images/site/hero-mobile-1.jpg`, `hero-mobile-2.jpg`, … | **Mobile app** home screen: full-screen swipeable campaign shots (portrait 9:16, at least 1080 × 1920 px). Add the product SKU to link a shot to its product page, e.g. `hero-mobile-1-SK-W-LHG-001.jpg`. Until these exist the app shows the studio product photos. |
 
 File names are case-sensitive, and must be `.jpg`.
 
@@ -38,6 +39,9 @@ File names are case-sensitive, and must be `.jpg`.
   textured Rajasthani interior (palace arches, jharokha, carved sandstone). This
   matches the dark-and-gold site design.
 - Model centred, full outfit visible head to toe, same camera height for every product.
+- For the app's `hero-mobile-*` shots: keep the face and upper body in the top
+  half of the frame and leave calm, darker space in the bottom third, where the
+  headline and buttons sit.
 
 ## AI-editing your raw photos
 

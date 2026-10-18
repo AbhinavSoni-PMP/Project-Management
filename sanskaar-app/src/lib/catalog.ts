@@ -73,3 +73,22 @@ export const sizeGuide = {
   groom: { head: ["Size", "Chest", "Waist", "Shoulder"], rows: [["36", 36, 30, 16.5], ["38", 38, 32, 17], ["40", 40, 34, 17.5], ["42", 42, 36, 18], ["44", 44, 38, 18.5], ["46", 46, 40, 19]] },
   bride: { head: ["Size", "Bust", "Waist", "Hip"], rows: [["XS", 32, 26, 35], ["S", 34, 28, 37], ["M", 36, 30, 39], ["L", 38, 32, 41], ["XL", 40, 34, 43], ["XXL", 42, 36, 45]] }
 };
+
+export interface HeroSlide { key: string; image: number; product?: Product }
+/**
+ * Home-screen hero slides. Portrait campaign photos named
+ * site/hero-mobile-<n>.jpg (optionally site/hero-mobile-<n>-<SKU>.jpg to link
+ * the look to its product) are used first; until the photoshoot is in, the
+ * studio photo of every photographed product fills the hero.
+ */
+export function heroSlides(): HeroSlide[] {
+  const campaign = Object.keys(images)
+    .filter(k => /^site\/hero-mobile-\d+/.test(k))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map(k => ({ key: k, image: images[k], product: byId(k.match(/^site\/hero-mobile-\d+-(.+)\.\w+$/)?.[1] ?? "") }));
+  if (campaign.length) return campaign;
+  return products
+    .filter(p => p.photos)
+    .map(p => ({ key: p.id, image: productPhoto(p, "front")!, product: p }))
+    .filter(s => s.image);
+}

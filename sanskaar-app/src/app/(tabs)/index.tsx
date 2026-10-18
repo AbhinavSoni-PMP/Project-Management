@@ -3,7 +3,9 @@ import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useBottomTabBarHeight } from "expo-router/tabs";
 import { Icon } from "../../components/Icon";
+import { HeroCarousel } from "../../components/HeroCarousel";
 import { SiteMedia } from "../../components/Media";
 import { ProductGrid } from "../../components/ProductGrid";
 import { Body, Button, Chip, Divider, Em, Eyebrow, Heading, SectionHead } from "../../components/ui";
@@ -34,6 +36,7 @@ const LOVE = [
 export default function Home() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const { recent } = useStore();
   const [tab, setTab] = useState("all");
 
@@ -49,29 +52,25 @@ export default function Home() {
   return (
     <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
       {/* HERO */}
-      <SiteMedia
-        src="site/hero.jpg"
-        style={{ height: Math.max(560, height * 0.82) }}
-        scene={{ key: "scene:hero", colors: ["#3a0d14", "#c8a45c"], w: 900, h: 1300, seed: 5, sunX: 0.6, sun: "#e0a85a",
-          figures: [["SK-M-SHW-002", 250, 620, 1.45], ["SK-W-LHG-001", 480, 610, 1.5]] }}
-      >
-        <LinearGradient colors={["rgba(14,12,11,0.55)", "rgba(14,12,11,0.05)", "rgba(14,12,11,0.92)", colors.bg]} locations={[0, 0.3, 0.78, 1]} style={StyleSheet.absoluteFill} />
-        <View style={[styles.brandBar, { paddingTop: insets.top + 10 }]}>
-          <Text style={styles.brand}>{config.brand}</Text>
-          <Pressable hitSlop={10} onPress={() => router.navigate("/shop")} accessibilityLabel="Search the catalog">
-            <Icon name="search" color={colors.text} />
-          </Pressable>
-        </View>
-        <View style={styles.heroText}>
-          <Eyebrow>Redefining regal elegance</Eyebrow>
-          <Heading size={40}>Crafting heirloom <Em>luxury</Em> for the royal Indian wedding</Heading>
-          <Body style={{ marginTop: 12 }}>Hand-woven silks, rich velvets and heavy zardozi, designed to make the bride and groom look majestic on their most special day.</Body>
-          <View style={styles.heroBtns}>
-            <Button label="Explore" onPress={() => router.navigate("/shop")} style={{ flex: 1 }} />
-            <Button label="Find your look" variant="outline" onPress={() => router.navigate("/advisor")} style={{ flex: 1 }} />
+      <HeroCarousel
+        width={width}
+        height={Math.max(560, height - tabBarHeight)}
+        top={
+          <View style={[styles.brandBar, { paddingTop: insets.top + 10 }]} pointerEvents="box-none">
+            <Text style={styles.brand}>{config.brand}</Text>
+            <Pressable hitSlop={10} onPress={() => router.navigate("/shop")} accessibilityLabel="Search the catalog">
+              <Icon name="search" color={colors.text} />
+            </Pressable>
           </View>
+        }
+      >
+        <Eyebrow>Redefining regal elegance</Eyebrow>
+        <Heading size={36}>Heirloom <Em>luxury</Em> for the royal Indian wedding</Heading>
+        <View style={styles.heroBtns}>
+          <Button label="Explore" onPress={() => router.navigate("/shop")} style={{ flex: 1 }} />
+          <Button label="Find your look" variant="outline" onPress={() => router.navigate("/advisor")} style={{ flex: 1 }} />
         </View>
-      </SiteMedia>
+      </HeroCarousel>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.marquee} contentContainerStyle={{ paddingHorizontal: gutter, gap: 26, alignItems: "center" }}>
         {MARQUEE.map(m => <Text key={m} style={styles.marqueeText}>✦  {m.toUpperCase()}</Text>)}
@@ -204,8 +203,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   brandBar: { position: "absolute", left: 0, right: 0, top: 0, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: gutter },
   brand: { fontFamily: fonts.serifBold, fontSize: 24, letterSpacing: 6, color: colors.gold2 },
-  heroText: { position: "absolute", left: gutter, right: gutter, bottom: 28 },
-  heroBtns: { flexDirection: "row", gap: 10, marginTop: 22 },
+  heroBtns: { flexDirection: "row", gap: 10, marginTop: 20 },
   marquee: { borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line, backgroundColor: colors.bg2, height: 48, flexGrow: 0 },
   marqueeText: { fontFamily: fonts.sansMedium, fontSize: 11, letterSpacing: 2.4, color: colors.gold },
   section: { paddingHorizontal: gutter, paddingTop: 48 },

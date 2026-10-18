@@ -7,7 +7,7 @@ Built with Expo (React Native), so one codebase runs on iPhone and Android.
 
 | Tab / screen | What it does |
 |---|---|
-| **Home** | Hero, Bride / Groom edits, signature catalogue with category tabs, the five Rajasthan collections, atelier story, testimonials, consultation CTA |
+| **Home** | Full-screen swipeable hero (campaign photos `sanskaar/images/site/hero-mobile-*.jpg`, or the studio product photos until those exist), Bride / Groom edits, signature catalogue with category tabs, the five Rajasthan collections, atelier story, testimonials, consultation CTA |
 | **Shop** | Full catalogue: search, Bride / Groom toggle, category chips, and a filter sheet (occasion, collection, colour, price, new / bestsellers, sort) |
 | **Product** | Swipeable photo gallery, colourways, size picker with size guide, "Made to measure", sticky **Add to bag**, WhatsApp enquiry, details / fit / shipping / care, "Complete the look" and similar pieces |
 | **Stylist** | The 3-question Bridal Style Advisor, same scoring as the website |
