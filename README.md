@@ -17,7 +17,7 @@ Static website for **SANSKAAR**, an Indian wedding couture brand for the bride a
 
 ### Mobile app
 
-An iOS & Android app for the same store lives in [`sanskaar-app/`](sanskaar-app/) (Expo / React Native): home, shop with filters, product pages, Style Advisor, wishlist, bag with WhatsApp checkout and consultation booking. It reads products, prices and photos from the website, so after editing the site run `npm run sync` in `sanskaar-app/`. See [`sanskaar-app/README.md`](sanskaar-app/README.md) to run it on your phone with Expo Go or publish it to the stores.
+An iOS & Android app for the same store lives in [`sanskaar-app/`](sanskaar-app/) (Expo / React Native): home, shop with filters, product pages, Style Advisor, wishlist, bag, card / UPI checkout and consultation booking. It reads products, prices and photos from the website, so after editing the site run `npm run sync` in `sanskaar-app/`. Checkout takes card, UPI, net banking, wallet and EMI payments through Razorpay via the small payments API in [`sanskaar-api/`](sanskaar-api/) (setup steps in its README). See [`sanskaar-app/README.md`](sanskaar-app/README.md) to run it on your phone with Expo Go or publish it to the stores.
 
 ---
 

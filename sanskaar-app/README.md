@@ -12,10 +12,21 @@ Built with Expo (React Native), so one codebase runs on iPhone and Android.
 | **Product** | Swipeable photo gallery, colourways, size picker with size guide, "Made to measure", sticky **Add to bag**, WhatsApp enquiry, details / fit / shipping / care, "Complete the look" and similar pieces |
 | **Stylist** | The 3-question Bridal Style Advisor, same scoring as the website |
 | **Wishlist** | Saved pieces |
-| **Bag** | Quantities, free-shipping progress, **Checkout on WhatsApp** with the full order pre-filled |
+| **Bag** | Quantities, free-shipping progress, **Proceed to checkout** |
+| **Checkout** | Delivery address (remembered for next time), order summary, then **Pay** with Razorpay: credit & debit cards, UPI, net banking, wallets, EMI. Order confirmation screen after a verified payment. |
 | **Book a consultation** | Appointment form sent to the atelier on WhatsApp |
 
-Bag, wishlist and recently viewed are saved on the phone.
+Bag, wishlist, recently viewed and the delivery address are saved on the phone.
+
+## Payments
+
+Checkout needs the payments API in [`../sanskaar-api`](../sanskaar-api) (it holds your Razorpay secret key and prices orders from the catalogue). Follow its README to get Razorpay test keys and put it online, then create `sanskaar-app/.env` with:
+
+```
+EXPO_PUBLIC_API_URL=https://your-api.vercel.app
+```
+
+and restart with `npx expo start -c`. Until this is set, the Pay button stays disabled.
 
 ## One source of truth: the website
 
@@ -25,7 +36,7 @@ The app does not keep its own copy of the catalogue. `npm run sync` reads the we
 - `src/data/art.generated.js` ← `sanskaar/js/art.js` (the illustrated previews shown until a product is photographed)
 - `assets/site/**` and `src/data/images.generated.ts` ← every photo in `sanskaar/images/`
 
-So to change a price, add a product or add photos: edit the website as usual (see `sanskaar/images/README.md`), then run `npm run sync` here. Don't edit the generated files by hand.
+So to change a price, add a product or add photos: edit the website as usual (see `sanskaar/images/README.md`), then run `npm run sync` here. The same command also updates the prices the payments API charges (`../sanskaar-api/data/catalog.json`). Don't edit the generated files by hand.
 
 ## Run it on your phone
 

@@ -1,4 +1,4 @@
-/* Bag, wishlist and recently viewed — persisted on the device */
+/* Bag, wishlist, recently viewed and the delivery address — persisted on the device */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -6,16 +6,18 @@ import { Platform } from "react-native";
 import { byId } from "./catalog";
 
 export interface CartItem { id: string; size: string; qty: number }
+export interface Address { name: string; phone: string; email: string; line1: string; line2: string; city: string; state: string; pincode: string }
 
-interface State { cart: CartItem[]; wish: string[]; recent: string[] }
+interface State { cart: CartItem[]; wish: string[]; recent: string[]; address: Address | null }
 const KEY = "sanskaar:v1";
-const empty: State = { cart: [], wish: [], recent: [] };
+const empty: State = { cart: [], wish: [], recent: [], address: null };
 
 interface Store extends State {
   ready: boolean;
   addToCart(id: string, size: string, qty?: number): void;
   setQty(index: number, qty: number): void;
   clearCart(): void;
+  saveAddress(a: Address): void;
   toggleWish(id: string): boolean;
   isWished(id: string): boolean;
   viewed(id: string): void;
@@ -44,7 +46,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState({
           cart: (saved.cart ?? []).filter(i => byId(i.id)),
           wish: (saved.wish ?? []).filter(id => byId(id)),
-          recent: (saved.recent ?? []).filter(id => byId(id))
+          recent: (saved.recent ?? []).filter(id => byId(id)),
+          address: saved.address ?? null
         });
       })
       .catch(() => {})
@@ -83,6 +86,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }));
     },
     clearCart() { setState(s => ({ ...s, cart: [] })); },
+    saveAddress(address) { setState(s => ({ ...s, address })); },
     toggleWish(id) {
       tap();
       const on = !state.wish.includes(id);

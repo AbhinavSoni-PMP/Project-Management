@@ -48,6 +48,8 @@ export default function RootLayout() {
               <Stack.Screen name="product/[id]" options={{ title: "", headerTransparent: true, headerStyle: { backgroundColor: "transparent" } }} />
               <Stack.Screen name="appointment" options={{ presentation: "modal", title: "Book a consultation" }} />
               <Stack.Screen name="size-guide" options={{ presentation: "modal", title: "Size guide" }} />
+              <Stack.Screen name="checkout" options={{ title: "Checkout" }} />
+              <Stack.Screen name="order-success" options={{ headerShown: false, gestureEnabled: false }} />
             </Stack>
             <Toast />
           </View>

@@ -12,6 +12,7 @@ SANSKAAR.config = {
   email: "hello@sanskaar.in",
   address: "MI Road, Jaipur, Rajasthan 302001",
   freeShippingAbove: 4999,
+  shippingFee: 250,                  // charged below freeShippingAbove
   instagram: "#", facebook: "#", youtube: "#", pinterest: "#"
 };
 

@@ -1,0 +1,11 @@
+{
+  "name": "sanskaar-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SANSKAAR payments API (Razorpay): creates orders and verifies payments",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node --env-file=.env server.js",
+    "test": "node --test"
+  }
+}

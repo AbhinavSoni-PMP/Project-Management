@@ -7,7 +7,6 @@ import { Body, Button, Eyebrow, Heading } from "../../components/ui";
 import { byId, config, inr } from "../../lib/catalog";
 import { useStore } from "../../lib/store";
 import { colors, fonts, gutter, radius } from "../../lib/theme";
-import { openWhatsApp, orderMessage } from "../../lib/whatsapp";
 
 export default function Bag() {
   const { cart, setQty, cartTotal, cartCount } = useStore();
@@ -57,8 +56,8 @@ export default function Bag() {
       <View style={styles.foot}>
         <Text style={styles.ship}>{left > 0 ? `Add ${inr(left)} more for free shipping` : "✦ You've unlocked free shipping"}</Text>
         <View style={styles.row}><Text style={styles.subLabel}>Subtotal</Text><Text style={styles.sub}>{inr(cartTotal)}</Text></View>
-        <Button label="Checkout on WhatsApp" icon="whatsapp" variant="whatsapp" onPress={() => openWhatsApp(orderMessage(cart))} />
-        <Text style={styles.note}>Our team confirms sizing & delivery before payment.</Text>
+        <Button label="Proceed to checkout" icon="shield" onPress={() => router.push("/checkout")} />
+        <Text style={styles.note}>Cards · UPI · Net banking · Wallets · EMI — secured by Razorpay</Text>
       </View>
     </SafeAreaView>
   );

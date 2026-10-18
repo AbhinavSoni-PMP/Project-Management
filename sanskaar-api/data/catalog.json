@@ -1,0 +1,749 @@
+{
+ "config": {
+  "freeShippingAbove": 4999,
+  "shippingFee": 250
+ },
+ "products": [
+  {
+   "id": "SK-M-IWS-101",
+   "name": "Neel Kamal Velvet Indo-Western",
+   "price": 24999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-102",
+   "name": "Gulnaar Velvet Indo-Western",
+   "price": 24999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-103",
+   "name": "Phoolbagh Sequin Velvet Jacket",
+   "price": 23999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-104",
+   "name": "Chandni Ivory Indo-Western",
+   "price": 26999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-105",
+   "name": "Gulabi Chandni Ivory Indo-Western",
+   "price": 26999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-001",
+   "name": "Maharaja Zardozi Sherwani",
+   "price": 64999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-002",
+   "name": "Shahi Maroon Velvet Sherwani",
+   "price": 72999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-003",
+   "name": "Gulabi Rose Sherwani",
+   "price": 54999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-004",
+   "name": "Thar Gold Brocade Sherwani",
+   "price": 58999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-005",
+   "name": "Mewar Wine Sherwani",
+   "price": 61999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-SHW-006",
+   "name": "Udaipur Mint Sherwani",
+   "price": 49999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-BND-001",
+   "name": "Jodhpuri Navy Bandhgala",
+   "price": 28999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-BND-002",
+   "name": "Royal Blue Jodhpuri Suit",
+   "price": 31999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-BND-003",
+   "name": "Black Rajputana Bandhgala",
+   "price": 33999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-BND-004",
+   "name": "Ivory Thar Bandhgala",
+   "price": 26999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-BND-005",
+   "name": "Emerald Jodhpuri Bandhgala",
+   "price": 29999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-001",
+   "name": "Asymmetric Drape Indo-Western",
+   "price": 34999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-002",
+   "name": "Midnight Mirror Indo-Western",
+   "price": 36999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-003",
+   "name": "Wine Cape Indo-Western",
+   "price": 39999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-IWS-004",
+   "name": "Peacock Teal Indo-Western",
+   "price": 32999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-KUR-001",
+   "name": "Haldi Yellow Kurta Set",
+   "price": 6999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-KUR-002",
+   "name": "Ivory Chikankari Kurta Set",
+   "price": 7999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-KUR-003",
+   "name": "Kesariya Festive Kurta",
+   "price": 5999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-KUR-004",
+   "name": "Mint Mehendi Kurta Set",
+   "price": 6499,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-KUR-005",
+   "name": "Maroon Silk Kurta Set",
+   "price": 8499,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-KUR-006",
+   "name": "Lilac Pastel Kurta Set",
+   "price": 6999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-JKT-001",
+   "name": "Bandhani Nehru Jacket Set",
+   "price": 12999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-JKT-002",
+   "name": "Emerald Brocade Jacket Set",
+   "price": 13999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-JKT-003",
+   "name": "Navy Velvet Jacket Set",
+   "price": 14999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-M-JKT-004",
+   "name": "Gulabi Printed Jacket Set",
+   "price": 11999,
+   "sizes": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44",
+    "46"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-001",
+   "name": "Rajkumari Bridal Lehenga",
+   "price": 184999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-002",
+   "name": "Gulabi Nagar Lehenga",
+   "price": 124999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-003",
+   "name": "Maroon Heritage Lehenga",
+   "price": 164999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-004",
+   "name": "Udaipur Pastel Lehenga",
+   "price": 98999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-005",
+   "name": "Blush Floral Lehenga",
+   "price": 89999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-006",
+   "name": "Wine Velvet Reception Lehenga",
+   "price": 134999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-007",
+   "name": "Emerald Bandhej Lehenga",
+   "price": 74999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-LHG-008",
+   "name": "Lilac Dreams Lehenga",
+   "price": 84999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SAR-001",
+   "name": "Banarasi Kadhua Saree",
+   "price": 38999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SAR-002",
+   "name": "Leheriya Chiffon Saree",
+   "price": 12999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SAR-003",
+   "name": "Ivory Gota Saree",
+   "price": 18999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SAR-004",
+   "name": "Royal Blue Kanjeevaram",
+   "price": 34999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SAR-005",
+   "name": "Rani Pink Bandhani Saree",
+   "price": 15999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SAR-006",
+   "name": "Black Sequin Saree",
+   "price": 21999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-ANK-001",
+   "name": "Mughal Maroon Anarkali",
+   "price": 32999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-ANK-002",
+   "name": "Peach Floral Anarkali",
+   "price": 24999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-ANK-003",
+   "name": "Peacock Teal Anarkali",
+   "price": 27999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-ANK-004",
+   "name": "Ivory Chikankari Anarkali",
+   "price": 19999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-ANK-005",
+   "name": "Navy Gota Anarkali",
+   "price": 22999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SHR-001",
+   "name": "Haldi Gota Sharara Set",
+   "price": 16999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SHR-002",
+   "name": "Mint Mirror Sharara",
+   "price": 18999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SHR-003",
+   "name": "Rani Pink Gharara Set",
+   "price": 21999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SHR-004",
+   "name": "Lilac Sequin Sharara",
+   "price": 19999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SUT-001",
+   "name": "Jaipuri Block Print Suit",
+   "price": 6999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SUT-002",
+   "name": "Emerald Silk Kurta Set",
+   "price": 9999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SUT-003",
+   "name": "Kesariya Leheriya Suit",
+   "price": 7499,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  },
+  {
+   "id": "SK-W-SUT-004",
+   "name": "Ivory Mukaish Kurta Set",
+   "price": 8999,
+   "sizes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ]
+  }
+ ]
+}

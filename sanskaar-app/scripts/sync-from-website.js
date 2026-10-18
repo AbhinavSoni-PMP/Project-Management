@@ -9,6 +9,7 @@
      - the illustrated previews (js/art.js)    -> src/data/art.generated.js
      - every photo under images/               -> assets/site/...
        plus a require() map Metro can bundle   -> src/data/images.generated.ts
+     - prices and sizes for the payments API   -> ../sanskaar-api/data/catalog.json
 
    Run it after editing products, prices or photos on the website:
      npm run sync
@@ -46,6 +47,14 @@ const catalog = {
 };
 fs.mkdirSync(OUT_DATA, { recursive: true });
 fs.writeFileSync(path.join(OUT_DATA, "catalog.json"), JSON.stringify(catalog, null, 1) + "\n");
+
+// The payments API prices orders from the same catalogue (never from the phone)
+const API_DATA = path.resolve(APP, "../sanskaar-api/data");
+fs.mkdirSync(API_DATA, { recursive: true });
+fs.writeFileSync(path.join(API_DATA, "catalog.json"), JSON.stringify({
+  config: { freeShippingAbove: config.freeShippingAbove, shippingFee: config.shippingFee },
+  products: S.products.map(p => ({ id: p.id, name: p.name, price: p.price, sizes: p.sizes }))
+}, null, 1) + "\n");
 
 // 3. Illustrated previews: same drawing code, exported as a CommonJS module
 const art = read("js/art.js").replace("window.SanskaarArt =", "module.exports =");
