@@ -35,7 +35,8 @@
           "imageWidth": 160,
           "backgroundColor": "#0e0c0b"
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "scheme": "sanskaar",
     "backgroundColor": "#0e0c0b"

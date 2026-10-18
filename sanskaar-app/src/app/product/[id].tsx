@@ -1,6 +1,6 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { FlatList, Pressable, ScrollView, type ScrollViewInstance, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon, IconName } from "../../components/Icon";
 import { ProductMedia } from "../../components/Media";
@@ -25,7 +25,7 @@ function ProductDetail({ p }: { p: Product }) {
   const [size, setSize] = useState<string | null>(null);
   const [slide, setSlide] = useState(0);
   const [open, setOpen] = useState<string | null>("details");
-  const scroll = useRef<ScrollViewInstance>(null);
+  const scroll = useRef<ScrollView>(null);
   const [sizesY, setSizesY] = useState(0);
 
   useEffect(() => { viewed(p.id); }, [p.id]); // eslint-disable-line react-hooks/exhaustive-deps
