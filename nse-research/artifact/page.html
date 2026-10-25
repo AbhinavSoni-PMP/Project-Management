@@ -207,7 +207,9 @@ footer .disc { color: var(--ink); }
   "use strict";
   const N = window.NSE, L = N.LABELS;
   const SERVER = "tapetide";
-  const HISTORY_DAYS = 1500;          // calendar days, about 1,030 sessions: enough for SMA 200 and weekly patterns
+  const TARGET_DAYS = 1100;           // calendar days of history to build up, about 750 sessions
+  const OVERLAP_DAYS = 10;            // re-fetched on every refresh to spot provider revisions
+  const MAX_CALLS_PER_STOCK = 4;      // per refresh; long histories fill in over a few refreshes
   const DAILY_FREE_CALLS = 50;
   const DEFAULT_LIST = ["RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS"];
   const KEY = "nse-terminal.v1";
@@ -237,10 +239,12 @@ footer .disc { color: var(--ink); }
     lastRefresh: saved.lastRefresh || null,
     log: saved.log || [],
     selected: saved.selected || null,
+    chunkDays: saved.chunkDays || 400,   // largest window whose reply arrived whole; learned from cut-off replies
+    niftyInterval: saved.niftyInterval || "1y",
     tf: "daily", patIdx: null, busy: false, storageOk: true,
   };
   function persist() {
-    S.storageOk = store.save({ watchlist: S.watchlist, stocks: S.stocks, calendar: S.calendar, nifty: S.nifty, lastRefresh: S.lastRefresh, log: S.log, selected: S.selected });
+    S.storageOk = store.save({ watchlist: S.watchlist, stocks: S.stocks, calendar: S.calendar, nifty: S.nifty, lastRefresh: S.lastRefresh, log: S.log, selected: S.selected, chunkDays: S.chunkDays, niftyInterval: S.niftyInterval });
   }
 
   // ---------------------------------------------------------- helpers
@@ -318,14 +322,27 @@ footer .disc { color: var(--ink); }
     if (!mcpPromise) mcpPromise = window.claude && window.claude.use ? window.claude.use("mcp").catch(() => null) : Promise.resolve(null);
     return mcpPromise;
   }
+  // Long replies can reach the page cut off, so they may not parse as JSON. Then the
+  // complete row objects that did arrive are kept, and the reply is marked `cut`.
+  const ROW_RE = /\{[^{}]*"date"\s*:\s*"\d{4}-\d{2}-\d{2}"[^{}]*\}/g;
+  function readReply(r) {
+    if (r && r.structuredContent && typeof r.structuredContent === "object") return { p: r.structuredContent, cut: false };
+    if (r && r.payload && typeof r.payload === "object") return { p: r.payload, cut: false };
+    const blocks = r && Array.isArray(r.content) ? r.content.filter((b) => b && b.type === "text").map((b) => b.text) : [];
+    const text = blocks.length ? blocks.join("") : typeof (r && r.payload) === "string" ? r.payload : "";
+    try { return { p: JSON.parse(text), cut: false }; } catch (e) { /* fall through */ }
+    const end = text.lastIndexOf("}");
+    if (end > 0) { try { return { p: JSON.parse(text.slice(0, end + 1)), cut: false }; } catch (e) { /* fall through */ } }
+    const rows = [];
+    for (const m of text.match(ROW_RE) || []) { try { rows.push(JSON.parse(m)); } catch (e) { /* skip */ } }
+    if (!rows.length) throw { code: "tool_error", message: "unreadable reply: " + text.slice(0, 160) };
+    return { p: null, rows, cut: true, chars: text.length, blocks: blocks.length };
+  }
   async function call(mcp, tool, input) {
     let tries = 0;
     for (;;) {
       try {
-        const r = await mcp.callTool(SERVER, tool, input, { cache: false });
-        let p = r && r.payload !== undefined ? r.payload : r;
-        if (typeof p === "string") { try { p = JSON.parse(p); } catch (e) { throw { code: "tool_error", message: p.slice(0, 200) }; } }
-        return p;
+        return readReply(await mcp.callTool(SERVER, tool, input, { cache: false }));
       } catch (err) {
         if (err && err.retryable && tries === 0) {
           tries++;
@@ -335,6 +352,64 @@ footer .disc { color: var(--ink); }
         throw err;
       }
     }
+  }
+  const dayNum = (s) => Math.round(Date.parse(String(s).slice(0, 10) + "T00:00:00Z") / 864e5);
+  const dayStr = (n) => new Date(n * 864e5).toISOString().slice(0, 10);
+
+  // Fetches the newest bars (from the last held bar minus an overlap), then backfills older
+  // history toward TARGET_DAYS. Windows go newest to oldest and only an unbroken run of
+  // whole replies is kept, so the series never has a hole in it.
+  async function fetchStock(mcp, sym, note) {
+    const old = (S.stocks[sym] && S.stocks[sym].rows) || [];
+    const today = dayNum(N.nowIst().date);
+    const firstOld = old.length ? dayNum(old[0][0]) : null, lastOld = old.length ? dayNum(old.at(-1)[0]) : null;
+    const fresh = new Map(), back = new Map();
+    let calls = 0, phase = "new", end = today;
+    let floor = old.length ? lastOld - OVERLAP_DAYS : today - TARGET_DAYS;   // oldest day this phase must reach
+    let reachedNew = today + 1, reachedBack = firstOld;
+    while (calls < MAX_CALLS_PER_STOCK) {
+      if (end < floor) {
+        if (phase === "new" && old.length && reachedNew <= lastOld && firstOld > today - TARGET_DAYS) {
+          phase = "back"; end = firstOld - 1; floor = today - TARGET_DAYS; continue;
+        }
+        break;
+      }
+      const days = Math.min(end - floor + 1, S.chunkDays);
+      const input = { symbol: sym, days, interval: "daily" };
+      if (end !== today) input.end_date = dayStr(end);
+      const r = await call(mcp, "get_price_history", input);
+      calls++;
+      if (r.cut) {
+        const reached = r.rows.length ? dayNum(r.rows.at(-1).date) - (end - days) : 0;
+        S.chunkDays = Math.max(10, Math.min(Math.floor(days * 0.6), Math.floor(Math.max(reached, 8) * 0.8)));
+        note(`${sym}: the reply for ${days} days was cut off (${r.chars} characters), so windows are now ${S.chunkDays} days.`);
+        continue;
+      }
+      const rows = (r.p && Array.isArray(r.p.data) ? r.p.data : []).filter((x) => x && x.date);
+      const into = phase === "new" ? fresh : back;
+      for (const x of rows) into.set(String(x.date).slice(0, 10), x);
+      const start = end - days + 1;
+      if (phase === "new") reachedNew = start; else reachedBack = start;
+      if (!rows.length && phase === "back") break;            // before the listing date
+      end = start - 1;
+    }
+    // Merge: old rows are kept only where the new run joins them without a gap.
+    const out = new Map();
+    const joined = old.length && reachedNew <= lastOld + 1;
+    if (joined || !fresh.size) {
+      for (const r of old) out.set(r[0], { date: r[0], open: r[1], high: r[2], low: r[3], close: r[4], raw_close: r[5], volume: r[6] });
+      if (old.length && reachedBack < firstOld) for (const [d, x] of back) if (dayNum(d) < firstOld) out.set(d, x);
+    }
+    let revised = 0, added = 0;
+    for (const [d, x] of fresh) {
+      const o = out.get(d);
+      if (!o) added++;
+      else if (["open", "high", "low", "close", "volume"].some((k) => o[k] !== x[k])) revised++;
+      out.set(d, x);
+    }
+    if (!joined && old.length && fresh.size) note(`${sym}: the new bars did not reach the bars held before, so the older bars were dropped to avoid a gap.`, "err");
+    const rows = [...out.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
+    return { rows, calls, revised, added: added + (joined ? [...back.keys()].filter((d) => dayNum(d) < firstOld).length : 0) };
   }
   const errText = (e) => (e && (e.message || e.code)) || String(e);
 
@@ -352,14 +427,14 @@ footer .disc { color: var(--ink); }
       return;
     }
     setBanner(null);
-    note(`Refresh started for ${syms.length} stocks (${syms.length + 2} Tapetide calls).`);
+    note(`Refresh started for ${syms.length} stocks.`);
     let fatal = null;
     const stopIf = (e) => { if (e && FATAL[e.code]) { fatal = e; return true; } return false; };
 
     // 1. Exchange calendar, used for the freshness check.
     try {
-      const p = await call(mcp, "get_observation_status", { symbol: syms[0], days: 60 });
-      const rows = (p && p.data) || [];
+      const r = await call(mcp, "get_observation_status", { symbol: syms[0], days: 60 });
+      const rows = (r.cut ? r.rows : r.p && r.p.data) || [];
       if (!rows.length) throw { message: "no calendar rows returned" };
       const sessions = rows.filter((r) => r.status === "traded" || r.status === "no_print").map((r) => r.date);
       S.calendar = { sessions: (S.calendar ? S.calendar.sessions.filter((d) => d < rows[0].date) : []).concat(sessions), end: rows.at(-1).date, fetched_at: Date.now() };
@@ -368,16 +443,27 @@ footer .disc { color: var(--ink); }
       if (!stopIf(e)) note(`Calendar: ${L.SOURCE_UNAVAILABLE}: ${errText(e)}. Freshness falls back to weekdays.`, "err");
     }
 
-    // 2. Nifty 50 for the market strip and relative strength.
+    // 2. Nifty 50 for the market strip and relative strength. A cut-off reply steps down to a shorter window.
     if (!fatal) {
-      try {
-        const p = await call(mcp, "get_index_history", { index_name: "Nifty 50", interval: "1y" });
-        const d = p && p.data;
-        if (!d || !Array.isArray(d.bars) || !d.bars.length) throw { message: "no index bars returned" };
-        S.nifty = { bars: d.bars.map((b) => ({ date: b.date, open: b.open, high: b.high, low: b.low, close: b.close, pe: b.pe, pb: b.pb, div_yield: b.div_yield })), source: (p.meta && p.meta.source) || null, fetched_at: Date.now() };
-        note(`Nifty 50: ${d.bars.length} daily bars to ${d.bars.at(-1).date}.`, "ok");
-      } catch (e) {
-        if (!stopIf(e)) note(`Nifty 50: ${L.SOURCE_UNAVAILABLE}: ${errText(e)}. Previous index data kept.`, "err");
+      const order = ["1y", "6m", "3m"];
+      for (let i = Math.max(0, order.indexOf(S.niftyInterval)); i < order.length; i++) {
+        try {
+          const r = await call(mcp, "get_index_history", { index_name: "Nifty 50", interval: order[i] });
+          if (r.cut) {
+            note(`Nifty 50 (${order[i]}): reply was cut off after ${r.rows.length} bars (${r.chars} characters).${i + 1 < order.length ? ` Trying ${order[i + 1]}.` : " Previous index data kept."}`, "err");
+            S.niftyInterval = order[Math.min(i + 1, order.length - 1)];
+            continue;
+          }
+          const d = r.p && r.p.data;
+          if (!d || !Array.isArray(d.bars) || !d.bars.length) throw { message: "no index bars returned" };
+          S.niftyInterval = order[i];
+          S.nifty = { bars: d.bars.map((b) => ({ date: b.date, open: b.open, high: b.high, low: b.low, close: b.close, pe: b.pe, pb: b.pb, div_yield: b.div_yield })), interval: order[i], fetched_at: Date.now() };
+          note(`Nifty 50: ${d.bars.length} daily bars to ${d.bars.at(-1).date}.`, "ok");
+          break;
+        } catch (e) {
+          if (!stopIf(e)) note(`Nifty 50: ${L.SOURCE_UNAVAILABLE}: ${errText(e)}. Previous index data kept.`, "err");
+          break;
+        }
       }
     }
 
@@ -385,24 +471,18 @@ footer .disc { color: var(--ink); }
     for (const sym of syms) {
       if (fatal) break;
       try {
-        const p = await call(mcp, "get_price_history", { symbol: sym, days: HISTORY_DAYS, interval: "daily" });
-        const rows = (p && Array.isArray(p.data) ? p.data : []).filter((r) => r && r.date);
-        if (!rows.length) throw { message: "no bars returned; check the symbol is an NSE stock" };
-        const prev = S.stocks[sym] && S.stocks[sym].rows ? new Map(S.stocks[sym].rows.map((r) => [r[0], r])) : new Map();
-        const packed = rows.map((r) => [String(r.date).slice(0, 10), r.open, r.high, r.low, r.close, r.raw_close ?? null, r.volume ?? null]);
-        let revised = 0;
-        for (const r of packed) {
-          const o = prev.get(r[0]);
-          if (o && [1, 2, 3, 4, 6].some((i) => o[i] !== r[i])) revised++;
-        }
-        S.stocks[sym] = { rows: packed, fetched_at: Date.now(), error: null, revised };
+        const res = await fetchStock(mcp, sym, note);
+        const packed = res.rows.map((r) => [String(r.date).slice(0, 10), r.open, r.high, r.low, r.close, r.raw_close ?? null, r.volume ?? null]);
+        if (!packed.length) throw { message: "no bars returned; check the symbol is an NSE stock" };
+        S.stocks[sym] = { rows: packed, fetched_at: Date.now(), error: null, revised: res.revised };
         memo.delete(sym);
-        note(`${sym}: ${packed.length} bars, ${packed[0][0]} to ${packed.at(-1)[0]}${revised ? `, ${revised} earlier bars revised by the provider` : ""}.`, "ok");
+        note(`${sym}: ${packed.length} sessions held, ${packed[0][0]} to ${packed.at(-1)[0]} (${res.calls} call${res.calls > 1 ? "s" : ""}, ${res.added} new bars${res.revised ? `, ${res.revised} earlier bars revised by the provider` : ""}).`, "ok");
       } catch (e) {
         if (stopIf(e)) break;
         S.stocks[sym] = Object.assign({}, S.stocks[sym] || {}, { error: `${L.SOURCE_UNAVAILABLE}: ${errText(e)}`, error_at: Date.now() });
         note(`${sym}: ${L.SOURCE_UNAVAILABLE}: ${errText(e)}. Previous data kept.`, "err");
       }
+      persist();
     }
 
     if (fatal) {
@@ -443,7 +523,7 @@ footer .disc { color: var(--ink); }
       el("div", { class: "faint" }, `${L.SOURCE_TAPETIDE} · ${L.FREQUENCY_EOD}`)
     );
     const n = S.watchlist.length;
-    $("cost").textContent = `Each refresh uses ${n + 2} Tapetide calls (${n} stocks, calendar, Nifty 50). The free plan allows ${DAILY_FREE_CALLS} a day.`;
+    $("cost").textContent = `A refresh uses about ${n + 2} Tapetide calls (one per stock, plus calendar and Nifty 50); the first load can take up to ${MAX_CALLS_PER_STOCK} per stock. The free plan allows ${DAILY_FREE_CALLS} a day.`;
   }
   function renderLog() {
     const box = $("log");
@@ -526,7 +606,7 @@ footer .disc { color: var(--ink); }
         el("p", { class: "muted", style: "margin:0" }, "This terminal reads end-of-day prices from your Tapetide connector and calculates everything else in this page. Nothing is fetched until you ask."),
         el("ol", null,
           el("li", null, "Check the watchlist above. The five symbols are an example list, not recommendations."),
-          el("li", null, `Press Refresh. Claude will ask once whether this page may use Tapetide. A refresh costs ${S.watchlist.length + 2} of your daily Tapetide calls.`),
+          el("li", null, `Press Refresh. Claude will ask once whether this page may use Tapetide. A refresh uses about ${S.watchlist.length + 2} of your daily Tapetide calls; the first load can use a few more.`),
           el("li", null, "Pick a stock in the table to see its chart, indicators, chart patterns and candlesticks."))));
       return;
     }
