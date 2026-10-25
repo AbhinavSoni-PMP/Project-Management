@@ -1,0 +1,10 @@
+# Stocks to refresh when you press Refresh. Each symbol costs one Tapetide
+# request per refresh (plus one request for the trading calendar).
+# These are examples of liquid NIFTY 50 names, not recommendations.
+[universe]
+symbols = ["RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS"]
+
+[refresh]
+# Calendar days of history to load the first time a symbol is refreshed.
+history_days = 2000
+db_path = "data/market.db"

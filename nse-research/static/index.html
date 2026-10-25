@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NSE Research Terminal</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #151b23; --line: #2a3340; --text: #e6edf3; --muted: #8b949e;
+    --pos: #3fb950; --neg: #f85149; --warn: #d29922; --info: #58a6ff; --na: #6e7681;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  h1 { font-size: 17px; margin: 0; letter-spacing: .3px; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  h3 { font-size: 13px; margin: 18px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+  main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+  button { background: #1f6feb; color: #fff; border: 0; border-radius: 6px; padding: 8px 16px; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .muted { color: var(--muted); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  tbody tr.click { cursor: pointer; }
+  tbody tr.click:hover { background: #1c2430; }
+  .scroll { overflow-x: auto; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 600; border: 1px solid currentColor; }
+  .pos { color: var(--pos); } .neg { color: var(--neg); } .warn { color: var(--warn); } .info { color: var(--info); } .na { color: var(--na); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; }
+  .kv div:nth-child(odd) { color: var(--muted); }
+  canvas { width: 100%; height: 380px; display: block; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+  .notice { border-left: 3px solid var(--warn); padding: 8px 12px; background: #1d1a12; margin: 10px 0; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>NSE Research Terminal</h1>
+    <div class="muted" id="sub">Research and paper trading only · End-of-day data</div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <span class="muted" id="refreshNote"></span>
+    <button id="refreshBtn">Refresh</button>
+  </div>
+</header>
+<main>
+  <div id="tokenWarn" class="notice" hidden>No Tapetide token found. Copy <code>.env.example</code> to <code>.env</code>, paste your token and restart the app.</div>
+  <section class="panel">
+    <h2>Universe</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Stock</th><th>Last close</th><th>Bar date</th><th>Freshness</th><th>vs SMA 200</th><th>vs SMA 50</th><th>RSI 14</th><th>ADX</th><th>Rel. volume</th><th>Traded value (Rs cr, median 20d)</th><th>Patterns</th><th>Status</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="12" class="muted">Loading…</td></tr></tbody>
+    </table></div>
+    <p class="muted" style="font-size:12px;margin:8px 0 0">All indicator values are CALCULATED FROM OHLCV DATA. Prices come from Tapetide (secondary source); NSE is not connected yet.</p>
+  </section>
+  <section id="detail"></section>
+  <section class="panel">
+    <h3 style="margin-top:0">Last refresh log</h3>
+    <div id="log" class="muted">No refresh in this session yet.</div>
+  </section>
+</main>
+<footer id="disclaimer"></footer>
+<script>
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "class" ? (e.className = v) : e.setAttribute(k, v);
+  for (const k of kids.flat(Infinity)) e.append(k instanceof Node ? k : document.createTextNode(k ?? "—"));
+  return e;
+};
+const fmt = (v, d = 2) => (v === null || v === undefined || Number.isNaN(v)) ? "—" : Number(v).toLocaleString("en-IN", { maximumFractionDigits: d, minimumFractionDigits: d });
+const signed = (v) => v === null || v === undefined ? el("span", { class: "na" }, "—") : el("span", { class: v >= 0 ? "pos" : "neg" }, (v >= 0 ? "+" : "") + fmt(v, 1) + "%");
+const FRESH = { CURRENT: ["pos", "Current (EOD)"], ONE_SESSION_BEHIND: ["warn", "1 session behind"], STALE: ["neg", "Stale"], NO_DATA: ["na", "No data"] };
+const STAGE = { CONFIRMED: "pos", DEVELOPING: "info", CANDIDATE: "warn", FAILED: "neg" };
+const badge = (cls, text) => el("span", { class: "badge " + cls }, text);
+const freshBadge = (f) => { const [c, t] = FRESH[f.status] || ["na", f.status]; return badge(c, t); };
+const bool = (v) => v === true ? el("span", { class: "pos" }, "yes") : v === false ? el("span", { class: "neg" }, "no") : el("span", { class: "na" }, "n/a");
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(body.detail || r.statusText);
+  return body;
+}
+
+async function loadStatus() {
+  const s = await api("/api/status");
+  $("#tokenWarn").hidden = s.token_configured;
+  $("#disclaimer").textContent = s.disclaimer;
+}
+
+async function loadStocks() {
+  const { stocks } = await api("/api/stocks");
+  const tb = $("#rows");
+  tb.replaceChildren();
+  if (!stocks.length) tb.append(el("tr", {}, el("td", { colspan: 12, class: "muted" }, "No stocks configured. Add symbols to config.toml.")));
+  for (const s of stocks) {
+    if (!s.bar_date) {
+      tb.append(el("tr", {}, el("td", {}, s.symbol), el("td", { colspan: 11, class: "na" }, s.status + " · press Refresh to load")));
+      continue;
+    }
+    const tr = el("tr", { class: "click" },
+      el("td", {}, el("strong", {}, s.symbol)),
+      el("td", {}, fmt(s.close)),
+      el("td", {}, s.bar_date),
+      el("td", {}, freshBadge(s.freshness)),
+      el("td", {}, signed(s.vs_sma200_pct)),
+      el("td", {}, signed(s.vs_sma50_pct)),
+      el("td", {}, fmt(s.rsi14, 1)),
+      el("td", {}, fmt(s.adx, 1)),
+      el("td", {}, fmt(s.rel_volume)),
+      el("td", {}, s.low_liquidity ? el("span", { class: "warn" }, fmt(s.traded_value_cr, 1) + " low") : fmt(s.traded_value_cr, 1)),
+      el("td", {}, s.patterns.length ? s.patterns.map((p) => [badge(STAGE[p.stage] || "na", p.name + " · " + p.stage.toLowerCase()), " "]) : el("span", { class: "na" }, "none")),
+      el("td", { class: "muted", style: "white-space:normal;min-width:220px;font-size:12px" }, s.status),
+    );
+    tr.onclick = () => loadDetail(s.symbol);
+    tb.append(tr);
+  }
+}
+
+function drawChart(canvas, c, levels) {
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  const g = canvas.getContext("2d"); g.scale(dpr, dpr);
+  const n = c.close.length, padR = 64, priceH = H * 0.78, volTop = H * 0.82;
+  const vals = [...c.high, ...c.low, ...levels.map((l) => l.price)].filter((v) => v != null);
+  const lo = Math.min(...vals), hi = Math.max(...vals), span = hi - lo || 1;
+  const y = (p) => 8 + (hi - p) / span * (priceH - 16);
+  const step = (W - padR) / n, x = (i) => i * step + step / 2;
+  const css = getComputedStyle(document.documentElement);
+  g.font = "11px system-ui"; g.fillStyle = css.getPropertyValue("--muted"); g.strokeStyle = css.getPropertyValue("--line");
+  for (let k = 0; k <= 4; k++) {
+    const p = lo + span * k / 4, yy = y(p);
+    g.beginPath(); g.moveTo(0, yy); g.lineTo(W - padR, yy); g.stroke();
+    g.fillText(fmt(p), W - padR + 6, yy + 4);
+  }
+  const vmax = Math.max(...c.volume.filter((v) => v != null)) || 1;
+  for (let i = 0; i < n; i++) {
+    const up = c.close[i] >= c.open[i];
+    const col = up ? css.getPropertyValue("--pos") : css.getPropertyValue("--neg");
+    g.strokeStyle = col; g.fillStyle = col;
+    g.beginPath(); g.moveTo(x(i), y(c.high[i])); g.lineTo(x(i), y(c.low[i])); g.stroke();
+    const top = y(Math.max(c.open[i], c.close[i])), bh = Math.max(1, Math.abs(y(c.open[i]) - y(c.close[i])));
+    g.fillRect(x(i) - Math.max(1, step * 0.35), top, Math.max(2, step * 0.7), bh);
+    if (c.volume[i] != null) { g.globalAlpha = 0.35; const vh = (H - volTop) * c.volume[i] / vmax; g.fillRect(x(i) - step * 0.35, H - vh, Math.max(1, step * 0.7), vh); g.globalAlpha = 1; }
+  }
+  const line = (arr, color) => { g.strokeStyle = color; g.lineWidth = 1.4; g.beginPath(); let on = false; arr.forEach((v, i) => { if (v == null) { on = false; return; } on ? g.lineTo(x(i), y(v)) : g.moveTo(x(i), y(v)); on = true; }); g.stroke(); g.lineWidth = 1; };
+  line(c.sma50, "#58a6ff"); line(c.sma200, "#d2a8ff");
+  for (const l of levels) {
+    g.setLineDash([5, 4]); g.strokeStyle = l.color; g.beginPath(); g.moveTo(0, y(l.price)); g.lineTo(W - padR, y(l.price)); g.stroke(); g.setLineDash([]);
+    g.fillStyle = l.color; g.fillText(l.label, 4, y(l.price) - 4);
+  }
+  g.fillStyle = "#58a6ff"; g.fillText("SMA 50", 4, 14); g.fillStyle = "#d2a8ff"; g.fillText("SMA 200", 60, 14);
+}
+
+function patternCard(p, onShow) {
+  const checks = p.breakout.checks || {};
+  return el("div", { class: "card" },
+    el("div", { style: "display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap" },
+      el("strong", {}, `${p.name} · ${p.timeframe}`),
+      el("span", {}, badge(STAGE[p.stage] || "na", p.stage), " ", badge("na", "confidence " + p.confidence))),
+    el("div", { class: "kv", style: "margin-top:8px" },
+      el("div", {}, "Formation"), el("div", {}, `${p.formation_start} → ${p.formation_end}`),
+      el("div", {}, "Boundary"), el("div", {}, Object.entries(p.boundary).map(([k, v]) => `${k.replaceAll("_", " ")} ${typeof v === "number" ? fmt(v) : v}`).join(" · ")),
+      el("div", {}, "Breakout level"), el("div", {}, fmt(p.breakout_level)),
+      el("div", {}, "Current price"), el("div", {}, fmt(p.current_price)),
+      el("div", {}, "Invalidation"), el("div", {}, fmt(p.invalidation_level)),
+      el("div", {}, "Breakout status"), el("div", {}, p.breakout.status.replaceAll("_", " ").toLowerCase() + (p.breakout.breakout_date ? ` (${p.breakout.breakout_date})` : "")),
+      el("div", {}, "Checks"), el("div", {}, "distance ", bool(checks.distance), " · two closes ", bool(checks.multiple_closes), " · volume ", bool(checks.volume)),
+      el("div", {}, "Textbook target"), el("div", {}, p.target_textbook == null ? "—" : fmt(p.target_textbook) + " (not validated)"),
+      el("div", {}, "Reliability"), el("div", {}, p.historical_reliability)),
+    el("ul", {}, p.reasons.map((r) => el("li", {}, r))),
+    Object.assign(el("button", { style: "padding:4px 10px;font-size:12px" }, "Show on chart"), { onclick: onShow }));
+}
+
+async function loadDetail(sym) {
+  const box = $("#detail");
+  box.replaceChildren(el("div", { class: "panel muted" }, `Loading ${sym}…`));
+  const d = await api("/api/stocks/" + encodeURIComponent(sym));
+  if (!d.header) { box.replaceChildren(el("div", { class: "panel" }, `${sym}: ${d.status}`)); return; }
+  const h = d.header, v = d.indicators.values, t = d.trend_facts;
+  const canvas = el("canvas");
+  const panel = el("div", { class: "panel" },
+    el("div", { style: "display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px" },
+      el("h2", {}, `${d.symbol} · ${fmt(h.last_price)}`),
+      el("div", {}, freshBadge(h.freshness))),
+    el("div", { class: "kv" },
+      el("div", {}, "Data timestamp"), el("div", {}, `${h.data_timestamp} (fetched ${h.fetched_at})`),
+      el("div", {}, "Data source"), el("div", {}, h.source),
+      el("div", {}, "Frequency"), el("div", {}, h.frequency),
+      el("div", {}, "Freshness"), el("div", {}, `${h.freshness.status.replaceAll("_", " ").toLowerCase()} · expected session ${h.freshness.expected_session} · basis: ${h.freshness.calendar_basis}`),
+      el("div", {}, "Research classification"), el("div", {}, d.status)),
+    d.data_quality.notes.map((n) => el("div", { class: "notice" }, n)),
+    el("h3", {}, "Chart (daily, last 260 sessions)"), canvas,
+    el("h3", {}, "Indicators · " + d.indicators.label),
+    el("div", { class: "grid" },
+      el("div", { class: "kv" }, el("div", {}, "SMA 20/50"), el("div", {}, `${fmt(v.sma20)} / ${fmt(v.sma50)}`), el("div", {}, "SMA 100/200"), el("div", {}, `${fmt(v.sma100)} / ${fmt(v.sma200)}`), el("div", {}, "EMA 20/50/200"), el("div", {}, `${fmt(v.ema20)} / ${fmt(v.ema50)} / ${fmt(v.ema200)}`), el("div", {}, "Weekly trend"), el("div", {}, t.weekly_trend ?? "—")),
+      el("div", { class: "kv" }, el("div", {}, "RSI 14"), el("div", {}, fmt(v.rsi14, 1)), el("div", {}, "MACD / signal"), el("div", {}, `${fmt(v.macd)} / ${fmt(v.macd_signal)}`), el("div", {}, "ADX (+DI / −DI)"), el("div", {}, `${fmt(v.adx, 1)} (${fmt(v.plus_di, 1)} / ${fmt(v.minus_di, 1)})`), el("div", {}, "Stochastic K/D"), el("div", {}, `${fmt(v.stoch_k, 1)} / ${fmt(v.stoch_d, 1)}`), el("div", {}, "ROC 12"), el("div", {}, fmt(v.roc12, 1) + "%")),
+      el("div", { class: "kv" }, el("div", {}, "ATR 14"), el("div", {}, `${fmt(v.atr14)} (${fmt(v.atr_pct, 1)}%)`), el("div", {}, "Bollinger"), el("div", {}, `${fmt(v.bb_lower)} – ${fmt(v.bb_upper)}`), el("div", {}, "Hist. vol 20/60"), el("div", {}, `${fmt(v.hv20, 1)}% / ${fmt(v.hv60, 1)}%`), el("div", {}, "Rel. volume"), el("div", {}, fmt(v.rel_volume)), el("div", {}, "Traded value (median)"), el("div", {}, "Rs " + fmt(v.traded_value_cr_median20, 1) + " cr"))),
+    el("p", { class: "muted", style: "font-size:12px" }, "Indicators are context, not signals. No single indicator produces a research setup."),
+    el("h3", {}, "Patterns"),
+    d.patterns.length ? d.patterns.map((p) => patternCard(p, () => drawChart(canvas, d.chart, [
+      { price: p.breakout_level, label: `${p.name} breakout level (latest bar)`, color: "#d29922" },
+      ...(p.invalidation_level != null ? [{ price: p.invalidation_level, label: "invalidation", color: "#f85149" }] : []),
+    ]))) : el("p", { class: "muted" }, "PATTERN NOT CONFIRMED: no supported structure meets the rules in the last 120 sessions."),
+    el("p", { class: "muted", style: "font-size:12px" }, "Not detected yet in this version: " + Object.entries(d.pattern_catalogue).filter(([, on]) => !on).map(([k]) => k).join(", ") + "."),
+    el("h3", {}, "Candlesticks (last 20 sessions, with context)"),
+    d.candles.length ? el("div", { class: "scroll" }, el("table", {},
+      el("thead", {}, el("tr", {}, ["Date", "Candle", "Bias", "Prior trend", "Fits trend", "At S/R zone", "Volume ≥ avg", "Next candle confirms", "Weekly agrees", "Weight"].map((x) => el("th", {}, x)))),
+      el("tbody", {}, d.candles.slice().reverse().map((c) => el("tr", {},
+        el("td", {}, c.date), el("td", {}, c.name), el("td", {}, c.bias), el("td", {}, c.context.preceding_trend),
+        el("td", {}, bool(c.context.fits_preceding_trend)), el("td", {}, bool(c.context.near_support_or_resistance)),
+        el("td", {}, bool(c.context.volume_above_average)), el("td", {}, bool(c.context.next_candle_confirmed)),
+        el("td", {}, bool(c.context.agrees_with_weekly_trend)), el("td", {}, c.weight)))))) : el("p", { class: "muted" }, "No supported candlestick shapes in the last 20 sessions."),
+    el("h3", {}, "Timeframes"),
+    el("div", { class: "kv" }, Object.entries(d.timeframes).map(([k, val]) => [el("div", {}, k), el("div", {}, val)])),
+    d.data_quality.revisions.length ? [el("h3", {}, "Provider revisions"), el("ul", {}, d.data_quality.revisions.map((r) => el("li", {}, `${r.date} ${r.field}: ${r.old} → ${r.new} (seen ${r.seen_at})`)))] : [],
+  );
+  box.replaceChildren(panel);
+  drawChart(canvas, d.chart, []);
+  panel.scrollIntoView({ behavior: "smooth" });
+}
+
+$("#refreshBtn").onclick = async () => {
+  const btn = $("#refreshBtn");
+  btn.disabled = true; $("#refreshNote").textContent = "Refreshing from Tapetide…";
+  try {
+    const r = await api("/api/refresh", { method: "POST" });
+    $("#log").replaceChildren(
+      el("div", {}, `Finished ${r.finished_at} · ${r.requests} request(s) · calendar: ${r.calendar}`),
+      el("ul", {}, r.symbols.map((s) => el("li", { class: s.ok ? "" : "neg" }, `${s.symbol}: ${s.message}`))));
+    $("#refreshNote").textContent = "Last refresh " + new Date().toLocaleTimeString();
+    await loadStocks();
+  } catch (e) {
+    $("#refreshNote").textContent = "Refresh failed: " + e.message;
+  } finally { btn.disabled = false; }
+};
+
+loadStatus(); loadStocks();
+</script>
+</body>
+</html>
