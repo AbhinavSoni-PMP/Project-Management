@@ -137,6 +137,15 @@ footer .disc { color: var(--ink); }
 .controls { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: center; }
 .controls select { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 3px 6px; font: inherit; font-size: 12px; }
 @media (max-width: 720px) { .heat-cols { grid-template-columns: minmax(0, 1fr); } }
+.read { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 10px; background: var(--bg); }
+.read-head { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; align-items: flex-start; }
+.read-verdict { font-size: 15px; margin-top: 4px; }
+.read-verdict .chip { font-size: 12px; }
+.read-score { text-align: right; min-width: 160px; }
+.meter { position: relative; height: 6px; border-radius: 3px; margin-top: 6px; background: linear-gradient(90deg, var(--down), var(--line) 50%, var(--up)); }
+.meter i { position: absolute; top: -3px; width: 3px; height: 12px; background: var(--ink); transform: translateX(-1px); }
+.guide summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; }
+.guide ol { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; font-size: 13px; max-width: 80ch; }
 .welcome { display: grid; gap: 8px; max-width: 68ch; }
 .welcome ol { margin: 0; padding-left: 20px; color: var(--muted); }
 
@@ -202,7 +211,7 @@ footer .disc { color: var(--ink); }
         <thead><tr>
           <th>Stock</th><th class="n">Close</th><th class="n">1D</th><th class="n">vs Nifty 3M</th>
           <th>Price vs SMA 200</th><th class="n">RSI 14</th><th class="n">ATR %</th><th class="n">Rel vol</th>
-          <th>Top pattern</th><th>Data</th><th>Research status</th>
+          <th>Top pattern</th><th>Data</th><th>Technical read</th>
         </tr></thead>
         <tbody id="universe-body"></tbody>
       </table>
@@ -333,6 +342,8 @@ footer .disc { color: var(--ink); }
     const usable = fresh.usable_for_signals && bars.length >= 200;
     const a = {
       sym, bars, ind, last, issues, fresh, weekly, wind, wt, patterns, candles, fetched_at: e.fetched_at,
+      source: e.source === "NSE" ? L.SOURCE_NSE : L.SOURCE_TAPETIDE,
+      read: N.technicalRead(bars, ind, patterns, candles, wt, fresh.usable_for_signals && bars.length >= 200),
       chg1d: n > 1 ? c[n - 1] / c[n - 2] - 1 : null,
       ret: { "1M": ret(21), "3M": ret(63), "6M": ret(126), "1Y": ret(250) },
       rs: { "3M": rs(60), "6M": rs(126) },
@@ -388,7 +399,7 @@ footer .disc { color: var(--ink); }
   // history toward TARGET_DAYS. Windows go newest to oldest and only an unbroken run of
   // whole replies is kept, so the series never has a hole in it.
   async function fetchStock(mcp, sym, note) {
-    const old = (S.stocks[sym] && S.stocks[sym].rows) || [];
+    const old = (S.stocks[sym] && S.stocks[sym].source !== "NSE" && S.stocks[sym].rows) || [];
     const today = dayNum(N.nowIst().date);
     const firstOld = old.length ? dayNum(old[0][0]) : null, lastOld = old.length ? dayNum(old.at(-1)[0]) : null;
     const fresh = new Map(), back = new Map();
@@ -509,19 +520,28 @@ footer .disc { color: var(--ink); }
     }
 
     // 3. Each stock. A failure keeps that stock's previous bars.
+    let tapetideDown = fatal ? errText(fatal) : null;
     for (const sym of syms) {
-      if (fatal) break;
       try {
+        if (tapetideDown) throw { message: tapetideDown };
         const res = await fetchStock(mcp, sym, note);
         const packed = res.rows.map((r) => [String(r.date).slice(0, 10), r.open, r.high, r.low, r.close, r.raw_close ?? null, r.volume ?? null]);
         if (!packed.length) throw { message: "no bars returned; check the symbol is an NSE stock" };
-        S.stocks[sym] = { rows: packed, fetched_at: Date.now(), error: null, revised: res.revised };
+        S.stocks[sym] = { rows: packed, fetched_at: Date.now(), error: null, revised: res.revised, source: "Tapetide" };
         memo.delete(sym);
         note(`${sym}: ${packed.length} sessions held, ${packed[0][0]} to ${packed.at(-1)[0]} (${res.calls} call${res.calls > 1 ? "s" : ""}, ${res.added} new bars${res.revised ? `, ${res.revised} earlier bars revised by the provider` : ""}).`, "ok");
       } catch (e) {
-        if (stopIf(e)) break;
-        S.stocks[sym] = Object.assign({}, S.stocks[sym] || {}, { error: `${L.SOURCE_UNAVAILABLE}: ${errText(e)}`, error_at: Date.now() });
-        note(`${sym}: ${L.SOURCE_UNAVAILABLE}: ${errText(e)}. Previous data kept.`, "err");
+        if (FATAL[e && e.code] || /limit|quota/i.test(errText(e))) tapetideDown = errText(e);
+        note(`${sym}: Tapetide: ${L.SOURCE_UNAVAILABLE}: ${errText(e).replace(/\.$/, "")}. Trying the NSE connector.`, "err");
+        try {
+          const rows = await fetchNseHistory(mcp, sym, note);
+          S.stocks[sym] = { rows, fetched_at: Date.now(), error: null, revised: 0, source: "NSE" };
+          memo.delete(sym);
+        } catch (e2) {
+          const msg = NSE_ERRORS[e2 && e2.code] || errText(e2);
+          S.stocks[sym] = Object.assign({}, S.stocks[sym] || {}, { error: `${L.SOURCE_UNAVAILABLE}: ${msg}`, error_at: Date.now() });
+          note(`${sym}: NSE: ${L.SOURCE_UNAVAILABLE}: ${msg}. Previous data kept.`, "err");
+        }
       }
       persist();
     }
@@ -631,7 +651,7 @@ footer .disc { color: var(--ink); }
         el("td", { class: "n" }, fmt(L0.rel_volume, 2)),
         el("td", null, top ? [el("span", { class: "chip " + top.stage }, top.stage), " ", top.name] : el("span", { class: "muted" }, "None found")),
         el("td", null, el("span", { class: "chip " + a.fresh.status }, a.fresh.status.replace(/_/g, " ")), a.lowLiquidity ? el("span", { class: "chip DEVELOPING", style: "margin-left:6px" }, "LOW LIQUIDITY") : null),
-        el("td", { class: "muted", style: "white-space:normal;min-width:180px;font-size:12px" }, a.usable ? "Not available yet (needs regime, news and validated strategies)" : L.NO_SIGNAL_DATA));
+        el("td", null, el("span", { class: "chip " + VERDICT_CHIP[a.read.verdict] }, VERDICT_LABEL[a.read.verdict]), a.read.verdict === "NO_SIGNAL" ? null : el("span", { class: "num muted", style: "margin-left:6px" }, (a.read.score > 0 ? "+" : "") + a.read.score)));
     });
     $("universe-body").replaceChildren(...rows);
   }
@@ -639,8 +659,14 @@ footer .disc { color: var(--ink); }
   // ---------------------------------------------------------- detail
   function renderDetail() {
     const box = $("detail");
-    const sym = S.selected && S.watchlist.includes(S.selected) ? S.selected : S.watchlist.find((s) => analyse(s));
+    const sym = S.selected && (S.watchlist.includes(S.selected) || S.stocks[S.selected] || loading.has(S.selected)) ? S.selected : S.watchlist.find((s) => analyse(s));
     const a = sym ? analyse(sym) : null;
+    if (!a && sym && (loading.has(sym) || (S.stocks[sym] && S.stocks[sym].error))) {
+      box.replaceChildren(el("div", { class: "welcome" }, el("h2", null, sym),
+        loading.has(sym) ? el("p", { class: "muted", style: "margin:0" }, "Loading about 15 months of daily bars from your NSE connector…")
+          : el("p", { class: "down", style: "margin:0" }, S.stocks[sym].error)));
+      return;
+    }
     if (!a) {
       box.replaceChildren(el("div", { class: "welcome" },
         el("h2", null, "No data loaded yet"),
@@ -664,18 +690,19 @@ footer .disc { color: var(--ink); }
 
     const head = el("div", { class: "detail-head" },
       el("div", null,
-        el("div", { class: "eyebrow" }, "Selected stock"),
-        el("h2", { style: "font-size:22px" }, sym)),
+        el("div", { class: "eyebrow" }, S.watchlist.includes(sym) ? "Watchlist stock" : "Opened from the heatmap"),
+        el("h2", { style: "font-size:22px" }, sym),
+        S.watchlist.includes(sym) ? null : el("button", { class: "btn small", type: "button", style: "margin-top:6px",
+          onclick: () => { if (S.watchlist.length >= 20) return; S.watchlist.push(sym); persist(); renderAll(); } }, S.watchlist.length >= 20 ? "Watchlist full" : "Add to watchlist")),
       el("div", null,
         el("span", { class: "price" }, fmt(last.close)), " ",
         el("span", { class: cls(a.chg1d) }, pct(a.chg1d)),
-        el("div", { class: "hint" }, `Close of ${niceDate(last.date)} · ${L.SOURCE_TAPETIDE} · fetched ${when(a.fetched_at)}`)),
+        el("div", { class: "hint" }, `Close of ${niceDate(last.date)} · ${a.source} · fetched ${when(a.fetched_at)}`)),
       el("div", null,
         el("span", { class: "chip " + a.fresh.status }, a.fresh.status.replace(/_/g, " ")),
         el("div", { class: "hint" }, a.fresh.status === "CURRENT" ? `Up to date for ${niceDate(a.fresh.expected_session)}` : `${a.fresh.sessions_behind} session(s) behind ${niceDate(a.fresh.expected_session)}`, ` · ${a.fresh.calendar_basis}`)));
 
-    const status = el("div", { class: "banner" + (a.usable ? "" : " err") },
-      el("span", null, el("b", null, "Research status: "), a.usable ? L.CLASSIFICATION_PENDING : L.NO_SIGNAL_DATA + (a.bars.length < 200 ? " (fewer than 200 sessions of history)" : "")));
+    const status = readSection(a);
 
     const legend = el("div", { class: "legend" },
       el("span", null, el("i", { style: `background:${cssVar("--accent")}` }), S.tf === "weekly" ? "SMA 10 (weekly)" : "SMA 50"),
@@ -691,8 +718,54 @@ footer .disc { color: var(--ink); }
       indicatorSection(a, L0),
       patternSection(pats, last.close),
       candleSection(a.candles),
+      guideSection(),
       qualitySection(a, e));
     requestAnimationFrame(() => drawChart(canvas, tfBars, tfInd, pats[S.patIdx] || null));
+  }
+
+
+  const VERDICT_CHIP = { BULLISH: "CONFIRMED", BEARISH: "FAILED", MIXED: "NEUTRAL", NO_SIGNAL: "ERR" };
+  const VERDICT_LABEL = { BULLISH: "LEANS BULLISH", BEARISH: "LEANS BEARISH", MIXED: "MIXED", NO_SIGNAL: "NO SIGNAL" };
+  function readSection(a) {
+    const r = a.read, lv = r.levels, close = a.bars.at(-1).close;
+    const scoreCls = (v) => (v > 0 ? "up" : v < 0 ? "down" : "muted");
+    const pctOff = (v) => (ok(v) ? ` (${pct(v / close - 1, 1)})` : "");
+    const why = a.usable ? null : el("div", { class: "hint down" }, a.bars.length < 200 ? `Only ${a.bars.length} sessions of history; the rules need 200.` : "The data is more than one session old. Refresh first.");
+    return el("div", { class: "read" },
+      el("div", { class: "read-head" },
+        el("div", null,
+          el("div", { class: "eyebrow" }, "Technical read"),
+          el("div", { class: "read-verdict" }, el("span", { class: "chip " + VERDICT_CHIP[r.verdict] }, VERDICT_LABEL[r.verdict]), " ", el("span", null, r.text)),
+          why),
+        el("div", { class: "read-score" },
+          el("div", { class: "num " + scoreCls(r.score), style: "font-size:22px" }, (r.score > 0 ? "+" : "") + r.score),
+          el("div", { class: "hint" }, `score, from −${r.maxScore} to +${r.maxScore}`),
+          el("div", { class: "meter" }, el("i", { style: `left:${50 + (50 * r.score) / (r.maxScore || 1)}%` })))),
+      el("div", { class: "scroll" }, el("table", null,
+        el("thead", null, el("tr", null, el("th", null, "Area"), el("th", null, "Rule"), el("th", null, "Evidence now"), el("th", { class: "n" }, "Score"))),
+        el("tbody", null, r.rules.map((x) => el("tr", null,
+          el("td", { class: "muted" }, x.group), el("td", null, x.name),
+          el("td", { style: "white-space:normal;min-width:240px" }, x.detail),
+          el("td", { class: "n " + scoreCls(x.score) }, x.score > 0 ? "+" + x.score : String(x.score))))))),
+      el("div", { class: "kv" },
+        el("span", null, "Nearest support ", el("b", null, lv.support ? fmt(lv.support.price) + pctOff(lv.support.price) : "none below")),
+        el("span", null, "Nearest resistance ", el("b", null, lv.resistance ? fmt(lv.resistance.price) + pctOff(lv.resistance.price) : "none above")),
+        el("span", null, "ATR 14 (normal daily range) ", el("b", null, fmt(lv.atr))),
+        el("span", null, "2 ATR band ", el("b", null, `${fmt(lv.two_atr_below)} to ${fmt(lv.two_atr_above)}`))),
+      el("div", { class: "hint" }, "How the score works: each rule adds +1 when it supports a rise and −1 when it supports a fall (a confirmed pattern breakout counts 2). +4 or more leans bullish, −4 or less leans bearish. These rules are not yet backtested on NSE data, so this is a research aid, not a buy or sell recommendation. Support and resistance are recent confirmed swing points, for reference only."));
+  }
+  function guideSection() {
+    const li = (b, t) => el("li", null, el("b", null, b), " ", t);
+    return el("details", { class: "guide" },
+      el("summary", null, "How to read this page"),
+      el("ol", null,
+        li("Start with the trend.", "Price above a rising 200-day average is an uptrend; below a falling one is a downtrend. The 50-day above the 200-day adds weight. Most methods trade with this trend, not against it."),
+        li("Check momentum.", "RSI above 55 and MACD above its signal line support a rise. RSI above 70 means the move is stretched; below 30, oversold. Momentum turning against the trend is an early warning."),
+        li("Look for confirmation in volume.", "Rises on above-average volume (relative volume over 1) and rising OBV are stronger than rises on thin volume."),
+        li("Use patterns only when they confirm.", "A Candidate is just a shape. Wait for Confirmed: a close beyond the breakout level by 2% or 1 ATR, two closes beyond it, and volume 1.5 times average. Failed patterns often move the other way."),
+        li("Read candles in context.", "A hammer or bullish engulfing matters most after a fall, near support, on good volume, and when the next candle closes above it. On its own a candle is weak evidence."),
+        li("Plan the exit before the entry.", "ATR is the normal daily range. A stop closer than about 1 ATR is often hit by noise. The invalidation level on a pattern card is where the pattern is proven wrong."),
+        li("Why there is no Buy or Sell button.", "None of these rules has been tested on past NSE data here yet. The next step is a backtest of each rule, then paper trading, before any rule is trusted.")));
   }
 
   function indicatorSection(a, I) {
@@ -766,10 +839,10 @@ footer .disc { color: var(--ink); }
     return el("div", { style: "display:grid;gap:8px" },
       el("div", { class: "panel-head" }, el("h2", null, "Data quality"), el("span", { class: "hint" }, `${a.bars.length} sessions · ${niceDate(a.bars[0].date)} to ${niceDate(a.bars.at(-1).date)}`)),
       el("div", { class: "kv" },
-        el("span", null, "Source ", el("b", null, L.SOURCE_TAPETIDE)),
+        el("span", null, "Source ", el("b", null, a.source)),
         el("span", null, "Issues ", el("b", null, String(a.issues.length))),
         el("span", null, "Bars revised on last refresh ", el("b", null, String(e.revised || 0))),
-        el("span", null, "Adjustment ", el("b", null, "split and bonus, not dividends"))),
+        el("span", null, "Adjustment ", el("b", null, e.source === "NSE" ? "none (raw NSE prices; a split or bonus shows as a big gap)" : "split and bonus, not dividends"))),
       e.error ? el("div", { class: "down" }, `Last refresh failed: ${e.error} (${when(e.error_at)}). Showing the earlier data.`) : null,
       items.length ? el("ul", { class: "muted", style: "margin:0;padding-left:18px;font-size:12px" }, items.map((i) => el("li", null, `${i.date} · ${i.field}: ${i.problem}`)))
         : el("div", { class: "empty" }, "No problems found in the bars."));
@@ -919,12 +992,8 @@ footer .disc { color: var(--ink); }
     return el("button", {
       type: "button", class: "tile" + (flag ? " flag" : ""),
       style: `--tone: var(${chg >= 0 ? "--up" : "--down"}); --mix: ${mix}%`,
-      title: (title ? title + " " : "") + (inList ? "Already in your watchlist." : "Click to add to your watchlist."),
-      onclick: () => {
-        if (inList) { S.selected = sym; persist(); renderUniverse(); renderDetail(); $("detail").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-        if (S.watchlist.length >= 20) { H.msg = "The watchlist is full (20 symbols). Remove one first."; renderHeat(); return; }
-        S.watchlist.push(sym); persist(); H.msg = `Added ${sym} to the watchlist. It loads on the next Refresh.`; renderAll();
-      },
+      title: (title ? title + " " : "") + "Click to open the chart.",
+      onclick: () => openStock(sym),
     }, el("span", { class: "t-sym" }, sym), el("span", { class: "t-chg" }, pct(chg / 100, 2)), el("span", { class: "t-sub" }, sub));
   }
   function renderHeat() {
@@ -977,6 +1046,77 @@ footer .disc { color: var(--ink); }
     src.textContent = `${L.SOURCE_TAPETIDE} · close-to-close change over the last ${k} session${k > 1 ? "s" : ""}, split and bonus adjusted · ${L.CALCULATED}. Best at the top left, worst at the bottom right.`;
   }
   $("heat-refresh").addEventListener("click", () => refreshHeat(null, null));
+
+
+  // ---------------------------------------------------------- NSE connector history
+  // get_stock_history returns up to 3 months per call and chains back with next_end_date.
+  // Field names are matched loosely because the reply shape is read at run time.
+  const NSE_KEYS = { date: ["date", "trade_date", "tradedate", "timestamp"], open: ["open", "open_price"], high: ["high", "high_price"],
+    low: ["low", "low_price"], close: ["close", "close_price", "closeprice"], volume: ["volume", "tottrdqty", "total_traded_quantity", "qty"] };
+  const NSE_MONTHS_PER_CALL = 3, NSE_CALLS = 5;   // about 15 months, enough for the 200-day average
+  function keyOf(o, f) { const ks = Object.keys(o); for (const k of NSE_KEYS[f]) { const m = ks.find((x) => x.toLowerCase() === k); if (m) return m; } return null; }
+  function isoDate(v) {
+    const t = String(v);
+    if (/^\d{4}-\d{2}-\d{2}/.test(t)) return t.slice(0, 10);
+    const d = Date.parse(t + " UTC");
+    return isNaN(d) ? null : new Date(d).toISOString().slice(0, 10);
+  }
+  function findRows(p) {
+    const q = [p];
+    while (q.length) {
+      const v = q.shift();
+      if (Array.isArray(v)) {
+        if (v.length && v[0] && typeof v[0] === "object" && keyOf(v[0], "date") && keyOf(v[0], "close")) return v;
+        v.forEach((x) => q.push(x));
+      } else if (v && typeof v === "object") Object.values(v).forEach((x) => q.push(x));
+    }
+    return [];
+  }
+  async function fetchNseHistory(mcp, sym, note) {
+    const got = new Map();
+    let endDate = "today", calls = 0, lastShape = "";
+    while (calls < NSE_CALLS) {
+      const r = await call(mcp, "get_stock_history", { symbol: sym, months: NSE_MONTHS_PER_CALL, endDate }, NSE_SERVER);
+      calls++;
+      const rows = (r.cut ? r.rows : findRows(r.p)).map((o) => {
+        const x = {};
+        for (const f of Object.keys(NSE_KEYS)) { const k = keyOf(o, f); x[f] = k === null ? null : f === "date" ? isoDate(o[k]) : Number(o[k]); }
+        return x;
+      }).filter((x) => x.date);
+      if (!rows.length) { lastShape = r.p ? JSON.stringify(r.p).slice(0, 160) : "empty reply"; break; }
+      for (const x of rows) got.set(x.date, x);
+      const first = rows.map((x) => x.date).sort()[0];
+      const next = r.p && (r.p.next_end_date || r.p.nextEndDate);
+      endDate = next && String(next) < first ? String(next).slice(0, 10) : dayStr(dayNum(first) - 1);
+    }
+    if (!got.size) throw { message: `no NSE bars returned for ${sym}; check the symbol. Reply: ${lastShape}` };
+    const rows = [...got.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
+    if (note) note(`${sym}: ${rows.length} sessions from the NSE connector, ${rows[0].date} to ${rows.at(-1).date} (${calls} calls, unadjusted prices).`, "ok");
+    return rows.map((x) => [x.date, x.open, x.high, x.low, x.close, x.close, ok(x.volume) ? x.volume : null]);
+  }
+  const loading = new Set();
+  async function openStock(sym) {
+    S.selected = sym; S.patIdx = null; persist();
+    const e = S.stocks[sym];
+    const fresh = e && e.rows && e.rows.length && Date.now() - (e.fetched_at || 0) < 12 * 3600e3;
+    const needLoad = !fresh && !loading.has(sym);
+    if (needLoad) loading.add(sym);
+    renderUniverse(); renderDetail();
+    $("detail").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!needLoad) return;
+    try {
+      const mcp = await getMcp();
+      if (!mcp) throw { message: "connector access isn't available in this view" };
+      const rows = await fetchNseHistory(mcp, sym, null);
+      S.stocks[sym] = { rows, fetched_at: Date.now(), error: null, revised: 0, source: "NSE" };
+      memo.delete(sym);
+    } catch (err) {
+      S.stocks[sym] = Object.assign({}, S.stocks[sym] || {}, { error: NSE_ERRORS[err && err.code] || `${L.SOURCE_UNAVAILABLE}: ${errText(err)}`, error_at: Date.now() });
+    }
+    loading.delete(sym); persist();
+    if (S.selected === sym) renderDetail();
+    renderUniverse();
+  }
 
   // ---------------------------------------------------------- watchlist editing
   $("watch-form").addEventListener("submit", (ev) => {

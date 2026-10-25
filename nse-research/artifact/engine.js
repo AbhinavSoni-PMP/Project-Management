@@ -13,6 +13,7 @@
 
   const LABELS = {
     SOURCE_TAPETIDE: "Tapetide (secondary source)",
+    SOURCE_NSE: "NSE bhavcopy (primary source, unadjusted)",
     CALCULATED: "CALCULATED FROM OHLCV DATA",
     DATA_NOT_AVAILABLE: "DATA NOT AVAILABLE",
     SOURCE_UNAVAILABLE: "DATA SOURCE UNAVAILABLE",
@@ -562,11 +563,66 @@
     return "sideways";
   }
 
+
+  // --------------------------------------------------------- technical read
+  // A transparent score: each rule adds +1/-1 (patterns +/-2). Research aid only, not backtested.
+  const READ_VERSION = "read-v1";
+  function technicalRead(b, ind, patterns, candles, wTrend, usable) {
+    const n = b.length, I = latest(ind), close = b[n - 1].close;
+    const f = (v) => (isNum(v) ? v.toFixed(2) : "n/a");
+    const rules = [];
+    const add = (group, name, score, detail) => rules.push({ group, name, score, detail });
+    if (isNum(I.sma200)) add("Trend", "Price vs 200-day average", close > I.sma200 ? 1 : -1, `Close ${f(close)} is ${close > I.sma200 ? "above" : "below"} SMA 200 at ${f(I.sma200)}.`);
+    else add("Trend", "Price vs 200-day average", 0, "Needs 200 sessions of history.");
+    if (isNum(I.sma50) && isNum(I.sma200)) add("Trend", "50-day vs 200-day average", I.sma50 > I.sma200 ? 1 : -1, `SMA 50 ${f(I.sma50)} is ${I.sma50 > I.sma200 ? "above" : "below"} SMA 200.`);
+    else add("Trend", "50-day vs 200-day average", 0, "Needs 200 sessions of history.");
+    add("Trend", "Weekly trend", wTrend === "up" ? 1 : wTrend === "down" ? -1 : 0,
+      wTrend ? `Weekly close vs its 20-week average: ${wTrend}.` : "Not enough weekly bars.");
+    add("Trend", "Trend strength (ADX 14)", 0, isNum(I.adx) ? `ADX ${I.adx.toFixed(1)}: ${I.adx >= 25 ? "strong trend, trend rules carry more weight" : I.adx >= 20 ? "moderate trend" : "weak or no trend, expect range trading"}.` : "n/a");
+    if (isNum(I.rsi14)) {
+      const sc = I.rsi14 > 55 ? 1 : I.rsi14 < 45 ? -1 : 0;
+      const note = I.rsi14 >= 70 ? " Overbought: moves often pause from here." : I.rsi14 <= 30 ? " Oversold: falls often pause from here." : "";
+      add("Momentum", "RSI 14", sc, `RSI ${I.rsi14.toFixed(1)} (above 55 supports rises, below 45 supports falls).${note}`);
+    }
+    if (isNum(I.macd) && isNum(I.macd_signal)) add("Momentum", "MACD vs signal line", I.macd > I.macd_signal ? 1 : -1, `MACD ${f(I.macd)} is ${I.macd > I.macd_signal ? "above" : "below"} its signal ${f(I.macd_signal)}.`);
+    if (n > 21 && isNum(ind.obv[n - 1]) && isNum(ind.obv[n - 21])) {
+      const up = ind.obv[n - 1] > ind.obv[n - 21];
+      add("Volume", "On-balance volume, 20 sessions", up ? 1 : -1, `OBV ${up ? "rose" : "fell"} over the last 20 sessions: volume is ${up ? "flowing in" : "flowing out"}.`);
+    }
+    const recent = b[Math.max(0, n - 20)].date;
+    const p = (patterns || []).find((x) => x.timeframe === "daily" && (x.stage === "CONFIRMED" || x.stage === "DEVELOPING") && x.breakout.breakout_date && x.breakout.breakout_date >= recent);
+    if (p) {
+      const bull = p.bias === "bullish" || (p.bias === "either" && isNum(p.target_textbook) && p.target_textbook > p.breakout_level);
+      const w = p.stage === "CONFIRMED" ? 2 : 1;
+      add("Pattern", p.name, bull ? w : -w, `${p.stage === "CONFIRMED" ? "Confirmed" : "Developing"} ${bull ? "upward" : "downward"} breakout on ${p.breakout.breakout_date}.`);
+    } else add("Pattern", "Chart pattern breakout", 0, "No confirmed or developing breakout in the last 20 sessions.");
+    const lastFive = b[Math.max(0, n - 5)].date;
+    const c = (candles || []).filter((x) => x.date >= lastFive && x.weight !== "isolated (low weight)" && (x.bias === "bullish" || x.bias === "bearish")).at(-1);
+    add("Candle", c ? c.name : "Recent candlestick", c ? (c.bias === "bullish" ? 1 : -1) : 0, c ? `${c.date}, ${c.weight}.` : "No candle with supporting context in the last 5 sessions.");
+
+    const score = rules.reduce((a, r) => a + r.score, 0);
+    const maxScore = rules.reduce((a, r) => a + (r.group === "Pattern" ? 2 : r.name.startsWith("Trend strength") ? 0 : 1), 0);
+    let verdict = "MIXED", text = "Mixed evidence: no clear edge either way.";
+    if (!usable) { verdict = "NO_SIGNAL"; text = LABELS.NO_SIGNAL_DATA; }
+    else if (score >= 4) { verdict = "BULLISH"; text = "Evidence leans bullish."; }
+    else if (score <= -4) { verdict = "BEARISH"; text = "Evidence leans bearish."; }
+
+    const sw = findSwings(b).filter((s) => s.confirmed_idx <= n - 1 && s.idx >= n - 250);
+    const sup = sw.filter((s) => s.kind === "L" && s.price < close).sort((x, y) => y.price - x.price)[0] || null;
+    const res = sw.filter((s) => s.kind === "H" && s.price > close).sort((x, y) => x.price - y.price)[0] || null;
+    const levels = {
+      support: sup ? { price: sup.price, date: sup.date } : null,
+      resistance: res ? { price: res.price, date: res.date } : null,
+      atr: I.atr14, two_atr_below: isNum(I.atr14) ? close - 2 * I.atr14 : null, two_atr_above: isNum(I.atr14) ? close + 2 * I.atr14 : null,
+    };
+    return { verdict, text, score, maxScore, rules, levels, rules_version: READ_VERSION, reliability: LABELS.NOT_BACKTESTED, label: LABELS.CALCULATED };
+  }
+
   const NSE = {
     LABELS, IND_VERSION, BREAKOUT, PATTERNS: P, CANDLES: C, CATALOGUE,
     normalizeBars, resampleWeekly, freshness, nowIst,
     sma, ema, wilder, rsi, macd, atr, adx, bollinger, stochastic, roc, obv, histVol, computeAll, latest,
-    findSwings, evaluateBreakout, detectPatterns, detectCandles, weeklyTrend,
+    findSwings, evaluateBreakout, detectPatterns, detectCandles, weeklyTrend, technicalRead,
   };
   root.NSE = NSE;
   if (typeof module !== "undefined" && module.exports) module.exports = NSE;
