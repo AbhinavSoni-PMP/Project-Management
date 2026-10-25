@@ -73,3 +73,22 @@ cd nse-research && python -m pytest -q
 
 Tests use synthetic price paths and a fake Tapetide client, so they need no
 token or network.
+
+## Run it as a Claude artifact (no install)
+
+`artifact/` holds a browser version that runs inside claude.ai and reads
+prices through your Tapetide connector, so it needs no Python and no token in
+a file. `artifact/engine.js` is a JavaScript port of the analysis engine and
+`artifact/page.html` is the page; `node artifact/build.js` inlines the engine
+into `artifact/dist/nse-terminal.html`, which is what gets published.
+
+Each refresh makes one Tapetide call per stock, plus one for the calendar and
+one for Nifty 50. Data is kept in the browser's local storage until the next
+refresh.
+
+To check the port still matches Python:
+
+```bash
+python tests/export_engine_cases.py /tmp/cases.json
+node artifact/compare_engine.js /tmp/cases.json
+```
