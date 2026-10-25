@@ -124,6 +124,19 @@ footer .disc { color: var(--ink); }
 .cat { display: flex; flex-wrap: wrap; gap: 6px; }
 .cat span { font-size: 11px; padding: 1px 7px; border-radius: 3px; background: var(--panel-2); }
 .cat span.off { color: var(--faint); text-decoration: line-through; }
+.heat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 6px; }
+.tile { border: 1px solid var(--line); border-radius: 5px; padding: 8px 9px; text-align: left; display: grid; gap: 1px; min-width: 0;
+  background: color-mix(in srgb, var(--tone) var(--mix), var(--panel)); }
+.tile:hover { border-color: var(--ink); }
+.tile .t-sym { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tile .t-chg { font-family: var(--font-mono); font-size: 15px; font-weight: 500; }
+.tile .t-sub { font-family: var(--font-mono); font-size: 11px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile.flag { border-style: dashed; }
+.heat-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.heat-cols h3 { margin-bottom: 6px; }
+.controls { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: center; }
+.controls select { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 3px 6px; font: inherit; font-size: 12px; }
+@media (max-width: 720px) { .heat-cols { grid-template-columns: minmax(0, 1fr); } }
 .welcome { display: grid; gap: 8px; max-width: 68ch; }
 .welcome ol { margin: 0; padding-left: 20px; color: var(--muted); }
 
@@ -157,8 +170,21 @@ footer .disc { color: var(--ink); }
     </div>
     <div>
       <canvas class="spark" id="spark" aria-label="Nifty 50, last year"></canvas>
-      <div class="kv"><span id="nifty-src">Tapetide (secondary source) · official NSE index data · 1 year, daily</span></div>
+      <div class="kv"><span id="nifty-src">Tapetide (secondary source) · official NSE index data</span></div>
     </div>
+  </section>
+
+  <section class="panel" aria-label="Heatmap">
+    <div class="panel-head">
+      <h2>Heatmap</h2>
+      <div class="controls">
+        <div class="tabs" role="group" aria-label="Heatmap view" id="heat-views"></div>
+        <button class="btn small" type="button" id="heat-refresh">Refresh heatmap</button>
+      </div>
+    </div>
+    <div class="controls" id="heat-controls"></div>
+    <div id="heat-body"></div>
+    <div class="hint" id="heat-src"></div>
   </section>
 
   <section class="panel" aria-label="Watchlist">
@@ -174,7 +200,7 @@ footer .disc { color: var(--ink); }
     <div class="scroll">
       <table id="universe">
         <thead><tr>
-          <th>Stock</th><th class="n">Close</th><th class="n">1D</th><th class="n">vs Nifty 6M</th>
+          <th>Stock</th><th class="n">Close</th><th class="n">1D</th><th class="n">vs Nifty 3M</th>
           <th>Price vs SMA 200</th><th class="n">RSI 14</th><th class="n">ATR %</th><th class="n">Rel vol</th>
           <th>Top pattern</th><th>Data</th><th>Research status</th>
         </tr></thead>
@@ -207,9 +233,9 @@ footer .disc { color: var(--ink); }
   "use strict";
   const N = window.NSE, L = N.LABELS;
   const SERVER = "tapetide";
-  const TARGET_DAYS = 1100;           // calendar days of history to build up, about 750 sessions
+  const TARGET_DAYS = 550;            // calendar days of history to build up, about 380 sessions
   const OVERLAP_DAYS = 10;            // re-fetched on every refresh to spot provider revisions
-  const MAX_CALLS_PER_STOCK = 4;      // per refresh; long histories fill in over a few refreshes
+  const MAX_CALLS_PER_STOCK = 5;      // per refresh; long histories fill in over a few refreshes
   const DAILY_FREE_CALLS = 50;
   const DEFAULT_LIST = ["RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS"];
   const KEY = "nse-terminal.v1";
@@ -239,12 +265,14 @@ footer .disc { color: var(--ink); }
     lastRefresh: saved.lastRefresh || null,
     log: saved.log || [],
     selected: saved.selected || null,
-    chunkDays: saved.chunkDays || 400,   // largest window whose reply arrived whole; learned from cut-off replies
-    niftyInterval: saved.niftyInterval || "1y",
+    chunkDays: saved.chunkDays2 || 120,  // largest window whose reply arrived whole (Tapetide sends about 100 rows at most)
+    niftyInterval: saved.niftyInterval2 || "3m",
+    heat: saved.heat || null,            // {date, gainers, losers, fetched_at} from the NSE connector
+    heatPeriod: "1D",
     tf: "daily", patIdx: null, busy: false, storageOk: true,
   };
   function persist() {
-    S.storageOk = store.save({ watchlist: S.watchlist, stocks: S.stocks, calendar: S.calendar, nifty: S.nifty, lastRefresh: S.lastRefresh, log: S.log, selected: S.selected, chunkDays: S.chunkDays, niftyInterval: S.niftyInterval });
+    S.storageOk = store.save({ watchlist: S.watchlist, stocks: S.stocks, calendar: S.calendar, nifty: S.nifty, lastRefresh: S.lastRefresh, log: S.log, selected: S.selected, chunkDays2: S.chunkDays, niftyInterval2: S.niftyInterval, heat: S.heat });
   }
 
   // ---------------------------------------------------------- helpers
@@ -307,7 +335,7 @@ footer .disc { color: var(--ink); }
       sym, bars, ind, last, issues, fresh, weekly, wind, wt, patterns, candles, fetched_at: e.fetched_at,
       chg1d: n > 1 ? c[n - 1] / c[n - 2] - 1 : null,
       ret: { "1M": ret(21), "3M": ret(63), "6M": ret(126), "1Y": ret(250) },
-      rs: { "3M": rs(63), "6M": rs(126) },
+      rs: { "3M": rs(60), "6M": rs(126) },
       lowLiquidity: ok(last.traded_value_cr_median20) && last.traded_value_cr_median20 < 10,
       status: usable ? L.CLASSIFICATION_PENDING : L.NO_SIGNAL_DATA,
       usable,
@@ -338,11 +366,11 @@ footer .disc { color: var(--ink); }
     if (!rows.length) throw { code: "tool_error", message: "unreadable reply: " + text.slice(0, 160) };
     return { p: null, rows, cut: true, chars: text.length, blocks: blocks.length };
   }
-  async function call(mcp, tool, input) {
+  async function call(mcp, tool, input, server) {
     let tries = 0;
     for (;;) {
       try {
-        return readReply(await mcp.callTool(SERVER, tool, input, { cache: false }));
+        return readReply(await mcp.callTool(server || SERVER, tool, input, { cache: false }));
       } catch (err) {
         if (err && err.retryable && tries === 0) {
           tries++;
@@ -386,6 +414,13 @@ footer .disc { color: var(--ink); }
         continue;
       }
       const rows = (r.p && Array.isArray(r.p.data) ? r.p.data : []).filter((x) => x && x.date);
+      if (rows.length && dayNum(rows.at(-1).date) < end - 7) {
+        // A whole-looking reply that stops well before the window's end was trimmed by row count.
+        const reached = dayNum(rows.at(-1).date) - (end - days);
+        S.chunkDays = Math.max(10, Math.min(Math.floor(days * 0.6), Math.floor(Math.max(reached, 8) * 0.85)));
+        note(`${sym}: Tapetide sent only ${rows.length} rows for ${days} days (to ${rows.at(-1).date}), so windows are now ${S.chunkDays} days.`);
+        continue;
+      }
       const into = phase === "new" ? fresh : back;
       for (const x of rows) into.set(String(x.date).slice(0, 10), x);
       const start = end - days + 1;
@@ -428,6 +463,7 @@ footer .disc { color: var(--ink); }
     }
     setBanner(null);
     note(`Refresh started for ${syms.length} stocks.`);
+    await refreshHeat(mcp, note);
     let fatal = null;
     const stopIf = (e) => { if (e && FATAL[e.code]) { fatal = e; return true; } return false; };
 
@@ -456,6 +492,11 @@ footer .disc { color: var(--ink); }
           }
           const d = r.p && r.p.data;
           if (!d || !Array.isArray(d.bars) || !d.bars.length) throw { message: "no index bars returned" };
+          if (dayNum(d.bars.at(-1).date) < dayNum(N.nowIst().date) - 7) {
+            note(`Nifty 50 (${order[i]}): Tapetide sent only ${d.bars.length} rows, ending ${d.bars.at(-1).date}.${i + 1 < order.length ? ` Trying ${order[i + 1]}.` : " Previous index data kept."}`, "err");
+            S.niftyInterval = order[Math.min(i + 1, order.length - 1)];
+            continue;
+          }
           S.niftyInterval = order[i];
           S.nifty = { bars: d.bars.map((b) => ({ date: b.date, open: b.open, high: b.high, low: b.low, close: b.close, pe: b.pe, pb: b.pb, div_yield: b.div_yield })), interval: order[i], fetched_at: Date.now() };
           note(`Nifty 50: ${d.bars.length} daily bars to ${d.bars.at(-1).date}.`, "ok");
@@ -540,7 +581,7 @@ footer .disc { color: var(--ink); }
     $("nifty-level").replaceChildren(fmt(last.close), " ", el("span", { class: cls(last.close / prev.close - 1), style: "font-size:15px" }, pct(last.close / prev.close - 1)));
     $("nifty-kv").replaceChildren(
       el("span", null, "Close of ", el("b", null, niceDate(last.date))),
-      el("span", null, "1Y ", el("b", { class: cls(last.close / b[0].close - 1) }, pct(last.close / b[0].close - 1))),
+      el("span", null, `${nf.interval ? nf.interval.toUpperCase() : "Period"} `, el("b", { class: cls(last.close / b[0].close - 1) }, pct(last.close / b[0].close - 1))),
       el("span", null, "P/E ", el("b", null, fmt(last.pe))),
       el("span", null, "P/B ", el("b", null, fmt(last.pb))),
       el("span", null, "Div yield ", el("b", null, ok(last.div_yield) ? last.div_yield.toFixed(2) + "%" : "—"))
@@ -583,7 +624,7 @@ footer .disc { color: var(--ink); }
         el("td", null, el("span", { class: "sym" }, sym), e.error ? el("span", { class: "chip ERR", title: e.error, style: "margin-left:8px" }, "last refresh failed") : null),
         el("td", { class: "n" }, fmt(close)),
         el("td", { class: "n " + cls(a.chg1d) }, pct(a.chg1d)),
-        el("td", { class: "n " + cls(a.rs["6M"]) }, pct(a.rs["6M"], 1)),
+        el("td", { class: "n " + cls(a.rs["3M"]) }, pct(a.rs["3M"], 1)),
         el("td", null, vs200 === null ? "—" : el("span", { class: vs200 >= 0 ? "up" : "down" }, (vs200 >= 0 ? "Above " : "Below ") + Math.abs(vs200 * 100).toFixed(1) + "%")),
         el("td", { class: "n" }, fmt(L0.rsi14, 1)),
         el("td", { class: "n" }, fmt(L0.atr_pct, 2)),
@@ -667,7 +708,7 @@ footer .disc { color: var(--ink); }
         group("Momentum", [row("RSI 14", fmt(I.rsi14, 1)), row("MACD 12,26,9 (line / signal / hist)", macdTxt),
           row("Stochastic 14,3,3 (%K / %D)", `${fmt(I.stoch_k, 1)} / ${fmt(I.stoch_d, 1)}`), row("ROC 12", ok(I.roc12) ? I.roc12.toFixed(2) + "%" : "—"),
           row("Return 1M / 3M", `${pct(a.ret["1M"], 1)} / ${pct(a.ret["3M"], 1)}`), row("Return 6M / 1Y", `${pct(a.ret["6M"], 1)} / ${pct(a.ret["1Y"], 1)}`),
-          row("vs Nifty 50, 3M / 6M", `${pct(a.rs["3M"], 1)} / ${pct(a.rs["6M"], 1)}`)]),
+          row("vs Nifty 50, 3M", pct(a.rs["3M"], 1))]),
         group("Volatility", [row("ATR 14", fmt(I.atr14)), row("ATR % of price", ok(I.atr_pct) ? I.atr_pct.toFixed(2) + "%" : "—"),
           row("Bollinger 20,2 upper", fmt(I.bb_upper)), row("Bollinger middle / lower", `${fmt(I.bb_mid)} / ${fmt(I.bb_lower)}`),
           row("Hist. vol 20D / 60D", `${fmt(I.hv20, 1)}% / ${fmt(I.hv60, 1)}%`)]),
@@ -837,6 +878,106 @@ footer .disc { color: var(--ink); }
     return out;
   }
 
+
+  // ---------------------------------------------------------- heatmap
+  const NSE_SERVER = "NSE";
+  const HEAT_FLOORS = [1, 5, 25];   // ₹ crore traded value, to drop bonds, ETFs and thinly traded lines
+  const NSE_ERRORS = {
+    needs_reauth: "Your NSE connector sign-in has expired. Reconnect NSE in claude.ai Settings, Connectors, then press Refresh heatmap.",
+    server_not_connected: "The NSE connector is not connected to your Claude account. Connect it in claude.ai Settings, Connectors.",
+    not_granted: "This page does not have permission to use the NSE connector yet. Allow it in the page's permissions, then press Refresh heatmap.",
+    not_in_manifest: "This page is not allowed to call that NSE tool.",
+    blocked_by_policy: "Your organization's policy blocks this page from using the NSE connector.",
+    rate_limited: "The NSE connector's request limit was reached. Try again later.",
+  };
+  const H = { view: "market", period: "1D", floor: 5, busy: false, msg: null, all: false };
+  async function refreshHeat(mcp, note) {
+    if (H.busy) return;
+    H.busy = true; H.msg = null; renderHeat();
+    mcp = mcp || (await getMcp());
+    if (!mcp) { H.busy = false; H.msg = "Connector access isn't available in this view. Open this page on claude.ai while signed in."; renderHeat(); return; }
+    try {
+      const date = N.nowIst().date;
+      const g = await call(mcp, "get_top_movers", { date, n: 50, direction: "gain" }, NSE_SERVER);
+      const l = await call(mcp, "get_top_movers", { date, n: 50, direction: "loss" }, NSE_SERVER);
+      const pick = (r) => ((r.p && r.p.stocks) || []).filter((x) => x && x.symbol && ok(x.pct_change));
+      const gainers = pick(g), losers = pick(l);
+      if (!gainers.length && !losers.length) throw { message: "no movers returned" };
+      S.heat = { date: (g.p && g.p.date) || (l.p && l.p.date), gainers, losers, fetched_at: Date.now() };
+      persist();
+      if (note) note(`Heatmap: NSE top movers for ${S.heat.date} (${gainers.length} gainers, ${losers.length} losers before the liquidity filter).`, "ok");
+    } catch (e) {
+      H.msg = NSE_ERRORS[e && e.code] || `${L.SOURCE_UNAVAILABLE}: ${errText(e)}`;
+      if (note) note(`Heatmap: ${H.msg}`, "err");
+    }
+    H.busy = false;
+    renderHeat();
+  }
+  function tile(sym, chg, cap, sub, flag, title) {
+    const mix = Math.round(12 + 70 * Math.min(1, Math.abs(chg) / cap));
+    const inList = S.watchlist.includes(sym);
+    return el("button", {
+      type: "button", class: "tile" + (flag ? " flag" : ""),
+      style: `--tone: var(${chg >= 0 ? "--up" : "--down"}); --mix: ${mix}%`,
+      title: (title ? title + " " : "") + (inList ? "Already in your watchlist." : "Click to add to your watchlist."),
+      onclick: () => {
+        if (inList) { S.selected = sym; persist(); renderUniverse(); renderDetail(); $("detail").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+        if (S.watchlist.length >= 20) { H.msg = "The watchlist is full (20 symbols). Remove one first."; renderHeat(); return; }
+        S.watchlist.push(sym); persist(); H.msg = `Added ${sym} to the watchlist. It loads on the next Refresh.`; renderAll();
+      },
+    }, el("span", { class: "t-sym" }, sym), el("span", { class: "t-chg" }, pct(chg / 100, 2)), el("span", { class: "t-sub" }, sub));
+  }
+  function renderHeat() {
+    $("heat-refresh").disabled = H.busy;
+    $("heat-refresh").textContent = H.busy ? "Loading…" : "Refresh heatmap";
+    $("heat-refresh").hidden = H.view !== "market";
+    $("heat-views").replaceChildren(...[["market", "NSE top movers"], ["watch", "My watchlist"]].map(([v, label]) =>
+      el("button", { class: "tab", type: "button", "aria-pressed": String(H.view === v), onclick: () => { H.view = v; H.msg = null; renderHeat(); } }, label)));
+    const body = $("heat-body"), src = $("heat-src"), ctr = $("heat-controls");
+    const msg = H.msg ? el("div", { class: "hint" }, H.msg) : null;
+    if (H.view === "market") {
+      ctr.replaceChildren(el("label", { class: "hint" }, "Hide stocks that traded less than ",
+        el("select", { id: "heat-floor", onchange: (ev) => { H.floor = Number(ev.target.value); renderHeat(); } },
+          HEAT_FLOORS.map((f) => el("option", { value: f, selected: f === H.floor }, `₹${f} Cr`))), " today"),
+        el("button", { class: "tab", type: "button", "aria-pressed": String(H.all), onclick: () => { H.all = !H.all; renderHeat(); } }, H.all ? "Showing all 50 each way" : "Showing top 20 each way"), msg || "");
+      const h = S.heat;
+      if (!h) {
+        body.replaceChildren(el("div", { class: "empty" }, "Press Refresh heatmap to load today's biggest gainers and losers on NSE (2 calls to your NSE connector)."));
+        src.textContent = "";
+        return;
+      }
+      const liquid = (x) => ok(x.close) && ok(x.volume) && (x.close * x.volume) / 1e7 >= H.floor;
+      const lim = H.all ? 50 : 20;
+      const gs = h.gainers.filter(liquid).sort((a, b) => b.pct_change - a.pct_change).slice(0, lim);
+      const ls = h.losers.filter(liquid).sort((a, b) => a.pct_change - b.pct_change).slice(0, lim);
+      const mk = (x) => {
+        const flag = x.pct_change <= -20;
+        return tile(x.symbol, x.pct_change, 10, `₹${fmt(x.close)}`, flag,
+          `Traded value ₹${fmt((x.close * x.volume) / 1e7, 1)} Cr.` + (flag ? " A fall of 20% or more can be a split or bonus ex-date in unadjusted NSE prices; check corporate actions." : ""));
+      };
+      body.replaceChildren(el("div", { class: "heat-cols" },
+        el("div", null, el("h3", { class: "up" }, `Top gainers (${gs.length})`), gs.length ? el("div", { class: "heat-grid" }, gs.map(mk)) : el("div", { class: "empty" }, "None above the liquidity floor.")),
+        el("div", null, el("h3", { class: "down" }, `Top losers (${ls.length})`), ls.length ? el("div", { class: "heat-grid" }, ls.map(mk)) : el("div", { class: "empty" }, "None above the liquidity floor."))));
+      src.textContent = `Official NSE bhavcopy via your NSE connector · session of ${niceDate(h.date)} · fetched ${when(h.fetched_at)} · % change against the previous close, unadjusted · the 50 biggest moves each way, then filtered by traded value. Dashed tiles: check for a corporate action. Not recommendations.`;
+      return;
+    }
+    // Watchlist view: returns over the chosen period from the bars already loaded.
+    const periods = { "1D": [1, 4], "1W": [5, 8], "1M": [21, 15], "3M": [63, 25] };
+    ctr.replaceChildren(el("div", { class: "tabs", role: "group", "aria-label": "Period" },
+      Object.keys(periods).map((k) => el("button", { class: "tab", type: "button", "aria-pressed": String(H.period === k), onclick: () => { H.period = k; renderHeat(); } }, k))), msg || "");
+    const [k, cap] = periods[H.period];
+    const items = S.watchlist.map((sym) => {
+      const a = analyse(sym);
+      if (!a || a.bars.length <= k) return null;
+      const c = a.bars.map((b) => b.close);
+      return { sym, chg: (c.at(-1) / c.at(-1 - k) - 1) * 100, close: c.at(-1), date: a.bars.at(-1).date };
+    }).filter(Boolean).sort((x, y) => y.chg - x.chg);
+    body.replaceChildren(items.length ? el("div", { class: "heat-grid" }, items.map((x) => tile(x.sym, x.chg, cap, `₹${fmt(x.close)}`, false, `Close of ${x.date}.`))) :
+      el("div", { class: "empty" }, "No watchlist data yet. Press Refresh to load it."));
+    src.textContent = `${L.SOURCE_TAPETIDE} · close-to-close change over the last ${k} session${k > 1 ? "s" : ""}, split and bonus adjusted · ${L.CALCULATED}. Best at the top left, worst at the bottom right.`;
+  }
+  $("heat-refresh").addEventListener("click", () => refreshHeat(null, null));
+
   // ---------------------------------------------------------- watchlist editing
   $("watch-form").addEventListener("submit", (ev) => {
     ev.preventDefault();
@@ -855,7 +996,7 @@ footer .disc { color: var(--ink); }
   $("refresh").addEventListener("click", refresh);
 
   // ---------------------------------------------------------- boot
-  function renderAll() { renderTop(); renderBanner(); renderLog(); renderNifty(); renderUniverse(); renderDetail(); }
+  function renderAll() { renderTop(); renderBanner(); renderLog(); renderNifty(); renderHeat(); renderUniverse(); renderDetail(); }
   $("disclaimer").textContent = L.DISCLAIMER + " No order is ever placed from this page.";
   $("catalogue").replaceChildren(...Object.entries(N.CATALOGUE).map(([k, on]) => el("span", { class: on ? "" : "off", title: on ? "Implemented" : "Not built yet" }, k)));
   renderAll();
