@@ -49,11 +49,61 @@ closes beyond it, and volume at least 1.5x its 20-day average. A close back
 inside within five bars marks a false breakout. All thresholds are versioned
 constants. No pattern has a reliability figure until pattern backtests exist.
 
+## Trading desk: 11 tools
+
+`nse_research/desk/` adds eleven tools on top of the engine above. They run
+from the command line and print JSON:
+
+```bash
+python -m nse_research.desk -h
+```
+
+| Tool | Command | What it does |
+| --- | --- | --- |
+| Chart scanner | `scan --universe nse-all --limit 500` | Runs every pattern and setup over many symbols and ranks them. Adds triangles, wedges, flags, pennants, gaps, NR4/NR7, inside bars and pipe bottoms from the chart-pattern reference |
+| News monitor | `news AAPL RELIANCE.NS --new-only` | Google News and Yahoo Finance RSS, tagged by event (earnings, rating, legal, offering...) with a keyword tone |
+| Entry timer | `entry RELIANCE` | RULES MET, WAIT or AVOID on the last close, with the checks and the buy-stop levels to watch |
+| Exit planner | `exit RELIANCE --entry 1200` | Initial stop, 1R/2R/3R targets, trailing stop, time stop and alternative stop levels |
+| Time machine | `timemachine RELIANCE --html tm.html` | Replays the entry and exit rules on history, then 10,000 resampled years and 10,000 simulated "buy today" paths. The HTML report animates the replay |
+| Risk manager | `risk AAPL --entry 190 --stop 182 --target 210` | Position size from the stop (1% risk default) and a check against portfolio limits |
+| Budget manager | `budget init 10000 --currency USD` | Capital, cash reserve, monthly loss limit; pauses buys when the limit is hit |
+| Order execution | `order buy AAPL 10 --stop 182 --target 210` | Paper broker by default, with brackets, limits and stops. Live orders only through Alpaca with `DESK_ALLOW_LIVE=1`, `--live` and a typed confirmation |
+| Price alerts | `alert add AAPL above 200`, `alert check` | Price, % move, SMA cross, entry-ready and stop-near rules; free push via ntfy, a webhook or Telegram |
+| Earnings analyst | `earnings AAPL` | Quarterly revenue, EPS and net income with year-on-year change from SEC EDGAR, plus the stock's typical move around reports |
+| Pelosi tracker | `congress fetch --member pelosi`, `congress summary` | US House trade disclosures from the House Clerk, parsed from the PTR PDFs; Senate trades by CSV import |
+
+Prices come from the local store, Yahoo Finance (`AAPL`, `RELIANCE.NS`),
+Stooq, or a CSV file such as a TradingView chart export (`--source`).
+
+**TradingView.** `python -m nse_research.desk tradingview --out desk.pine`
+writes the same entry and exit rules as a Pine Script strategy. Paste it into
+the Pine Editor to see the signals and replay them in the Strategy Tester. Its
+alerts can POST to `/api/desk/tradingview` (set `DESK_WEBHOOK_SECRET`; webhooks
+need a paid TradingView plan and a public URL). Received alerts are logged and
+forwarded to your notifications; they never place orders.
+
+**Dashboard routes.** `/desk/timemachine/RELIANCE` opens the time machine
+report for a stored symbol, and `/api/desk/scan`, `/api/desk/entry/{symbol}`
+and `/api/desk/exit/{symbol}` return JSON.
+
+**Settings** (environment or `.env`): `DESK_NTFY_TOPIC`, `DESK_WEBHOOK_URL`,
+`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` for alerts; `DESK_SEC_CONTACT`
+("Name email", which the SEC asks for); `ALPACA_KEY_ID`, `ALPACA_SECRET_KEY`
+and `DESK_ALLOW_LIVE` for Alpaca. Desk state (budget, paper ledger, alerts,
+parsed disclosures) lives in `data/desk/`, which is git-ignored.
+
+**What the numbers mean.** The time machine estimates odds from this stock's
+past. A rule that worked before can stop working, and the simulated paths
+assume the future moves like the past. The "drift removed" run shows the odds
+if the past trend does not repeat. A good result is a reason to paper trade
+first, not a promise of profit. Congress disclosures arrive up to 45 days
+after the trade.
+
 ## Not built yet
 
-Triangles, wedges, flags, pennants, cup and handle, gaps, narrow-range bars and
-pipe bottoms; market regime and sector analysis; news and events; backtesting;
-strategy validation; paper portfolio; alerts; research log. Until regime, news
+Cup and handle; market regime and sector analysis; strategy validation
+across many symbols at once; research log. Earnings for NSE companies need
+the Tapetide connector (the Claude skill covers this). Until regime, news
 and validated strategies exist, every stock shows its research classification
 as not available, rather than a guessed label.
 
